@@ -12,7 +12,7 @@ export function SiteHeader() {
     <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
       <div className="container flex h-16 items-center">
         <Link href="/" className="mr-6 flex items-center space-x-2">
-          <Image src="/placeholder-logo.png" alt="AgriBeta Logo" width={120} height={40} className="h-10 w-auto" />
+          <Image src="/favicon.ico" alt="AgriBeta Logo" width={32} height={32} className="h-10 w-auto" />
         </Link>
         <MainNav />
         <Suspense fallback={null}>
