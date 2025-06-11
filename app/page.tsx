@@ -281,36 +281,36 @@ export default function Home() {
             OUR VALUES
           </h2>
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-12 w-full max-w-7xl">
-            <div className="flex flex-col items-center space-y-4 group">
-              <Gem className="h-16 w-16 text-agribeta-green transition-transform duration-300 group-hover:scale-110 group-hover:drop-shadow-lg" />
+            <Card className="flex flex-col items-center space-y-4 group p-4 bg-transparent border-none shadow-none transition-all duration-300 hover:bg-gray-800 hover:shadow-lg">
+              <Gem className="h-16 w-16 text-agribeta-green transition-transform duration-300 group-hover:scale-110 group-hover:text-agribeta-orange" />
               <p className="text-xl font-semibold text-agribeta-green transition-colors duration-300 group-hover:text-agribeta-orange">
                 Integrity
               </p>
-            </div>
-            <div className="flex flex-col items-center space-y-4 group">
-              <Leaf className="h-16 w-16 text-agribeta-green transition-transform duration-300 group-hover:scale-110 group-hover:drop-shadow-lg" />
+            </Card>
+            <Card className="flex flex-col items-center space-y-4 group p-4 bg-transparent border-none shadow-none transition-all duration-300 hover:bg-gray-800 hover:shadow-lg">
+              <Leaf className="h-16 w-16 text-agribeta-green transition-transform duration-300 group-hover:scale-110 group-hover:text-agribeta-orange" />
               <p className="text-xl font-semibold text-agribeta-green transition-colors duration-300 group-hover:text-agribeta-orange">
                 Resilience
               </p>
-            </div>
-            <div className="flex flex-col items-center space-y-4 group">
-              <Lightbulb className="h-16 w-16 text-agribeta-green transition-transform duration-300 group-hover:scale-110 group-hover:drop-shadow-lg" />
+            </Card>
+            <Card className="flex flex-col items-center space-y-4 group p-4 bg-transparent border-none shadow-none transition-all duration-300 hover:bg-gray-800 hover:shadow-lg">
+              <Lightbulb className="h-16 w-16 text-agribeta-green transition-transform duration-300 group-hover:scale-110 group-hover:text-agribeta-orange" />
               <p className="text-xl font-semibold text-agribeta-green transition-colors duration-300 group-hover:text-agribeta-orange">
                 Clarity
               </p>
-            </div>
-            <div className="flex flex-col items-center space-y-4 group">
-              <Zap className="h-16 w-16 text-agribeta-green transition-transform duration-300 group-hover:scale-110 group-hover:drop-shadow-lg" />
+            </Card>
+            <Card className="flex flex-col items-center space-y-4 group p-4 bg-transparent border-none shadow-none transition-all duration-300 hover:bg-gray-800 hover:shadow-lg">
+              <Zap className="h-16 w-16 text-agribeta-green transition-transform duration-300 group-hover:scale-110 group-hover:text-agribeta-orange" />
               <p className="text-xl font-semibold text-agribeta-green transition-colors duration-300 group-hover:text-agribeta-orange">
                 Empowerment
               </p>
-            </div>
-            <div className="flex flex-col items-center space-y-4 group">
-              <Sparkles className="h-16 w-16 text-agribeta-green transition-transform duration-300 group-hover:scale-110 group-hover:drop-shadow-lg" />
+            </Card>
+            <Card className="flex flex-col items-center space-y-4 group p-4 bg-transparent border-none shadow-none transition-all duration-300 hover:bg-gray-800 hover:shadow-lg">
+              <Sparkles className="h-16 w-16 text-agribeta-green transition-transform duration-300 group-hover:scale-110 group-hover:text-agribeta-orange" />
               <p className="text-xl font-semibold text-agribeta-green transition-colors duration-300 group-hover:text-agribeta-orange">
                 Innovation
               </p>
-            </div>
+            </Card>
           </div>
         </div>
       </section>
