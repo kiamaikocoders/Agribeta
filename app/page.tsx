@@ -156,27 +156,27 @@ export default function Home() {
               BUILT FOR FARMERS. POWERED BY AI.
             </h2>
             <div className="mx-auto grid max-w-5xl grid-cols-1 gap-8 md:grid-cols-3 mt-8">
-              <div className="flex flex-col items-center space-y-3 p-4">
-                <TrendingUp className="h-12 w-12 text-agribeta-orange" />
-                <h3 className="text-xl font-bold text-white">Predict</h3>
-                <p className="text-gray-200 text-center">
+              <Card className="flex flex-col items-center space-y-3 p-4 bg-transparent border-none shadow-none group transition-all duration-300 hover:bg-agribeta-green/80 hover:shadow-lg">
+                <TrendingUp className="h-12 w-12 text-agribeta-orange transition-colors duration-300 group-hover:text-white group-hover:scale-110" />
+                <h3 className="text-xl font-bold text-white transition-colors duration-300 group-hover:text-agribeta-orange">Predict</h3>
+                <p className="text-gray-200 text-center transition-colors duration-300 group-hover:text-white">
                   Early warning systems for pests
                 </p>
-                  </div>
-              <div className="flex flex-col items-center space-y-3 p-4">
-                <Target className="h-12 w-12 text-agribeta-orange" />
-                <h3 className="text-xl font-bold text-white">Pinpoint</h3>
-                <p className="text-gray-200 text-center">
+              </Card>
+              <Card className="flex flex-col items-center space-y-3 p-4 bg-transparent border-none shadow-none group transition-all duration-300 hover:bg-agribeta-green/80 hover:shadow-lg">
+                <Target className="h-12 w-12 text-agribeta-orange transition-colors duration-300 group-hover:text-white group-hover:scale-110" />
+                <h3 className="text-xl font-bold text-white transition-colors duration-300 group-hover:text-agribeta-orange">Pinpoint</h3>
+                <p className="text-gray-200 text-center transition-colors duration-300 group-hover:text-white">
                   AI-based detection using imaging
                 </p>
-                </div>
-              <div className="flex flex-col items-center space-y-3 p-4">
-                <ShieldCheck className="h-12 w-12 text-agribeta-orange" />
-                <h3 className="text-xl font-bold text-white">Protect</h3>
-                <p className="text-gray-200 text-center">
+              </Card>
+              <Card className="flex flex-col items-center space-y-3 p-4 bg-transparent border-none shadow-none group transition-all duration-300 hover:bg-agribeta-green/80 hover:shadow-lg">
+                <ShieldCheck className="h-12 w-12 text-agribeta-orange transition-colors duration-300 group-hover:text-white group-hover:scale-110" />
+                <h3 className="text-xl font-bold text-white transition-colors duration-300 group-hover:text-agribeta-orange">Protect</h3>
+                <p className="text-gray-200 text-center transition-colors duration-300 group-hover:text-white">
                   Timely. Actionable Interventions
                 </p>
-              </div>
+              </Card>
             </div>
           </div>
         </div>
