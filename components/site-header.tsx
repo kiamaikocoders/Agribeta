@@ -5,6 +5,7 @@ import { MainNav } from "@/components/main-nav"
 import { ThemeToggle } from "@/components/theme-toggle"
 import { buttonVariants } from "@/components/ui/button"
 import { Sun } from "lucide-react"
+import { Suspense } from "react"
 
 export function SiteHeader() {
   return (
@@ -14,10 +15,14 @@ export function SiteHeader() {
           <Image src="/placeholder-logo.png" alt="AgriBeta Logo" width={120} height={40} className="h-10 w-auto" />
         </Link>
         <MainNav />
-        <MobileNav />
+        <Suspense fallback={null}>
+          <MobileNav />
+        </Suspense>
         <div className="flex flex-1 items-center justify-end space-x-4">
           <nav className="flex items-center space-x-2">
-            <ThemeToggle />
+            <Suspense fallback={null}>
+              <ThemeToggle />
+            </Suspense>
             <Link href="/dashboard" className={buttonVariants({ variant: "ghost", size: "default" })}>
               <Sun className="mr-2 h-4 w-4" />
               Dashboard
