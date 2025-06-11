@@ -2,7 +2,7 @@ import Link from "next/link"
 import Image from "next/image"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
-import { TreesIcon as Plant, Shield, Users, Camera, Upload, Leaf, Handshake, BarChart, TrendingUp, Target, ShieldCheck, Gem, Lightbulb, Zap, Waypoints, Sparkles, BookOpen, ShoppingCart, LineChart } from "lucide-react"
+import { TreesIcon as Plant, Shield, Users, Camera, Upload, Leaf, Handshake, BarChart, TrendingUp, Target, ShieldCheck, Gem, Lightbulb, Zap, Waypoints, Sparkles, BookOpen, ShoppingCart, LineChart, Diamond } from "lucide-react"
 
 export default function Home() {
   return (
@@ -275,33 +275,41 @@ export default function Home() {
       </section>
 
       {/* OUR VALUES Section */}
-      <section className="w-full py-12 md:py-24 lg:py-32 bg-gray-50 dark:bg-gray-900">
-        <div className="container px-4 md:px-6">
-          <div className="flex flex-col items-center justify-center space-y-6 text-center">
-              <h2 className="text-3xl font-bold tracking-tighter sm:text-4xl md:text-5xl text-agribeta-orange">
-              OUR VALUES
-              </h2>
-            <div className="mx-auto grid max-w-6xl grid-cols-1 gap-8 sm:grid-cols-2 lg:grid-cols-5 mt-8">
-              <div className="flex flex-col items-center space-y-3 p-4">
-                <Gem className="h-12 w-12 text-agribeta-green" />
-                <h3 className="text-xl font-bold text-agribeta-green">Integrity</h3>
-              </div>
-              <div className="flex flex-col items-center space-y-3 p-4">
-                <Leaf className="h-12 w-12 text-agribeta-green" />
-                <h3 className="text-xl font-bold text-agribeta-green">Resilience</h3>
-              </div>
-              <div className="flex flex-col items-center space-y-3 p-4">
-                <Lightbulb className="h-12 w-12 text-agribeta-green" />
-                <h3 className="text-xl font-bold text-agribeta-green">Clarity</h3>
-              </div>
-              <div className="flex flex-col items-center space-y-3 p-4">
-                <Zap className="h-12 w-12 text-agribeta-green" />
-                <h3 className="text-xl font-bold text-agribeta-green">Empowerment</h3>
-              </div>
-              <div className="flex flex-col items-center space-y-3 p-4">
-                <Sparkles className="h-12 w-12 text-agribeta-green" />
-                <h3 className="text-xl font-bold text-agribeta-green">Innovation</h3>
-              </div>
+      <section className="w-full py-24 md:py-32 lg:py-40 bg-gray-900 text-white">
+        <div className="container px-4 md:px-6 flex flex-col items-center justify-center text-center space-y-12">
+          <h2 className="text-5xl font-extrabold tracking-tighter text-agribeta-orange drop-shadow-lg">
+            OUR VALUES
+          </h2>
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-12 w-full max-w-7xl">
+            <div className="flex flex-col items-center space-y-4 group">
+              <Gem className="h-16 w-16 text-agribeta-green transition-transform duration-300 group-hover:scale-110 group-hover:drop-shadow-lg" />
+              <p className="text-xl font-semibold text-agribeta-green transition-colors duration-300 group-hover:text-agribeta-orange">
+                Integrity
+              </p>
+            </div>
+            <div className="flex flex-col items-center space-y-4 group">
+              <Leaf className="h-16 w-16 text-agribeta-green transition-transform duration-300 group-hover:scale-110 group-hover:drop-shadow-lg" />
+              <p className="text-xl font-semibold text-agribeta-green transition-colors duration-300 group-hover:text-agribeta-orange">
+                Resilience
+              </p>
+            </div>
+            <div className="flex flex-col items-center space-y-4 group">
+              <Lightbulb className="h-16 w-16 text-agribeta-green transition-transform duration-300 group-hover:scale-110 group-hover:drop-shadow-lg" />
+              <p className="text-xl font-semibold text-agribeta-green transition-colors duration-300 group-hover:text-agribeta-orange">
+                Clarity
+              </p>
+            </div>
+            <div className="flex flex-col items-center space-y-4 group">
+              <Zap className="h-16 w-16 text-agribeta-green transition-transform duration-300 group-hover:scale-110 group-hover:drop-shadow-lg" />
+              <p className="text-xl font-semibold text-agribeta-green transition-colors duration-300 group-hover:text-agribeta-orange">
+                Empowerment
+              </p>
+            </div>
+            <div className="flex flex-col items-center space-y-4 group">
+              <Sparkles className="h-16 w-16 text-agribeta-green transition-transform duration-300 group-hover:scale-110 group-hover:drop-shadow-lg" />
+              <p className="text-xl font-semibold text-agribeta-green transition-colors duration-300 group-hover:text-agribeta-orange">
+                Innovation
+              </p>
             </div>
           </div>
         </div>
