@@ -7,6 +7,7 @@ import { FCMDocumentViewer } from "@/components/fcm/fcm-document-viewer"
 import { FCMPredictiveAnalytics } from "@/components/fcm/fcm-predictive-analytics"
 import { FCMComplianceReporting } from "@/components/fcm/fcm-compliance-reporting"
 import Image from "next/image"
+import { Suspense } from "react"
 
 export default function FCMManagementPage() {
   return (
@@ -54,7 +55,9 @@ export default function FCMManagementPage() {
           </TabsContent>
 
           <TabsContent value="document" className="p-6 bg-card rounded-lg border shadow-sm">
-            <FCMDocumentViewer />
+            <Suspense fallback={null}>
+              <FCMDocumentViewer />
+            </Suspense>
           </TabsContent>
 
           <TabsContent value="analytics" className="p-6 bg-card rounded-lg border shadow-sm">
