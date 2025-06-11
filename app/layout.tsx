@@ -34,7 +34,9 @@ export default function RootLayout({
               <SiteFooter />
             </div>
             <Toaster />
-            <Analytics />
+            <Suspense fallback={null}>
+              <Analytics />
+            </Suspense>
           </DiagnosisHistoryProvider>
         </ThemeProvider>
       </body>
