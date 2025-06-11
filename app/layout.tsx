@@ -1,7 +1,7 @@
 import type React from "react"
 import { ThemeProvider } from "@/components/theme-provider"
 import { Toaster } from "@/components/ui/toaster"
-import { Analytics } from "@/components/analytics"
+import { AnalyticsWrapper } from "@/components/analytics-wrapper"
 import { SiteHeader } from "@/components/site-header"
 import { SiteFooter } from "@/components/site-footer"
 import { DiagnosisHistoryProvider } from "@/contexts/diagnosis-history-context"
@@ -39,7 +39,7 @@ export default function RootLayout({
                   <Toaster />
                 </Suspense>
                 <Suspense fallback={null}>
-                  <Analytics />
+                  <AnalyticsWrapper />
                 </Suspense>
               </DiagnosisHistoryProvider>
             </Suspense>
