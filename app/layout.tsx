@@ -34,7 +34,9 @@ export default function RootLayout({
                 </Suspense>
                 <SiteFooter />
               </div>
-              <Toaster />
+              <Suspense fallback={null}>
+                <Toaster />
+              </Suspense>
               <Suspense fallback={null}>
                 <Analytics />
               </Suspense>
