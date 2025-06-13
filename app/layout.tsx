@@ -25,25 +25,25 @@ export default function RootLayout({
     <html lang="en" suppressHydrationWarning>
       <body className={cn("min-h-screen bg-background font-sans antialiased")}>
         <Suspense fallback={null}>
-          <ThemeProvider attribute="class" defaultTheme="light">
+        <ThemeProvider attribute="class" defaultTheme="light">
             <Suspense fallback={null}>
-              <DiagnosisHistoryProvider>
-                <div className="relative flex min-h-screen flex-col">
-                  <SiteHeader />
-                  <Suspense>
-                    <div className="flex-1">{children}</div>
-                  </Suspense>
-                  <SiteFooter />
-                </div>
+          <DiagnosisHistoryProvider>
+            <div className="relative flex min-h-screen flex-col">
+              <SiteHeader />
+              <Suspense>
+                <div className="flex-1">{children}</div>
+              </Suspense>
+              <SiteFooter />
+            </div>
                 <Suspense fallback={null}>
-                  <Toaster />
+            <Toaster />
                 </Suspense>
                 <Suspense fallback={null}>
                   <AnalyticsWrapper />
                 </Suspense>
-              </DiagnosisHistoryProvider>
+          </DiagnosisHistoryProvider>
             </Suspense>
-          </ThemeProvider>
+        </ThemeProvider>
         </Suspense>
       </body>
     </html>

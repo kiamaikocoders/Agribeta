@@ -1,7 +1,9 @@
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { OverviewDashboard } from "@/components/analytics/overview-dashboard"
-import { FCMAnalytics } from "@/components/analytics/fcm-analytics"
-import { DiagnosisAnalytics } from "@/components/analytics/diagnosis-analytics"
+// Update the import path below if your Tabs components are located elsewhere
+// Update the import path below to the correct location of your Tabs components
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "../../components/ui/tabs"
+import { OverviewDashboard } from "../../components/analytics/overview-dashboard"
+import { FCMAnalytics } from "../../components/analytics/fcm-analytics"
+import { DiagnosisAnalytics } from "../../components/analytics/diagnosis-analytics"
 import Image from "next/image"
 
 export default function AnalyticsPage() {

@@ -56,7 +56,7 @@ export default function FCMManagementPage() {
 
           <TabsContent value="document" className="p-6 bg-card rounded-lg border shadow-sm">
             <Suspense fallback={null}>
-              <FCMDocumentViewer />
+            <FCMDocumentViewer />
             </Suspense>
           </TabsContent>
 
