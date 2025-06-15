@@ -71,9 +71,10 @@ const shopItems: ShopItem[] = [
 export default function ShopPage() {
   const [selectedCategory, setSelectedCategory] = useState<string>('all');
 
+  // Filter to only show equipment and tools categories
   const filteredItems = selectedCategory === 'all'
-    ? shopItems
-    : shopItems.filter(item => item.category === selectedCategory);
+    ? shopItems.filter(item => item.category === 'equipment' || item.category === 'tools')
+    : shopItems.filter(item => item.category === selectedCategory && (item.category === 'equipment' || item.category === 'tools'));
 
   return (
     <div className="min-h-screen bg-gray-50 py-12">
@@ -95,26 +96,7 @@ export default function ShopPage() {
           >
             All
           </button>
-          <button
-            onClick={() => setSelectedCategory('fertilizers')}
-            className={`px-4 py-2 rounded-full ${
-              selectedCategory === 'fertilizers'
-                ? 'bg-green-600 text-white'
-                : 'bg-white text-gray-700 hover:bg-gray-100'
-            }`}
-          >
-            Fertilizers
-          </button>
-          <button
-            onClick={() => setSelectedCategory('seeds')}
-            className={`px-4 py-2 rounded-full ${
-              selectedCategory === 'seeds'
-                ? 'bg-green-600 text-white'
-                : 'bg-white text-gray-700 hover:bg-gray-100'
-            }`}
-          >
-            Seeds
-          </button>
+          {/* Removed Fertilizers and Seeds buttons */}
         </div>
 
         {/* Shop Items Grid */}
@@ -126,4 +108,4 @@ export default function ShopPage() {
       </div>
     </div>
   );
-} 
+}
