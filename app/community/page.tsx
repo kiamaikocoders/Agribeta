@@ -20,7 +20,7 @@ export default function CommunityPage() {
 
       <div className="relative z-10 container py-8">
         <div className="mb-8">
-          <h1 className="text-4xl font-bold text-agribeta-green mb-2">Community Hub</h1>
+          <h1 className="text-4xl font-bold text-agribeta-green mb-2">Agribeta Network</h1>
           <p className="text-lg text-muted-foreground">Connect with other growers, access resources, and get support</p>
         </div>
 

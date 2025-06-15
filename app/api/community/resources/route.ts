@@ -29,8 +29,8 @@ export async function GET(req: NextRequest) {
           },
           {
             id: 2,
-            title: "FCM Management Protocol",
-            description: "Official protocol for FCM management in roses",
+            title: "Agribeta Protect Protocol",
+            description: "Official protocol for Agribeta Protect in roses",
             content:
               "Detailed protocol for implementing FCM management practices in rose production to meet EU regulations.",
             fileType: "PDF",
@@ -73,7 +73,7 @@ export async function GET(req: NextRequest) {
           },
           {
             id: 6,
-            title: "Disease Diagnosis Demo",
+            title: "Agribeta Pinpoint Demo",
             description: "Using AgriBeta for accurate disease diagnosis",
             duration: "8:15",
             uploadDate: "2023-04-22T16:45:00Z",

@@ -31,8 +31,8 @@ export default function AnalyticsPage() {
         <Tabs defaultValue="overview" className="w-full">
           <TabsList className="grid grid-cols-3 mb-8">
             <TabsTrigger value="overview">Overview</TabsTrigger>
-            <TabsTrigger value="fcm">FCM Analytics</TabsTrigger>
-            <TabsTrigger value="diagnosis">Diagnosis Analytics</TabsTrigger>
+            <TabsTrigger value="fcm">Agribeta Protect Analytics</TabsTrigger>
+            <TabsTrigger value="diagnosis">Agribeta Pinpoint Analytics</TabsTrigger>
           </TabsList>
 
           <TabsContent value="overview" className="p-6 bg-card/90 backdrop-blur-sm rounded-lg border shadow-sm">

@@ -25,9 +25,9 @@ export default function FCMManagementPage() {
 
       <div className="relative z-10 container py-8">
         <div className="mb-8">
-          <h1 className="text-4xl font-bold text-agribeta-green mb-2">FCM Management System</h1>
+          <h1 className="text-4xl font-bold text-agribeta-green mb-2">Agribeta Protect System</h1>
           <p className="text-lg text-muted-foreground">
-            Comprehensive tools for managing False Codling Moth in rose cultivation
+            Comprehensive tools for managing Agribeta Protect in rose cultivation
           </p>
         </div>
 

@@ -12,7 +12,7 @@ export async function POST(req: NextRequest) {
     // For this example, we'll use Groq to simulate a diagnosis
 
     const prompt = `
-      You are an expert agricultural AI assistant specializing in avocado disease diagnosis.
+      You are an expert agricultural AI assistant specializing in Agribeta Pinpoint.
       
       Analyze the following image of an avocado plant and provide a diagnosis with the following information:
       1. The most likely disease affecting the plant

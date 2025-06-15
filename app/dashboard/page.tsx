@@ -5,13 +5,13 @@ import Link from "next/link"
 export default function DashboardPage() {
   const modules = [
     {
-      title: "Avocado Disease Diagnosis",
+      title: "Agribeta Pinpoint",
       description: "Upload images to diagnose avocado plant diseases",
       link: "/diagnosis",
       icon: "🥑",
     },
     {
-      title: "FCM Management",
+      title: "Agribeta Protect",
       description: "Monitor and manage False Codling Moth in roses",
       link: "/fcm-management",
       icon: "🌹",
@@ -23,7 +23,7 @@ export default function DashboardPage() {
       icon: "📊",
     },
     {
-      title: "Community Hub",
+      title: "Agribeta Network",
       description: "Connect with other growers and access resources",
       link: "/community",
       icon: "👥",

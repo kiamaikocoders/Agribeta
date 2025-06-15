@@ -12,7 +12,7 @@ import { Suspense } from "react"
 export const metadata = {
   title: "AgriBeta - Agricultural Management Platform",
   description:
-    "Comprehensive agricultural management platform for avocado disease diagnosis and FCM management in roses",
+    "Comprehensive agricultural management platform for Agribeta Pinpoint and Agribeta Protect in roses",
     generator: 'v0.dev'
 }
 

@@ -17,17 +17,17 @@ export function MainNav({ className, ...props }: React.HTMLAttributes<HTMLElemen
     },
     {
       href: "/diagnosis",
-      label: "Disease Diagnosis",
+      label: "Agribeta Pinpoint",
       icon: <Plant className="mr-2 h-4 w-4" />,
     },
     {
       href: "/fcm-management",
-      label: "FCM Management",
+      label: "Agribeta Protect",
       icon: <Shield className="mr-2 h-4 w-4" />,
     },
     {
       href: "/community",
-      label: "Community",
+      label: "Agribeta Network",
       icon: <Users className="mr-2 h-4 w-4" />,
     },
     {
