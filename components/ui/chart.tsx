@@ -363,3 +363,97 @@ export {
   ChartLegendContent,
   ChartStyle,
 }
+
+// Lightweight wrapper used by admin analytics pages
+// Accepts series in the shape: [{ name: string, data: [{ x: any, y: number }] }]
+export function Chart({
+  type,
+  series,
+  height = 300,
+}: {
+  type: "line" | "area"
+  series: Array<{ name: string; data: Array<{ x: any; y: number }> }>
+  height?: number
+}) {
+  // Build a unified data table keyed by x
+  const dataMap = new Map<any, Record<string, unknown>>()
+  for (const s of series) {
+    for (const point of s.data) {
+      const existing = dataMap.get(point.x) || { x: point.x }
+      ;(existing as any)[s.name] = point.y
+      dataMap.set(point.x, existing)
+    }
+  }
+
+  // Try to sort by date or fallback to string compare
+  const data = Array.from(dataMap.values()).sort((a, b) => {
+    const ax = (a as any).x
+    const bx = (b as any).x
+    const ad = new Date(ax as any)
+    const bd = new Date(bx as any)
+    if (!isNaN(ad.getTime()) && !isNaN(bd.getTime())) {
+      return ad.getTime() - bd.getTime()
+    }
+    return String(ax).localeCompare(String(bx))
+  })
+
+  // Provide a simple color config so ChartContainer can expose CSS vars
+  const defaultPalette = [
+    "#22c55e",
+    "#3b82f6",
+    "#f97316",
+    "#a78bfa",
+    "#ef4444",
+  ]
+
+  const config: ChartConfig = series.reduce((acc, s, i) => {
+    acc[s.name] = { label: s.name, color: defaultPalette[i % defaultPalette.length] }
+    return acc
+  }, {} as ChartConfig)
+
+  const seriesNames = series.map((s) => s.name)
+
+  return (
+    <ChartContainer config={config} style={{ height }}>
+      {type === "line" ? (
+        <RechartsPrimitive.LineChart data={data} margin={{ left: 12, right: 12 }}>
+          <RechartsPrimitive.CartesianGrid strokeDasharray="3 3" />
+          <RechartsPrimitive.XAxis dataKey="x" tickLine={false} axisLine={false} />
+          <RechartsPrimitive.YAxis tickLine={false} axisLine={false} width={40} />
+          <ChartTooltip content={<ChartTooltipContent />} />
+          <RechartsPrimitive.Legend />
+          {seriesNames.map((name) => (
+            <RechartsPrimitive.Line
+              key={name}
+              type="monotone"
+              dataKey={name}
+              stroke={`var(--color-${name})`}
+              dot={false}
+              strokeWidth={2}
+              isAnimationActive={false}
+            />
+          ))}
+        </RechartsPrimitive.LineChart>
+      ) : (
+        <RechartsPrimitive.AreaChart data={data} margin={{ left: 12, right: 12 }}>
+          <RechartsPrimitive.CartesianGrid strokeDasharray="3 3" />
+          <RechartsPrimitive.XAxis dataKey="x" tickLine={false} axisLine={false} />
+          <RechartsPrimitive.YAxis tickLine={false} axisLine={false} width={40} />
+          <ChartTooltip content={<ChartTooltipContent />} />
+          <RechartsPrimitive.Legend />
+          {seriesNames.map((name) => (
+            <RechartsPrimitive.Area
+              key={name}
+              type="monotone"
+              dataKey={name}
+              stroke={`var(--color-${name})`}
+              fill={`var(--color-${name})`}
+              fillOpacity={0.2}
+              isAnimationActive={false}
+            />
+          ))}
+        </RechartsPrimitive.AreaChart>
+      )}
+    </ChartContainer>
+  )
+}
