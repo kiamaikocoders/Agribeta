@@ -5,6 +5,7 @@ import { AnalyticsWrapper } from "@/components/analytics-wrapper"
 import { SiteHeader } from "@/components/site-header"
 import { SiteFooter } from "@/components/site-footer"
 import { DiagnosisHistoryProvider } from "@/contexts/diagnosis-history-context"
+import { AuthProvider } from "@/contexts/auth-context"
 import { cn } from "@/lib/utils"
 import "@/app/globals.css"
 import { Suspense } from "react"
@@ -27,6 +28,7 @@ export default function RootLayout({
         <Suspense fallback={null}>
         <ThemeProvider attribute="class" defaultTheme="light">
             <Suspense fallback={null}>
+            <AuthProvider>
           <DiagnosisHistoryProvider>
             <div className="relative flex min-h-screen flex-col">
               <SiteHeader />
@@ -42,6 +44,7 @@ export default function RootLayout({
                   <AnalyticsWrapper />
                 </Suspense>
           </DiagnosisHistoryProvider>
+            </AuthProvider>
             </Suspense>
         </ThemeProvider>
         </Suspense>

@@ -1,6 +1,7 @@
 // Update the import path below if your Tabs components are located elsewhere
 // Update the import path below to the correct location of your Tabs components
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "../../components/ui/tabs"
+import { ProtectedRoute } from "../../components/auth/protected-route"
 import { OverviewDashboard } from "../../components/analytics/overview-dashboard"
 import { FCMAnalytics } from "../../components/analytics/fcm-analytics"
 import { DiagnosisAnalytics } from "../../components/analytics/diagnosis-analytics"
@@ -8,6 +9,7 @@ import Image from "next/image"
 
 export default function AnalyticsPage() {
   return (
+    <ProtectedRoute>
     <div className="relative min-h-screen">
       {/* Background Image with Overlay */}
       <div className="absolute inset-0 z-0 overflow-hidden">
@@ -49,5 +51,6 @@ export default function AnalyticsPage() {
         </Tabs>
       </div>
     </div>
+    </ProtectedRoute>
   )
 }

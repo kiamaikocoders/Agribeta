@@ -1,4 +1,5 @@
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
+import { ProtectedRoute } from "@/components/auth/protected-route"
 import { FCMOverview } from "@/components/fcm/fcm-overview"
 import { FCMMonitoring } from "@/components/fcm/fcm-monitoring"
 import { FCMCompliance } from "@/components/fcm/fcm-compliance"
@@ -11,6 +12,7 @@ import { Suspense } from "react"
 
 export default function FCMManagementPage() {
   return (
+    <ProtectedRoute>
     <div className="relative min-h-screen">
       {/* Background Image with Overlay */}
       <div className="absolute inset-0 z-0 overflow-hidden">
@@ -74,5 +76,6 @@ export default function FCMManagementPage() {
         </Tabs>
       </div>
     </div>
+    </ProtectedRoute>
   )
 }

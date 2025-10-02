@@ -1,111 +1,122 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import ShopCard from '@/components/shop/ShopCard';
 import { ShopItem } from '@/types/shop';
-
-// Temporary data - we'll move this to a separate file later
-const shopItems: ShopItem[] = [
-  {
-    id: 1,
-    name: 'Digital Pheromone Trap',
-    description: 'Advanced digital trap for pest monitoring',
-    price: 129.99,
-    image: '/shop-items/digital-trap.jpg',
-    category: 'equipment',
-    stock: 50,
-    rating: 4.7,
-  },
-  {
-    id: 2,
-    name: 'Handheld Microscope',
-    description: 'Portable microscope for on-field diagnosis',
-    price: 79.99,
-    image: '/shop-items/handheld-microscope.jpg',
-    category: 'tools',
-    stock: 75,
-    rating: 4.6,
-  },
-  {
-    id: 3,
-    name: 'LCD Microscope',
-    description: 'High-resolution LCD microscope for detailed analysis',
-    price: 199.99,
-    image: '/shop-items/lcd-microscope.jpg',
-    category: 'tools',
-    stock: 30,
-    rating: 4.9,
-  },
-  {
-    id: 4,
-    name: 'Raspberry Pi 3',
-    description: 'Mini-computer for various agricultural automation projects',
-    price: 35.00,
-    image: '/shop-items/raspberry- pi-3.jpg',
-    category: 'equipment',
-    stock: 120,
-    rating: 4.4,
-  },
-  {
-    id: 5,
-    name: 'Weather Monitoring Station',
-    description: 'Real-time weather data for optimized farming decisions',
-    price: 249.99,
-    image: '/shop-items/weather-station.jpg',
-    category: 'equipment',
-    stock: 20,
-    rating: 4.8,
-  },
-  {
-    id: 6,
-    name: 'Pheromone Trap Installation Kit',
-    description: 'Complete kit for easy installation of pheromone traps',
-    price: 49.99,
-    image: '/shop-items/trap-installation.jpg',
-    category: 'tools',
-    stock: 80,
-    rating: 4.3,
-  },
-];
+import { supabase } from '@/lib/supabaseClient';
+import { ProtectedRoute } from '@/components/auth/protected-route';
 
 export default function ShopPage() {
   const [selectedCategory, setSelectedCategory] = useState<string>('all');
+  const [shopItems, setShopItems] = useState<ShopItem[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
-  // Filter to only show equipment and tools categories
+  useEffect(() => {
+    const fetchShopItems = async () => {
+      setLoading(true);
+      try {
+        console.log('Fetching shop items...');
+        const { data, error } = await supabase.from('shop_items').select('*');
+        console.log('Shop items response:', { data, error });
+        
+        if (error) {
+          console.error('Error fetching shop items:', error);
+          setError(`Database error: ${error.message}`);
+        } else if (data) {
+          console.log('Shop items loaded:', data.length, 'items');
+          setShopItems(data);
+          setError(null);
+        } else {
+          console.log('No data returned from shop_items table');
+          setError('No shop items found in database');
+        }
+      } catch (err) {
+        console.error('Exception fetching shop items:', err);
+        setError(`Connection error: ${err instanceof Error ? err.message : 'Unknown error'}`);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchShopItems();
+  }, []);
+
   const filteredItems = selectedCategory === 'all'
     ? shopItems.filter(item => item.category === 'equipment' || item.category === 'tools')
     : shopItems.filter(item => item.category === selectedCategory && (item.category === 'equipment' || item.category === 'tools'));
 
   return (
-    <div className="min-h-screen bg-gray-50 py-12">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="text-center mb-12">
-          <h1 className="text-4xl font-bold text-gray-900 mb-4">Farm Shop</h1>
-          <p className="text-lg text-gray-600">Quality products for your farming needs</p>
-        </div>
+    <ProtectedRoute>
+      <div className="min-h-screen bg-[#F8F9FA] py-12">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center mb-12">
+            <h1 className="text-4xl font-bold text-[#343A40] mb-4">Farm Shop</h1>
+            <p className="text-lg text-[#6C757D]">Quality products for your farming needs</p>
+          </div>
 
-        {/* Category Filter */}
-        <div className="flex justify-center space-x-4 mb-8">
-          <button
-            onClick={() => setSelectedCategory('all')}
-            className={`px-4 py-2 rounded-full ${
-              selectedCategory === 'all'
-                ? 'bg-green-600 text-white'
-                : 'bg-white text-gray-700 hover:bg-gray-100'
-            }`}
-          >
-            All
-          </button>
-          {/* Removed Fertilizers and Seeds buttons */}
-        </div>
+          {/* Category Filter */}
+          <div className="flex justify-center space-x-4 mb-8">
+            <button
+              onClick={() => setSelectedCategory('all')}
+              className={`px-4 py-2 rounded-full ${
+                selectedCategory === 'all'
+                  ? 'bg-[#28A745] text-white'
+                  : 'bg-white text-[#6C757D] hover:bg-gray-100'
+              }`}
+            >
+              All
+            </button>
+            {/* Removed Fertilizers and Seeds buttons */}
+          </div>
 
-        {/* Shop Items Grid */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-          {filteredItems.map((item) => (
-            <ShopCard key={item.id} item={item} />
-          ))}
+          {/* Shop Items Grid */}
+          {loading ? (
+            <div className="text-center py-12 text-lg text-[#6C757D]">Loading shop items...</div>
+          ) : error ? (
+            <div className="text-center py-12">
+              <div className="text-lg text-red-600 mb-4">Error loading shop items</div>
+              <div className="text-sm text-gray-600 mb-4">{error}</div>
+              <button 
+                onClick={() => window.location.reload()} 
+                className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
+              >
+                Retry
+              </button>
+            </div>
+          ) : (
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+              {filteredItems.map((item) => (
+                <div
+                  key={item.id}
+                  className="bg-white rounded-lg shadow-md p-6 flex flex-col items-center justify-between transform transition-all duration-300 hover:scale-105"
+                >
+                  <img
+                    src={item.image}
+                    alt={item.name}
+                    className="w-full h-48 object-cover rounded-md mb-4"
+                  />
+                  <div className="text-center mb-4">
+                    <h3 className="font-bold text-xl text-[#000428] mb-1">{item.name}</h3>
+                    <p className="text-[#6C757D] text-sm mb-2">{item.description}</p>
+                    <div className="flex items-center justify-center text-[#FFC107] mb-2">
+                      ⭐ {item.rating.toFixed(1)}
+                    </div>
+                    <p className="text-3xl font-extrabold text-[#28A745]">${item.price.toFixed(2)}</p>
+                  </div>
+                  <div className="w-full text-center mb-4">
+                    <span className="text-sm text-[#343A40] bg-green-100 py-1 px-3 rounded-full">
+                      In stock: {item.stock}
+                    </span>
+                  </div>
+                  <button className="w-full py-3 px-6 bg-[#28A745] text-white font-bold rounded-md hover:bg-green-700 transition-colors duration-200 flex items-center justify-center">
+                    <span className="mr-2">🛒</span> Add to Cart
+                  </button>
+                </div>
+              ))}
+            </div>
+          )}
         </div>
       </div>
-    </div>
+    </ProtectedRoute>
   );
 }

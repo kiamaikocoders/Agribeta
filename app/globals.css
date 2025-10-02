@@ -2,13 +2,7 @@
 @tailwind components;
 @tailwind utilities;
 
-@font-face {
-  font-family: "Athena";
-  src: url("/fonts/Athena-Regular.woff2") format("woff2");
-  font-weight: normal;
-  font-style: normal;
-  font-display: swap;
-}
+/* Using system fonts instead of custom Athena font */
 
 @layer base {
   :root {
@@ -62,7 +56,7 @@
     @apply border-border;
   }
   body {
-    @apply bg-background text-foreground font-athena;
+    @apply bg-background text-foreground font-sans;
   }
 }
 

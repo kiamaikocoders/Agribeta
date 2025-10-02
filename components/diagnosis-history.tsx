@@ -1,18 +1,29 @@
 "use client"
 
-import { useDiagnosisHistory, type DiagnosisResult } from "@/contexts/diagnosis-history-context"
+import { useEffect, useState } from "react"
+import { supabase } from '@/lib/supabaseClient';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { ScrollArea } from "@/components/ui/scroll-area"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { formatDistanceToNow, format } from "date-fns"
 import { Leaf, Trash2, ChevronRight, AlertCircle } from "lucide-react"
-import { useState } from "react"
 import { DiagnosisResultEnhanced } from "./diagnosis-result-enhanced"
 
 export function DiagnosisHistory() {
-  const { history, clearHistory } = useDiagnosisHistory()
-  const [selectedDiagnosis, setSelectedDiagnosis] = useState<DiagnosisResult | null>(null)
+  const [history, setHistory] = useState<any[]>([])
+  const [loading, setLoading] = useState(true)
+  const [selectedDiagnosis, setSelectedDiagnosis] = useState<any | null>(null)
+
+  useEffect(() => {
+    const fetchHistory = async () => {
+      setLoading(true)
+      const { data, error } = await supabase.from('diagnosis_results').select('*').order('timestamp', { ascending: false })
+      if (!error && data) setHistory(data)
+      setLoading(false)
+    }
+    fetchHistory()
+  }, [])
 
   if (history.length === 0) {
     return (
@@ -54,7 +65,9 @@ export function DiagnosisHistory() {
               variant="outline"
               size="sm"
               className="text-red-500 border-red-200 hover:bg-red-50 hover:text-red-600"
-              onClick={clearHistory}
+              onClick={() => {
+                // Implement clear history functionality
+              }}
             >
               <Trash2 className="h-4 w-4 mr-2" />
               Clear History

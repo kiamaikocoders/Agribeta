@@ -134,7 +134,7 @@ export function AIChatbot() {
               >
                 {message.role === "assistant" && (
                   <Avatar className="h-8 w-8">
-                    <AvatarImage src="/agribeta-logo.jpeg" alt="AgriBeta AI" />
+                    <AvatarImage src="/agribeta-logo.png" alt="AgriBeta AI" />
                     <AvatarFallback className="bg-agribeta-green text-white">AI</AvatarFallback>
                   </Avatar>
                 )}

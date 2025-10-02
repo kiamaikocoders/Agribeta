@@ -2,8 +2,23 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import { Button } from "@/components/ui/button"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { FileText, Video, ImageIcon, Download, ExternalLink } from "lucide-react"
+import { useEffect, useState } from 'react';
+import { supabase } from '@/lib/supabaseClient';
 
 export function ResourceLibrary() {
+  const [resources, setResources] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchResources = async () => {
+      setLoading(true);
+      const { data, error } = await supabase.from('resources').select('*').order('uploaded_at', { ascending: false });
+      if (!error && data) setResources(data);
+      setLoading(false);
+    };
+    fetchResources();
+  }, []);
+
   return (
     <div className="space-y-6">
       <Tabs defaultValue="documents" className="w-full">

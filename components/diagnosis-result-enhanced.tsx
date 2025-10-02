@@ -138,7 +138,7 @@ export function DiagnosisResultEnhanced({
                 <div className="flex items-center">
                   {Array.from({ length: 5 }).map((_, i) => (
                     <div
-                      key={i}
+                      key={`severity-bar-${i}`}
                       className={`h-2 w-8 mr-1 rounded-sm ${
                         i < Math.ceil(result.confidence * 5) ? "bg-agribeta-green" : "bg-gray-200 dark:bg-gray-700"
                       }`}
@@ -152,7 +152,7 @@ export function DiagnosisResultEnhanced({
                 <div className="flex items-center">
                   {Array.from({ length: 5 }).map((_, i) => (
                     <div
-                      key={i}
+                      key={`urgency-bar-${i}`}
                       className={`h-2 w-8 mr-1 rounded-sm ${
                         i < Math.ceil(result.confidence * 5) ? "bg-agribeta-orange" : "bg-gray-200 dark:bg-gray-700"
                       }`}

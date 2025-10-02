@@ -1,7 +1,63 @@
+"use client"
+
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Activity, AlertTriangle, CheckCircle2, Leaf, Shield, Thermometer } from "lucide-react"
+import { useEffect, useState } from 'react';
+import { supabase } from '@/lib/supabaseClient';
 
 export function OverviewDashboard() {
+  // State for summary stats
+  const [complianceScore, setComplianceScore] = useState<number | null>(null);
+  const [diagnosisCount, setDiagnosisCount] = useState<number | null>(null);
+  const [detections, setDetections] = useState<number | null>(null);
+  const [monitoringSessions, setMonitoringSessions] = useState<number | null>(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchStats = async () => {
+      setLoading(true);
+      // FCM Compliance Score: average of last 30 days compliance
+      const { data: monitoring, error: mErr } = await supabase
+        .from('fcm_monitoring')
+        .select('*')
+        .gte('date', new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString().split('T')[0]);
+      // Diagnosis count: this month
+      const { data: diagnoses, error: dErr } = await supabase
+        .from('diagnosis_results')
+        .select('*')
+        .gte('date', new Date(new Date().getFullYear(), new Date().getMonth(), 1).toISOString().split('T')[0]);
+      // Detections: FCM caught in last 30 days
+      let detectionCount = 0;
+      if (monitoring) {
+        monitoring.forEach((m) => {
+          if (m.trap_data) {
+            try {
+              const traps = JSON.parse(m.trap_data);
+              traps.forEach((t: any) => {
+                detectionCount += Number(t.count) || 0;
+              });
+            } catch {}
+          }
+        });
+      }
+      // Monitoring sessions: this month
+      const { data: sessions, error: sErr } = await supabase
+        .from('fcm_monitoring')
+        .select('*')
+        .gte('date', new Date(new Date().getFullYear(), new Date().getMonth(), 1).toISOString().split('T')[0]);
+      // Compliance: completed/scheduled (assume 2 per week)
+      let scheduled = 8; // 4 weeks * 2
+      let completed = sessions ? sessions.length : 0;
+      let compliance = scheduled ? Math.round((completed / scheduled) * 100) : 0;
+      setComplianceScore(compliance);
+      setDiagnosisCount(diagnoses ? diagnoses.length : 0);
+      setDetections(detectionCount);
+      setMonitoringSessions(sessions ? sessions.length : 0);
+      setLoading(false);
+    };
+    fetchStats();
+  }, []);
+
   return (
     <div className="space-y-6">
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
@@ -11,10 +67,10 @@ export function OverviewDashboard() {
             <Shield className="h-4 w-4 text-green-600" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">78%</div>
+            <div className="text-2xl font-bold">{loading ? '...' : `${complianceScore ?? 0}%`}</div>
             <p className="text-xs text-gray-500">+5% from last month</p>
             <div className="mt-4 h-1 w-full bg-gray-200 rounded-full overflow-hidden">
-              <div className="bg-green-600 h-1 rounded-full" style={{ width: "78%" }}></div>
+              <div className="bg-green-600 h-1 rounded-full" style={{ width: `${complianceScore ?? 0}%` }}></div>
             </div>
           </CardContent>
         </Card>
@@ -24,7 +80,7 @@ export function OverviewDashboard() {
             <Leaf className="h-4 w-4 text-green-600" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">24</div>
+            <div className="text-2xl font-bold">{loading ? '...' : diagnosisCount ?? 0}</div>
             <p className="text-xs text-gray-500">This month</p>
           </CardContent>
         </Card>
@@ -34,7 +90,7 @@ export function OverviewDashboard() {
             <AlertTriangle className="h-4 w-4 text-amber-600" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">2</div>
+            <div className="text-2xl font-bold">{loading ? '...' : detections ?? 0}</div>
             <p className="text-xs text-gray-500">Last 30 days</p>
           </CardContent>
         </Card>
@@ -44,7 +100,7 @@ export function OverviewDashboard() {
             <Activity className="h-4 w-4 text-blue-600" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">18</div>
+            <div className="text-2xl font-bold">{loading ? '...' : monitoringSessions ?? 0}</div>
             <p className="text-xs text-gray-500">This month</p>
           </CardContent>
         </Card>

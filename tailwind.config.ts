@@ -20,8 +20,8 @@ const config = {
     },
     extend: {
       fontFamily: {
-        athena: ["Athena", "serif"],
-        sans: ["Athena", "sans-serif"],
+        sans: ["Inter", "system-ui", "sans-serif"],
+        serif: ["Georgia", "serif"],
       },
       colors: {
         border: "hsl(var(--border))",

@@ -1,11 +1,19 @@
 import Image from 'next/image';
 import { ShopItem } from '@/types/shop';
+import { toast } from '@/components/ui/use-toast';
 
 interface ShopCardProps {
   item: ShopItem;
 }
 
 export default function ShopCard({ item }: ShopCardProps) {
+  const handleAddToCart = () => {
+    toast({
+      title: "Added to Cart",
+      description: `${item.name} has been added to your cart.`,
+    });
+  };
+
   return (
     <div className="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow duration-300">
       <div className="relative h-48 w-full">
@@ -29,7 +37,10 @@ export default function ShopCard({ item }: ShopCardProps) {
           </div>
           <span className="text-sm text-gray-500">In Stock: {item.stock}</span>
         </div>
-        <button className="w-full mt-4 bg-green-600 text-white py-2 px-4 rounded-md hover:bg-green-700 transition-colors duration-300">
+        <button 
+          className="w-full mt-4 bg-green-600 text-white py-2 px-4 rounded-md hover:bg-green-700 transition-colors duration-300"
+          onClick={handleAddToCart}
+        >
           Add to Cart
         </button>
       </div>

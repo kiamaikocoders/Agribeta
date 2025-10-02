@@ -1,6 +1,7 @@
 "use client"
 
 import { useState } from "react"
+import { ProtectedRoute } from "@/components/auth/protected-route"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
@@ -14,8 +15,12 @@ import { WeatherDiseaseCorrelation } from "@/components/weather/weather-disease-
 import { ErrorBoundary } from "@/components/error-boundary"
 import { useDiagnosisHistory } from "@/contexts/diagnosis-history-context"
 import { preprocessImage } from "@/utils/image-preprocessing"
+import { useAuth } from "@/contexts/auth-context"
+import { useUsage } from "@/hooks/use-usage"
+import { supabase } from "@/lib/supabaseClient"
 import { cn } from "@/lib/utils"
 import Image from "next/image"
+import Link from "next/link"
 
 export default function DiagnosisPage() {
   const [activeTab, setActiveTab] = useState<"new" | "history" | "weather">("new")
@@ -26,6 +31,8 @@ export default function DiagnosisPage() {
   const [selectedImage, setSelectedImage] = useState<string | null>(null)
   const [processedImage, setProcessedImage] = useState<string | null>(null)
   const { addDiagnosis } = useDiagnosisHistory()
+  const { user, profile } = useAuth()
+  const { usage, canUseService, trackUsage } = useUsage()
 
   const handleImageCapture = async (imageData: string) => {
     setSelectedImage(imageData)
@@ -47,8 +54,14 @@ export default function DiagnosisPage() {
   }
 
   const analyzeImage = async () => {
-    if (!selectedImage) {
+    if (!selectedImage || !user) {
       setError("Please select or capture an image first")
+      return
+    }
+
+    // Check usage limits
+    if (!canUseService('ai_prediction')) {
+      setError("You've reached your AI prediction limit. Please upgrade your plan to continue.")
       return
     }
 
@@ -82,6 +95,29 @@ export default function DiagnosisPage() {
         ],
       }
 
+      // Save diagnosis to database with user tracking
+      const { error: dbError } = await supabase
+        .from('diagnosis_results')
+        .insert([{
+          user_id: user.id,
+          image: imageToAnalyze,
+          disease: diagnosisResult.disease,
+          confidence: diagnosisResult.confidence,
+          description: diagnosisResult.description,
+          treatment: diagnosisResult.treatment,
+          prevention_tips: diagnosisResult.preventionTips,
+        }])
+
+      if (dbError) {
+        console.error('Error saving diagnosis:', dbError)
+      }
+
+      // Track usage with the new usage system
+      const usageResult = await trackUsage('ai_prediction', 1)
+      if (!usageResult.success) {
+        console.error('Error tracking usage:', usageResult.error)
+      }
+
       setResult(diagnosisResult)
 
       // Add to history
@@ -105,6 +141,7 @@ export default function DiagnosisPage() {
   }
 
   return (
+    <ProtectedRoute>
     <ErrorBoundary>
       <div className="relative min-h-screen">
         {/* Background Image with Overlay */}
@@ -230,6 +267,34 @@ export default function DiagnosisPage() {
                         <AlertDescription>{error}</AlertDescription>
                       </Alert>
                     )}
+
+                    {/* Usage Limit Warning */}
+                    {usage && !canUseService('ai_prediction') && (
+                      <Alert className="mt-4">
+                        <AlertCircle className="h-4 w-4" />
+                        <AlertTitle>Usage Limit Reached</AlertTitle>
+                        <AlertDescription>
+                          You've used {usage.ai_predictions.used}/{usage.ai_predictions.limit === -1 ? '∞' : usage.ai_predictions.limit} AI predictions this month.
+                          <Link href="/billing" className="ml-2 text-agribeta-green hover:underline">
+                            Upgrade your plan
+                          </Link> to continue.
+                        </AlertDescription>
+                      </Alert>
+                    )}
+
+                    {/* Usage Status */}
+                    {usage && canUseService('ai_prediction') && (
+                      <Alert className="mt-4">
+                        <AlertCircle className="h-4 w-4" />
+                        <AlertTitle>Usage Status</AlertTitle>
+                        <AlertDescription>
+                          {usage.ai_predictions.remaining === -1 
+                            ? 'Unlimited AI predictions available'
+                            : `${usage.ai_predictions.remaining} AI predictions remaining this month`
+                          }
+                        </AlertDescription>
+                      </Alert>
+                    )}
                   </CardContent>
                   <CardFooter
                     className={cn("flex justify-center", {
@@ -238,7 +303,7 @@ export default function DiagnosisPage() {
                   >
                     <Button
                       onClick={analyzeImage}
-                      disabled={!selectedImage || isAnalyzing || isPreprocessing || !!result}
+                      disabled={!selectedImage || isAnalyzing || isPreprocessing || !!result || !canUseService('ai_prediction')}
                       className="w-full bg-agribeta-green hover:bg-agribeta-green/90"
                     >
                       {isAnalyzing && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
@@ -269,5 +334,6 @@ export default function DiagnosisPage() {
         </div>
       </div>
     </ErrorBoundary>
+    </ProtectedRoute>
   )
 }

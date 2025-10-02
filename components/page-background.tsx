@@ -18,19 +18,20 @@ export function PageBackground({
   children,
 }: PageBackgroundProps) {
   return (
-    <div className="relative min-h-screen">
+    <div className="relative min-h-screen w-full">
       {/* Background Image with Overlay */}
       <div className="absolute inset-0 z-0 overflow-hidden">
         <Image
           src={imageSrc || "/placeholder.svg"}
           alt={alt}
           fill
-          className={cn("object-cover", `opacity-${Math.round(opacity * 100)}`)}
+          className="object-cover"
+          style={{ opacity }}
           priority
         />
       </div>
 
-      <div className={cn("relative z-10", className)}>{children}</div>
+      <div className={cn("relative z-10 w-full", className)}>{children}</div>
     </div>
   )
 }

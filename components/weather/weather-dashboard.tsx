@@ -1,6 +1,8 @@
 "use client"
 
 import { useWeather } from "@/contexts/weather-context"
+import { useEffect, useState } from "react"
+import { supabase } from '@/lib/supabaseClient'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Progress } from "@/components/ui/progress"
@@ -8,9 +10,55 @@ import { Badge } from "@/components/ui/badge"
 import { Skeleton } from "@/components/ui/skeleton"
 import { LocationSelector } from "@/components/weather/location-selector"
 import { AlertTriangle, Droplets, ThermometerSun, Wind, Sun, CloudRain } from "lucide-react"
+import { Button } from "@/components/ui/button"
 
 export function WeatherDashboard() {
   const { weatherData, loading, error, diseaseRisks, recommendations } = useWeather()
+  // State for historical weather
+  const [history, setHistory] = useState<any[]>([])
+  const [saving, setSaving] = useState(false)
+  const [historyLoading, setHistoryLoading] = useState(true)
+
+  // Fetch weather history from Supabase
+  useEffect(() => {
+    const fetchHistory = async () => {
+      setHistoryLoading(true)
+      const { data, error } = await supabase
+        .from('weather_snapshots')
+        .select('*')
+        .order('timestamp', { ascending: true })
+        .limit(30)
+      if (!error && data) setHistory(data)
+      setHistoryLoading(false)
+    }
+    fetchHistory()
+  }, [])
+
+  // Save current weather snapshot to Supabase
+  const saveSnapshot = async () => {
+    if (!weatherData) return
+    setSaving(true)
+    const snapshot = {
+      location: weatherData.location.name,
+      country: weatherData.location.country,
+      timestamp: new Date().toISOString(),
+      temp_c: weatherData.current.temp_c,
+      humidity: weatherData.current.humidity,
+      precip_mm: weatherData.current.precip_mm,
+      wind_kph: weatherData.current.wind_kph,
+      uv: weatherData.current.uv,
+      risks: JSON.stringify(diseaseRisks),
+    }
+    await supabase.from('weather_snapshots').insert([snapshot])
+    setSaving(false)
+    // Optionally refetch history
+    const { data, error } = await supabase
+      .from('weather_snapshots')
+      .select('*')
+      .order('timestamp', { ascending: true })
+      .limit(30)
+    if (!error && data) setHistory(data)
+  }
 
   if (error) {
     return (
@@ -50,6 +98,59 @@ export function WeatherDashboard() {
         </CardHeader>
         <CardContent>
           <LocationSelector />
+          <div className="mt-4 flex justify-end">
+            <Button onClick={saveSnapshot} disabled={saving || !weatherData}>
+              {saving ? 'Saving...' : 'Save Weather Snapshot'}
+            </Button>
+          </div>
+        </CardContent>
+      </Card>
+
+      {/* Historical Weather & Risk Trends */}
+      <Card>
+        <CardHeader>
+          <CardTitle>Weather & Risk Trends</CardTitle>
+          <CardDescription>Historical weather and disease risk data (last 30 records)</CardDescription>
+        </CardHeader>
+        <CardContent>
+          {historyLoading ? (
+            <div>Loading history...</div>
+          ) : history.length === 0 ? (
+            <div className="text-gray-500">No weather history available. Save a snapshot to begin tracking.</div>
+          ) : (
+            <div className="overflow-x-auto">
+              <table className="min-w-full text-xs">
+                <thead>
+                  <tr className="bg-blue-50">
+                    <th className="px-2 py-1">Time</th>
+                    <th className="px-2 py-1">Temp (°C)</th>
+                    <th className="px-2 py-1">Humidity (%)</th>
+                    <th className="px-2 py-1">Precip (mm)</th>
+                    <th className="px-2 py-1">Wind (kph)</th>
+                    <th className="px-2 py-1">UV</th>
+                    <th className="px-2 py-1">Risks</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {history.map((snap) => (
+                    <tr key={snap.id} className="border-b">
+                      <td className="px-2 py-1">{new Date(snap.timestamp).toLocaleString()}</td>
+                      <td className="px-2 py-1">{snap.temp_c}</td>
+                      <td className="px-2 py-1">{snap.humidity}</td>
+                      <td className="px-2 py-1">{snap.precip_mm}</td>
+                      <td className="px-2 py-1">{snap.wind_kph}</td>
+                      <td className="px-2 py-1">{snap.uv}</td>
+                      <td className="px-2 py-1">
+                        {snap.risks && JSON.parse(snap.risks).map((r: any, idx: number) => (
+                          <div key={r.disease + '-' + idx}>{r.disease}: {r.risk}%</div>
+                        ))}
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          )}
         </CardContent>
       </Card>
 

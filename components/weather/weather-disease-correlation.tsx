@@ -207,7 +207,7 @@ export function WeatherDiseaseCorrelation() {
             <h3 className="text-lg font-medium text-agribeta-green mb-3">Disease Risk Analysis</h3>
             <div className="space-y-4">
               {diseaseRisks.map((risk, index) => (
-                <div key={index} className="space-y-1">
+                <div key={`disease-risk-${risk.disease || index}`} className="space-y-1">
                   <div className="flex justify-between items-center">
                     <span className="font-medium">{risk.disease}</span>
                     <Badge className={getRiskBadgeColor(risk.risk)}>
@@ -238,7 +238,7 @@ export function WeatherDiseaseCorrelation() {
             <h3 className="text-lg font-medium text-agribeta-green mb-3">7-Day Forecast</h3>
             <div className="space-y-4">
               {forecastDays.map((day, index) => (
-                <div key={index} className="flex items-center p-3 bg-card/50 rounded-lg">
+                <div key={`forecast-${day.date || index}`} className="flex items-center p-3 bg-card/50 rounded-lg">
                   <div className="w-16 text-center">
                     <div className="text-sm font-medium">
                       {new Date(day.date).toLocaleDateString("en-US", { weekday: "short" })}
@@ -279,7 +279,7 @@ export function WeatherDiseaseCorrelation() {
                       .sort((a, b) => b.risk - a.risk)
                       .slice(0, 1)
                       .map((risk, i) => (
-                        <Badge key={i} className={getRiskBadgeColor(risk.risk)}>
+                        <Badge key={`risk-badge-${risk.disease || i}`} className={getRiskBadgeColor(risk.risk)}>
                           {risk.disease}: {getRiskLabel(risk.risk)}
                         </Badge>
                       ))}
@@ -312,7 +312,7 @@ export function WeatherDiseaseCorrelation() {
 
                     return (
                       <div
-                        key={index}
+                        key={`disease-risk-${risk.disease || index}`}
                         className="absolute inset-0 flex flex-col justify-between pointer-events-none"
                         style={{ padding: "1.5rem 1rem 1rem" }}
                       >

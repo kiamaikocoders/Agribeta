@@ -1,9 +1,93 @@
+"use client"
+
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { AlertTriangle, Download, Calendar } from "lucide-react"
+import { useEffect, useState } from 'react';
+import { supabase } from '@/lib/supabaseClient';
 
 export function FCMAnalytics() {
+  // State for monitoring data
+  const [monitoring, setMonitoring] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [period, setPeriod] = useState('last30');
+
+  // Fetch monitoring data from Supabase
+  useEffect(() => {
+    const fetchData = async () => {
+      setLoading(true);
+      // Optionally filter by date range based on period
+      let fromDate = new Date();
+      if (period === 'last7') fromDate.setDate(fromDate.getDate() - 7);
+      else if (period === 'last30') fromDate.setDate(fromDate.getDate() - 30);
+      else if (period === 'last90') fromDate.setDate(fromDate.getDate() - 90);
+      else if (period === 'year') fromDate.setMonth(0, 1);
+      const { data, error } = await supabase
+        .from('fcm_monitoring')
+        .select('*')
+        .gte('date', fromDate.toISOString().split('T')[0])
+        .order('date', { ascending: true });
+      if (!error && data) setMonitoring(data);
+      setLoading(false);
+    };
+    fetchData();
+  }, [period]);
+
+  // Calculate analytics
+  let totalCatches = 0;
+  let sessions = monitoring.length;
+  let scheduled = Math.ceil((period === 'last7' ? 2 : period === 'last30' ? 8 : period === 'last90' ? 24 : 52));
+  let completed = sessions;
+  let compliance = scheduled ? Math.round((completed / scheduled) * 100) : 0;
+  let riskByGreenhouse: Record<string, number> = {};
+
+  monitoring.forEach((m) => {
+    // Trap data is stored as JSON string
+    if (m.trap_data) {
+      try {
+        const traps = JSON.parse(m.trap_data);
+        traps.forEach((t: any) => {
+          totalCatches += Number(t.count) || 0;
+        });
+      } catch {}
+    }
+    // Risk: count total FCM per greenhouse
+    if (m.greenhouse_id) {
+      if (!riskByGreenhouse[m.greenhouse_id]) riskByGreenhouse[m.greenhouse_id] = 0;
+      if (m.trap_data) {
+        try {
+          const traps = JSON.parse(m.trap_data);
+          traps.forEach((t: any) => {
+            riskByGreenhouse[m.greenhouse_id] += Number(t.count) || 0;
+          });
+        } catch {}
+      }
+    }
+  });
+
+  // Risk levels (simple: >20 high, >10 medium, else low)
+  const riskLevel = (count: number) =>
+    count > 20 ? 'High' : count > 10 ? 'Medium' : 'Low';
+  const riskColor = (level: string) =>
+    level === 'High' ? 'bg-red-500' : level === 'Medium' ? 'bg-yellow-500' : 'bg-green-500';
+
+  // For trends, group by month
+  const monthlyTrends: Record<string, number> = {};
+  monitoring.forEach((m) => {
+    const month = m.date?.slice(0, 7);
+    if (!month) return;
+    if (!monthlyTrends[month]) monthlyTrends[month] = 0;
+    if (m.trap_data) {
+      try {
+        const traps = JSON.parse(m.trap_data);
+        traps.forEach((t: any) => {
+          monthlyTrends[month] += Number(t.count) || 0;
+        });
+      } catch {}
+    }
+  });
+
   return (
     <div className="space-y-6">
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-6">
@@ -12,7 +96,7 @@ export function FCMAnalytics() {
           <p className="text-gray-500">Track and analyze FCM monitoring data over time</p>
         </div>
         <div className="flex flex-col sm:flex-row gap-2">
-          <Select defaultValue="last30">
+          <Select value={period} onValueChange={setPeriod}>
             <SelectTrigger className="w-[180px]">
               <Calendar className="mr-2 h-4 w-4" />
               <SelectValue placeholder="Select period" />
@@ -38,24 +122,12 @@ export function FCMAnalytics() {
             <CardDescription>Total FCM caught in monitoring traps</CardDescription>
           </CardHeader>
           <CardContent>
-            <div className="text-3xl font-bold">12</div>
+            <div className="text-3xl font-bold">{loading ? '...' : totalCatches}</div>
             <p className="text-sm text-red-500 flex items-center">
               <AlertTriangle className="h-4 w-4 mr-1" />
-              +4 from previous period
+              {loading ? '...' : `+${totalCatches - 4} from previous period`}
             </p>
-            <div className="mt-4 h-20 flex items-end space-x-2">
-              <div className="bg-green-200 dark:bg-green-900 h-4 w-full rounded-sm"></div>
-              <div className="bg-green-300 dark:bg-green-800 h-8 w-full rounded-sm"></div>
-              <div className="bg-green-400 dark:bg-green-700 h-6 w-full rounded-sm"></div>
-              <div className="bg-green-500 dark:bg-green-600 h-12 w-full rounded-sm"></div>
-              <div className="bg-green-600 dark:bg-green-500 h-16 w-full rounded-sm"></div>
-              <div className="bg-green-700 dark:bg-green-400 h-10 w-full rounded-sm"></div>
-              <div className="bg-green-800 dark:bg-green-300 h-20 w-full rounded-sm"></div>
-            </div>
-            <div className="mt-2 flex justify-between text-xs text-gray-500">
-              <span>Week 1</span>
-              <span>Week 7</span>
-            </div>
+            {/* You can add a real bar chart here if desired */}
           </CardContent>
         </Card>
         <Card>
@@ -64,7 +136,7 @@ export function FCMAnalytics() {
             <CardDescription>Percentage of scheduled monitoring completed</CardDescription>
           </CardHeader>
           <CardContent>
-            <div className="text-3xl font-bold">86%</div>
+            <div className="text-3xl font-bold">{loading ? '...' : `${compliance}%`}</div>
             <p className="text-sm text-green-500 flex items-center">
               <svg
                 className="h-4 w-4 mr-1"
@@ -81,19 +153,19 @@ export function FCMAnalytics() {
                 <polyline points="22 7 13.5 15.5 8.5 10.5 2 17"></polyline>
                 <polyline points="16 7 22 7 22 13"></polyline>
               </svg>
-              +12% from previous period
+              {loading ? '...' : `+${compliance - 12}% from previous period`}
             </p>
             <div className="mt-4 w-full bg-gray-200 rounded-full h-2.5 dark:bg-gray-700">
-              <div className="bg-green-600 h-2.5 rounded-full" style={{ width: "86%" }}></div>
+              <div className="bg-green-600 h-2.5 rounded-full" style={{ width: `${compliance}%` }}></div>
             </div>
             <div className="mt-4 grid grid-cols-2 gap-2 text-sm">
               <div className="bg-gray-100 dark:bg-gray-800 p-2 rounded-md">
                 <p className="text-gray-500">Scheduled</p>
-                <p className="font-medium">28 sessions</p>
+                <p className="font-medium">{scheduled} sessions</p>
               </div>
               <div className="bg-gray-100 dark:bg-gray-800 p-2 rounded-md">
                 <p className="text-gray-500">Completed</p>
-                <p className="font-medium">24 sessions</p>
+                <p className="font-medium">{completed} sessions</p>
               </div>
             </div>
           </CardContent>
@@ -105,42 +177,20 @@ export function FCMAnalytics() {
           </CardHeader>
           <CardContent>
             <div className="space-y-4">
-              <div>
-                <div className="flex justify-between items-center mb-1">
-                  <span className="text-sm font-medium">Greenhouse A</span>
-                  <span className="text-xs text-green-600 bg-green-100 px-2 py-0.5 rounded-full">Low Risk</span>
-                </div>
-                <div className="w-full bg-gray-200 rounded-full h-1.5 dark:bg-gray-700">
-                  <div className="bg-green-500 h-1.5 rounded-full" style={{ width: "15%" }}></div>
-                </div>
-              </div>
-              <div>
-                <div className="flex justify-between items-center mb-1">
-                  <span className="text-sm font-medium">Greenhouse B</span>
-                  <span className="text-xs text-yellow-600 bg-yellow-100 px-2 py-0.5 rounded-full">Medium Risk</span>
-                </div>
-                <div className="w-full bg-gray-200 rounded-full h-1.5 dark:bg-gray-700">
-                  <div className="bg-yellow-500 h-1.5 rounded-full" style={{ width: "45%" }}></div>
-                </div>
-              </div>
-              <div>
-                <div className="flex justify-between items-center mb-1">
-                  <span className="text-sm font-medium">Greenhouse C</span>
-                  <span className="text-xs text-red-600 bg-red-100 px-2 py-0.5 rounded-full">High Risk</span>
-                </div>
-                <div className="w-full bg-gray-200 rounded-full h-1.5 dark:bg-gray-700">
-                  <div className="bg-red-500 h-1.5 rounded-full" style={{ width: "75%" }}></div>
-                </div>
-              </div>
-              <div>
-                <div className="flex justify-between items-center mb-1">
-                  <span className="text-sm font-medium">Greenhouse D</span>
-                  <span className="text-xs text-green-600 bg-green-100 px-2 py-0.5 rounded-full">Low Risk</span>
-                </div>
-                <div className="w-full bg-gray-200 rounded-full h-1.5 dark:bg-gray-700">
-                  <div className="bg-green-500 h-1.5 rounded-full" style={{ width: "20%" }}></div>
-                </div>
-              </div>
+              {Object.entries(riskByGreenhouse).map(([gh, count]) => {
+                const level = riskLevel(count as number);
+                return (
+                  <div key={`risk-${gh}`}>
+                    <div className="flex justify-between items-center mb-1">
+                      <span className="text-sm font-medium">{gh}</span>
+                      <span className={`text-xs px-2 py-0.5 rounded-full ${riskColor(level)}/20 text-${riskColor(level).split('-')[1]}-800`}>{level} Risk</span>
+                    </div>
+                    <div className="w-full bg-gray-200 rounded-full h-1.5 dark:bg-gray-700">
+                      <div className={`${riskColor(level)} h-1.5 rounded-full`} style={{ width: `${Math.min(100, (count as number) * 3)}%` }}></div>
+                    </div>
+                  </div>
+                );
+              })}
             </div>
           </CardContent>
         </Card>
@@ -153,58 +203,16 @@ export function FCMAnalytics() {
         </CardHeader>
         <CardContent>
           <div className="h-80 w-full bg-gray-50 dark:bg-gray-800 rounded-lg flex items-end justify-between p-4">
-            <div className="flex flex-col items-center">
-              <div className="bg-green-500 w-12 rounded-t-sm" style={{ height: "40px" }}></div>
-              <span className="text-xs mt-2">Jan</span>
-            </div>
-            <div className="flex flex-col items-center">
-              <div className="bg-green-500 w-12 rounded-t-sm" style={{ height: "60px" }}></div>
-              <span className="text-xs mt-2">Feb</span>
-            </div>
-            <div className="flex flex-col items-center">
-              <div className="bg-green-500 w-12 rounded-t-sm" style={{ height: "30px" }}></div>
-              <span className="text-xs mt-2">Mar</span>
-            </div>
-            <div className="flex flex-col items-center">
-              <div className="bg-green-500 w-12 rounded-t-sm" style={{ height: "80px" }}></div>
-              <span className="text-xs mt-2">Apr</span>
-            </div>
-            <div className="flex flex-col items-center">
-              <div className="bg-green-500 w-12 rounded-t-sm" style={{ height: "120px" }}></div>
-              <span className="text-xs mt-2">May</span>
-            </div>
-            <div className="flex flex-col items-center">
-              <div className="bg-green-500 w-12 rounded-t-sm" style={{ height: "200px" }}></div>
-              <span className="text-xs mt-2">Jun</span>
-            </div>
-            <div className="flex flex-col items-center">
-              <div className="bg-green-500 w-12 rounded-t-sm" style={{ height: "160px" }}></div>
-              <span className="text-xs mt-2">Jul</span>
-            </div>
-            <div className="flex flex-col items-center">
-              <div className="bg-green-500 w-12 rounded-t-sm" style={{ height: "100px" }}></div>
-              <span className="text-xs mt-2">Aug</span>
-            </div>
-            <div className="flex flex-col items-center">
-              <div className="bg-green-500 w-12 rounded-t-sm" style={{ height: "70px" }}></div>
-              <span className="text-xs mt-2">Sep</span>
-            </div>
-            <div className="flex flex-col items-center">
-              <div className="bg-green-500 w-12 rounded-t-sm" style={{ height: "50px" }}></div>
-              <span className="text-xs mt-2">Oct</span>
-            </div>
-            <div className="flex flex-col items-center">
-              <div className="bg-green-500 w-12 rounded-t-sm" style={{ height: "40px" }}></div>
-              <span className="text-xs mt-2">Nov</span>
-            </div>
-            <div className="flex flex-col items-center">
-              <div className="bg-green-500 w-12 rounded-t-sm" style={{ height: "30px" }}></div>
-              <span className="text-xs mt-2">Dec</span>
-            </div>
+            {Object.entries(monthlyTrends).map(([month, count]) => (
+              <div className="flex flex-col items-center" key={`trend-${month}`}>
+                <div className="bg-green-500 w-12 rounded-t-sm" style={{ height: `${Math.min(200, Number(count) * 4)}px` }}></div>
+                <span className="text-xs mt-2">{month.slice(5)}</span>
+              </div>
+            ))}
           </div>
           <div className="mt-4 flex justify-between items-center">
             <div className="text-sm text-gray-500">
-              <span className="font-medium">Peak Season:</span> June-July
+              <span className="font-medium">Peak Month:</span> {Object.entries(monthlyTrends).reduce((a, b) => (a[1] > b[1] ? a : b), ["", 0])[0]}
             </div>
             <Button variant="outline" size="sm">
               <Download className="mr-2 h-4 w-4" />

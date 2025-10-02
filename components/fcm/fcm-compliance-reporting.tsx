@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
@@ -20,8 +20,13 @@ import {
   Send,
   Upload,
   XCircle,
+  Edit,
+  Trash2,
+  X,
+  Check,
 } from "lucide-react"
 import { cn } from "@/lib/utils"
+import { supabase } from '@/lib/supabaseClient'
 
 export function FCMComplianceReporting() {
   const [isGenerating, setIsGenerating] = useState(false)
@@ -29,6 +34,11 @@ export function FCMComplianceReporting() {
   const [complianceScore, setComplianceScore] = useState(78)
   const [reportDate, setReportDate] = useState(new Date().toISOString().split("T")[0])
   const [reportPeriod, setReportPeriod] = useState("monthly")
+  const [reports, setReports] = useState<any[]>([])
+  const [loading, setLoading] = useState(true)
+  const [saving, setSaving] = useState(false)
+  const [editingId, setEditingId] = useState<string | null>(null)
+  const [editForm, setEditForm] = useState<any>(null)
 
   const generateReport = () => {
     setIsGenerating(true)
@@ -44,6 +54,77 @@ export function FCMComplianceReporting() {
     setReportGenerated(false)
     setReportDate(new Date().toISOString().split("T")[0])
     setReportPeriod("monthly")
+  }
+
+  useEffect(() => {
+    let subscription: any
+    const fetchReports = async () => {
+      setLoading(true)
+      const { data, error } = await supabase.from('fcm_reports').select('*').order('report_date', { ascending: false })
+      if (!error && data) setReports(data)
+      setLoading(false)
+    }
+    fetchReports()
+    // Real-time subscription
+    subscription = supabase
+      .channel('fcm_reports_changes')
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'fcm_reports' }, (payload) => {
+        fetchReports()
+      })
+      .subscribe()
+    return () => {
+      if (subscription) supabase.removeChannel(subscription)
+    }
+  }, [])
+
+  const handleSave = async () => {
+    setSaving(true)
+    const record = {
+      report_date: reportDate,
+      report_period: reportPeriod,
+      greenhouse_id: "all",
+      summary: "",
+      corrective_actions: "",
+    }
+    const { error } = await supabase.from('fcm_reports').insert([record])
+    setSaving(false)
+    if (!error) {
+      setReportDate(new Date().toISOString().split("T")[0])
+      setReportPeriod("monthly")
+    } else {
+      alert('Error saving: ' + error.message)
+    }
+  }
+
+  const startEdit = (row: any) => {
+    setEditingId(row.id)
+    setEditForm({
+      report_date: row.report_date,
+      report_period: row.report_period,
+      greenhouse_id: row.greenhouse_id,
+      summary: row.summary || '',
+      corrective_actions: row.corrective_actions || '',
+    })
+  }
+
+  const handleEditSave = async (id: string) => {
+    setSaving(true)
+    const record = {
+      report_date: editForm.report_date,
+      report_period: editForm.report_period,
+      greenhouse_id: editForm.greenhouse_id,
+      summary: editForm.summary,
+      corrective_actions: editForm.corrective_actions,
+    }
+    const { error } = await supabase.from('fcm_reports').update(record).eq('id', id)
+    setSaving(false)
+    if (!error) setEditingId(null)
+    else alert('Error updating: ' + error.message)
+  }
+
+  const handleDelete = async (id: string) => {
+    if (!window.confirm('Delete this report?')) return
+    await supabase.from('fcm_reports').delete().eq('id', id)
   }
 
   return (
@@ -375,188 +456,82 @@ export function FCMComplianceReporting() {
         </TabsContent>
 
         <TabsContent value="history" className="mt-6">
-          <Card className="border-agribeta-orange/20">
-            <CardHeader>
-              <CardTitle className="text-agribeta-orange">Report History</CardTitle>
-              <CardDescription>Access and download previously generated FCM compliance reports</CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-6">
-              <div className="flex justify-between items-center">
-                <div className="relative w-full max-w-sm">
-                  <Input
-                    placeholder="Search reports..."
-                    className="pl-9 border-agribeta-green focus-visible:ring-agribeta-green"
-                  />
-                  <svg
-                    className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-500"
-                    xmlns="http://www.w3.org/2000/svg"
-                    width="24"
-                    height="24"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    strokeWidth="2"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                  >
-                    <circle cx="11" cy="11" r="8"></circle>
-                    <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
-                  </svg>
-                </div>
-                <div className="flex items-center space-x-2">
-                  <Button variant="outline" className="border-agribeta-green text-agribeta-green">
-                    <Upload className="mr-2 h-4 w-4" />
-                    Import
-                  </Button>
-                  <Button variant="outline" className="border-agribeta-green text-agribeta-green">
-                    <Download className="mr-2 h-4 w-4" />
-                    Export All
-                  </Button>
-                </div>
-              </div>
-
-              <div className="border rounded-md">
-                <div className="grid grid-cols-6 gap-4 p-4 border-b bg-muted text-sm font-medium">
-                  <div className="col-span-2">Report Name</div>
-                  <div>Date</div>
-                  <div>Type</div>
-                  <div>Score</div>
-                  <div className="text-right">Actions</div>
-                </div>
-
-                <div className="divide-y">
-                  <div className="grid grid-cols-6 gap-4 p-4 items-center hover:bg-muted/50">
-                    <div className="col-span-2 flex items-center">
-                      <FileText className="h-5 w-5 text-agribeta-green mr-2" />
-                      <span>Monthly FCM Compliance Report</span>
-                    </div>
-                    <div>2023-05-01</div>
-                    <div>Monthly</div>
-                    <div>
-                      <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
-                        85%
-                      </span>
-                    </div>
-                    <div className="flex justify-end space-x-2">
-                      <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
-                        <svg
-                          className="h-4 w-4"
-                          xmlns="http://www.w3.org/2000/svg"
-                          width="24"
-                          height="24"
-                          viewBox="0 0 24 24"
-                          fill="none"
-                          stroke="currentColor"
-                          strokeWidth="2"
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                        >
-                          <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
-                          <circle cx="12" cy="12" r="3"></circle>
-                        </svg>
-                      </Button>
-                      <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
-                        <Download className="h-4 w-4" />
-                      </Button>
-                    </div>
-                  </div>
-
-                  <div className="grid grid-cols-6 gap-4 p-4 items-center hover:bg-muted/50">
-                    <div className="col-span-2 flex items-center">
-                      <FileText className="h-5 w-5 text-agribeta-orange mr-2" />
-                      <span>Quarterly FCM Compliance Report</span>
-                    </div>
-                    <div>2023-04-01</div>
-                    <div>Quarterly</div>
-                    <div>
-                      <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-amber-100 text-amber-800">
-                        78%
-                      </span>
-                    </div>
-                    <div className="flex justify-end space-x-2">
-                      <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
-                        <svg
-                          className="h-4 w-4"
-                          xmlns="http://www.w3.org/2000/svg"
-                          width="24"
-                          height="24"
-                          viewBox="0 0 24 24"
-                          fill="none"
-                          stroke="currentColor"
-                          strokeWidth="2"
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                        >
-                          <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
-                          <circle cx="12" cy="12" r="3"></circle>
-                        </svg>
-                      </Button>
-                      <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
-                        <Download className="h-4 w-4" />
-                      </Button>
-                    </div>
-                  </div>
-
-                  <div className="grid grid-cols-6 gap-4 p-4 items-center hover:bg-muted/50">
-                    <div className="col-span-2 flex items-center">
-                      <FileText className="h-5 w-5 text-agribeta-green mr-2" />
-                      <span>Monthly FCM Compliance Report</span>
-                    </div>
-                    <div>2023-03-01</div>
-                    <div>Monthly</div>
-                    <div>
-                      <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800">
-                        58%
-                      </span>
-                    </div>
-                    <div className="flex justify-end space-x-2">
-                      <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
-                        <svg
-                          className="h-4 w-4"
-                          xmlns="http://www.w3.org/2000/svg"
-                          width="24"
-                          height="24"
-                          viewBox="0 0 24 24"
-                          fill="none"
-                          stroke="currentColor"
-                          strokeWidth="2"
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                        >
-                          <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
-                          <circle cx="12" cy="12" r="3"></circle>
-                        </svg>
-                      </Button>
-                      <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
-                        <Download className="h-4 w-4" />
-                      </Button>
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-              <div className="flex items-center justify-between">
-                <div className="text-sm text-gray-500">Showing 3 of 12 reports</div>
-                <div className="flex items-center space-x-2">
-                  <Button variant="outline" size="sm" disabled>
-                    Previous
-                  </Button>
-                  <Button variant="outline" size="sm" className="bg-agribeta-green text-white border-agribeta-green">
-                    1
-                  </Button>
-                  <Button variant="outline" size="sm">
-                    2
-                  </Button>
-                  <Button variant="outline" size="sm">
-                    3
-                  </Button>
-                  <Button variant="outline" size="sm">
-                    Next
-                  </Button>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
+          {loading ? (
+            <div>Loading report history...</div>
+          ) : reports.length === 0 ? (
+            <div className="border rounded-lg p-4 text-center">
+              <p className="text-gray-500">No reports found. Generate a report to see history.</p>
+            </div>
+          ) : (
+            <div className="overflow-x-auto">
+              <table className="min-w-full text-sm">
+                <thead>
+                  <tr className="bg-[#167539]/10">
+                    <th className="px-4 py-2">Date</th>
+                    <th className="px-4 py-2">Period</th>
+                    <th className="px-4 py-2">Greenhouse</th>
+                    <th className="px-4 py-2">Summary</th>
+                    <th className="px-4 py-2">Actions</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {reports.map((r) => (
+                    editingId === r.id ? (
+                      <tr key={r.id} className="border-b bg-yellow-50">
+                        <td className="px-2 py-1">
+                          <Input type="date" value={editForm.report_date} onChange={e => setEditForm((prev: any) => ({ ...prev, report_date: e.target.value }))} />
+                        </td>
+                        <td className="px-2 py-1">
+                          <Select value={editForm.report_period} onValueChange={val => setEditForm((prev: any) => ({ ...prev, report_period: val }))}>
+                            <SelectTrigger><SelectValue /></SelectTrigger>
+                            <SelectContent>
+                              <SelectItem value="weekly">Weekly</SelectItem>
+                              <SelectItem value="biweekly">Bi-weekly</SelectItem>
+                              <SelectItem value="monthly">Monthly</SelectItem>
+                              <SelectItem value="quarterly">Quarterly</SelectItem>
+                            </SelectContent>
+                          </Select>
+                        </td>
+                        <td className="px-2 py-1">
+                          <Select value={editForm.greenhouse_id} onValueChange={val => setEditForm((prev: any) => ({ ...prev, greenhouse_id: val }))}>
+                            <SelectTrigger><SelectValue /></SelectTrigger>
+                            <SelectContent>
+                              <SelectItem value="all">All Greenhouses</SelectItem>
+                              <SelectItem value="gh-a">Greenhouse A</SelectItem>
+                              <SelectItem value="gh-b">Greenhouse B</SelectItem>
+                              <SelectItem value="gh-c">Greenhouse C</SelectItem>
+                            </SelectContent>
+                          </Select>
+                        </td>
+                        <td className="px-2 py-1">
+                          <Input value={editForm.summary} onChange={e => setEditForm((prev: any) => ({ ...prev, summary: e.target.value }))} />
+                          <Input value={editForm.corrective_actions} onChange={e => setEditForm((prev: any) => ({ ...prev, corrective_actions: e.target.value }))} className="mt-1" />
+                        </td>
+                        <td className="px-2 py-1 flex gap-1">
+                          <Button size="icon" variant="outline" onClick={() => handleEditSave(r.id)} disabled={saving}><Check className="h-4 w-4" /></Button>
+                          <Button size="icon" variant="outline" onClick={() => setEditingId(null)}><X className="h-4 w-4" /></Button>
+                        </td>
+                      </tr>
+                    ) : (
+                      <tr key={r.id} className="border-b">
+                        <td className="px-4 py-2">{r.report_date}</td>
+                        <td className="px-4 py-2">{r.report_period}</td>
+                        <td className="px-4 py-2">{r.greenhouse_id}</td>
+                        <td className="px-4 py-2">
+                          {r.summary}
+                          {r.corrective_actions && <div className="text-xs text-gray-500 mt-1">Actions: {r.corrective_actions}</div>}
+                        </td>
+                        <td className="px-4 py-2 flex gap-1">
+                          <Button size="icon" variant="outline" onClick={() => startEdit(r)}><Edit className="h-4 w-4" /></Button>
+                          <Button size="icon" variant="destructive" onClick={() => handleDelete(r.id)}><Trash2 className="h-4 w-4" /></Button>
+                        </td>
+                      </tr>
+                    )
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          )}
         </TabsContent>
 
         <TabsContent value="templates" className="mt-6">

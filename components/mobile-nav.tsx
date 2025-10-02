@@ -4,7 +4,7 @@ import * as React from "react"
 import Link from "next/link"
 import Image from "next/image"
 import { cn } from "@/lib/utils"
-import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet"
+import { Sheet, SheetContent, SheetTrigger, SheetTitle, SheetDescription } from "@/components/ui/sheet"
 import { Button } from "@/components/ui/button"
 import { ScrollArea } from "@/components/ui/scroll-area"
 import { TreesIcon as Plant, Shield, Users, BarChart2, Menu, Leaf } from "lucide-react"
@@ -14,9 +14,24 @@ export function MobileNav() {
 
   const routes = [
     {
-      href: "/",
+      href: "/dashboard/networks",
       label: "Home",
       icon: <Leaf className="mr-2 h-4 w-4" />,
+    },
+    {
+      href: "/agronomists",
+      label: "Agronomists",
+      icon: <Users className="mr-2 h-4 w-4" />,
+    },
+    {
+      href: "/analytics",
+      label: "Analytics",
+      icon: <BarChart2 className="mr-2 h-4 w-4" />,
+    },
+    {
+      href: "/profile",
+      label: "Profile",
+      icon: <Users className="mr-2 h-4 w-4" />,
     },
     {
       href: "/diagnosis",
@@ -27,16 +42,6 @@ export function MobileNav() {
       href: "/fcm-management",
       label: "FCM Management",
       icon: <Shield className="mr-2 h-4 w-4" />,
-    },
-    {
-      href: "/community",
-      label: "Community",
-      icon: <Users className="mr-2 h-4 w-4" />,
-    },
-    {
-      href: "/analytics",
-      label: "Analytics",
-      icon: <BarChart2 className="mr-2 h-4 w-4" />,
     },
   ]
 
@@ -52,8 +57,19 @@ export function MobileNav() {
         </Button>
       </SheetTrigger>
       <SheetContent side="left" className="pr-0">
+        <SheetTitle className="sr-only">Navigation Menu</SheetTitle>
+        <SheetDescription className="sr-only">
+          Main navigation menu for AgriBeta platform
+        </SheetDescription>
         <Link href="/" className="flex items-center space-x-2 mb-4" onClick={() => setOpen(false)}>
-          <Image src="/agribeta-logo.jpeg" alt="AgriBeta Logo" width={120} height={40} className="h-10 w-auto" />
+          <Image 
+            src="/agribeta-logo.png" 
+            alt="AgriBeta Logo" 
+            width={180} 
+            height={60} 
+            className="h-16 w-auto" 
+            priority 
+          />
         </Link>
         <ScrollArea className="my-4 h-[calc(100vh-8rem)] pb-10">
           <div className="flex flex-col space-y-3">

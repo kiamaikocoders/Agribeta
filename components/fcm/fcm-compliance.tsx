@@ -1,10 +1,34 @@
+"use client"
+
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Progress } from "@/components/ui/progress"
 import { Badge } from "@/components/ui/badge"
 import { CheckCircle2, AlertTriangle, XCircle } from "lucide-react"
+import { useEffect, useState } from 'react';
+import { supabase } from '@/lib/supabaseClient';
 
 export function FCMCompliance() {
+  // State for compliance data
+  const [compliance, setCompliance] = useState<any>(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchCompliance = async () => {
+      setLoading(true);
+      const { data, error } = await supabase.from('fcm_compliance').select('*').order('created_at', { ascending: false }).limit(1);
+      if (!error && data && data.length > 0) setCompliance(data[0]);
+      setLoading(false);
+    };
+    fetchCompliance();
+  }, []);
+
+  if (loading) return <div>Loading compliance data...</div>;
+  if (!compliance) return <div className="text-gray-500">No compliance data found.</div>;
+
+  // Example: checklist is stored as JSON in the DB
+  const checklist = compliance.checklist || {};
+
   return (
     <div className="space-y-6">
       <Card>
