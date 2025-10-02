@@ -181,14 +181,21 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
       if (authError) return { error: authError }
 
-      if (authData.user) {
+      if (authData.user && authData.session) {
         console.log('User created successfully:', authData.user.id)
         
-        // Immediately complete profile setup with the provided data
+        // Wait a moment for the database trigger to create the basic profile
+        await new Promise(resolve => setTimeout(resolve, 1000))
+        
+        // Set up the Supabase client with the new session
+        await supabase.auth.setSession(authData.session)
+        
+        // Complete profile setup with the provided data
         const profileResult = await completeProfileSetup(userData, authData.user.id)
         if (profileResult.error) {
           console.error('Error completing profile setup:', profileResult.error)
-          // Don't fail the signup, but log the error
+          // Store the data for later completion during sign-in
+          return { error: profileResult.error, pendingData: userData }
         }
 
         // If the email is allowlisted, promote to admin
@@ -240,7 +247,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     if (!targetUserId) return { error: 'No user ID provided' }
 
     try {
-      // Update the basic profile
+      // First, update the basic profile with error handling
       const { error: profileError } = await supabase
         .from('profiles')
         .update({
@@ -262,42 +269,67 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         return { error: profileError }
       }
 
-      // Create role-specific profile
+      console.log('Profile updated successfully for user:', targetUserId)
+
+      // Create role-specific profile with better error handling
       if (userData.role === 'farmer') {
+        console.log('Creating farmer profile for user:', targetUserId, userData)
+        
+        const farmerData = {
+          id: targetUserId,
+          farm_size: userData.farm_size,
+          farm_location: userData.farm_location,
+          primary_crop: userData.primary_crop,
+          secondary_crops: userData.secondary_crops,
+          planting_season: userData.planting_season,
+          irrigation_type: userData.irrigation_type,
+          pest_management_method: userData.pest_management_method,
+          soil_type: userData.soil_type,
+          successful_treatments: 0,
+          total_spent: 0
+        }
+
         const { error: farmerError } = await supabase
           .from('farmer_profiles')
-          .insert([{
-            id: targetUserId,
-            farm_size: userData.farm_size,
-            farm_location: userData.farm_location,
-            primary_crop: userData.primary_crop,
-            secondary_crops: userData.secondary_crops,
-            planting_season: userData.planting_season,
-            irrigation_type: userData.irrigation_type,
-            pest_management_method: userData.pest_management_method,
-            soil_type: userData.soil_type,
-          }])
+          .insert([farmerData])
         
         if (farmerError) {
           console.error('Error creating farmer profile:', farmerError)
+          return { error: farmerError }
         }
+        
+        console.log('Farmer profile created successfully')
+        
       } else if (userData.role === 'agronomist') {
+        console.log('Creating agronomist profile for user:', targetUserId, userData)
+        
+        const agronomistData = {
+          id: targetUserId,
+          title: userData.title,
+          years_experience: userData.years_experience,
+          specializations: userData.specializations,
+          certifications: userData.certifications,
+          hourly_rate: userData.hourly_rate,
+          consultation_fee: userData.consultation_fee,
+          timezone: userData.timezone,
+          total_consultations: 0,
+          average_rating: null,
+          response_time_minutes: null,
+          success_rate: null,
+          is_verified: false,
+          total_earnings: 0
+        }
+
         const { error: agronomistError } = await supabase
           .from('agronomist_profiles')
-          .insert([{
-            id: targetUserId,
-            title: userData.title,
-            years_experience: userData.years_experience,
-            specializations: userData.specializations,
-            certifications: userData.certifications,
-            hourly_rate: userData.hourly_rate,
-            consultation_fee: userData.consultation_fee,
-            timezone: userData.timezone,
-          }])
+          .insert([agronomistData])
         
         if (agronomistError) {
           console.error('Error creating agronomist profile:', agronomistError)
+          return { error: agronomistError }
         }
+        
+        console.log('Agronomist profile created successfully')
       }
 
       // Refresh the profile data if user is logged in
