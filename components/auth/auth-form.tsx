@@ -80,9 +80,24 @@ export function AuthForm() {
     const { error } = await signIn(signInData.email, signInData.password)
 
     if (error) {
+      console.error('Signin error details:', error)
+      let errorMessage = 'Failed to sign in. Please try again.'
+      
+      if (error.message?.includes('Email not confirmed')) {
+        errorMessage = 'Please check your email and click the verification link before signing in.'
+      } else if (error.message?.includes('Invalid login credentials')) {
+        errorMessage = 'Invalid email or password. Please check your credentials and try again.'
+      } else if (error.message?.includes('Too many requests')) {
+        errorMessage = 'Too many failed attempts. Please wait a few minutes before trying again.'
+      } else if (error.message?.includes('Signups not allowed')) {
+        errorMessage = 'This account may not exist. Try signing up first.'
+      } else if (error.message) {
+        errorMessage = error.message
+      }
+      
       toast({
-        title: 'Error',
-        description: error.message,
+        title: 'Sign In Error',
+        description: errorMessage,
         variant: 'destructive',
       })
     } else {
@@ -129,9 +144,23 @@ export function AuthForm() {
       }
 
       if (error) {
+        console.error('Signup error details:', error)
+        let errorMessage = 'Failed to create account. Please try again.'
+        
+        if (error.message?.includes('User already registered')) {
+          errorMessage = 'This email is already registered. Try signing in instead.'
+          setActiveTab('signin')
+        } else if (error.message?.includes('Password should be')) {
+          errorMessage = 'Password must be at least 6 characters long.'
+        } else if (error.message?.includes('signup is disabled')) {
+          errorMessage = 'Account registration is currently disabled.'
+        } else if (error.message) {
+          errorMessage = error.message
+        }
+        
         toast({
-          title: 'Error',
-          description: error.message || 'Failed to create account. Please try again.',
+          title: 'Signup Error',
+          description: errorMessage,
           variant: 'destructive',
         })
       } else {
