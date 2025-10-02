@@ -1,3 +1,5 @@
+"use client"
+
 import { ProtectedRoute } from '@/components/auth/protected-route'
 import { AdminDashboard } from '@/components/admin/admin-dashboard'
 import Link from 'next/link'
