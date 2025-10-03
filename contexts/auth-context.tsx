@@ -183,15 +183,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
       if (authData.user) {
         console.log('User created successfully:', authData.user.id)
-        
-        // Immediately complete profile setup with the provided data
-        const profileResult = await completeProfileSetup(userData, authData.user.id)
-        if (profileResult.error) {
-          console.error('Error completing profile setup:', profileResult.error)
-          // Don't fail the signup, but log the error
-        }
-
-        // If the email is allowlisted, promote to admin
+        // Do NOT attempt profile writes now; user may not have a session yet due to email verification.
+        // Profile completion will be handled after first sign-in from the client using a secure API route.
         if (ADMIN_EMAILS.includes(email)) {
           await supabase
             .from('profiles')
@@ -263,10 +256,22 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       }
 
       // Create role-specific profile
+      const { data: sessionData } = await supabase.auth.getSession()
+      const accessToken = sessionData.session?.access_token
+
+      if (!accessToken) {
+        // Cannot create role-specific profile without a user session
+        return { error: 'No session available for secure profile creation' }
+      }
+
       if (userData.role === 'farmer') {
-        const { error: farmerError } = await supabase
-          .from('farmer_profiles')
-          .insert([{
+        const res = await fetch('/api/profiles/farmer', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${accessToken}`,
+          },
+          body: JSON.stringify({
             id: targetUserId,
             farm_size: userData.farm_size,
             farm_location: userData.farm_location,
@@ -276,15 +281,22 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
             irrigation_type: userData.irrigation_type,
             pest_management_method: userData.pest_management_method,
             soil_type: userData.soil_type,
-          }])
-        
-        if (farmerError) {
-          console.error('Error creating farmer profile:', farmerError)
+            farm_name: userData.farm_name,
+          }),
+        })
+        if (!res.ok) {
+          const err = await res.json().catch(() => ({}))
+          console.error('Error creating farmer profile (api):', err)
+          return { error: err?.error || 'Failed to create farmer profile' }
         }
       } else if (userData.role === 'agronomist') {
-        const { error: agronomistError } = await supabase
-          .from('agronomist_profiles')
-          .insert([{
+        const res = await fetch('/api/profiles/agronomist', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${accessToken}`,
+          },
+          body: JSON.stringify({
             id: targetUserId,
             title: userData.title,
             years_experience: userData.years_experience,
@@ -293,10 +305,13 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
             hourly_rate: userData.hourly_rate,
             consultation_fee: userData.consultation_fee,
             timezone: userData.timezone,
-          }])
-        
-        if (agronomistError) {
-          console.error('Error creating agronomist profile:', agronomistError)
+            company: userData.company,
+          }),
+        })
+        if (!res.ok) {
+          const err = await res.json().catch(() => ({}))
+          console.error('Error creating agronomist profile (api):', err)
+          return { error: err?.error || 'Failed to create agronomist profile' }
         }
       }
 
