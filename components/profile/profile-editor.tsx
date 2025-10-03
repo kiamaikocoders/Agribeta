@@ -178,23 +178,41 @@ export function ProfileEditor({ onUpdate }: ProfileEditorProps) {
 
       // Update role-specific profile
       if (profile?.role === 'farmer') {
-        const { error: farmerError } = await supabase
-          .from('farmer_profiles')
-          .upsert({
+        const { data: sessionData } = await supabase.auth.getSession()
+        const accessToken = sessionData.session?.access_token
+        if (!accessToken) throw new Error('No session found')
+        const res = await fetch('/api/profiles/farmer', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${accessToken}`,
+          },
+          body: JSON.stringify({
             id: user.id,
             farm_size: formData.farm_size ? parseFloat(formData.farm_size) : null,
             farm_location: formData.farm_location,
             primary_crop: formData.primary_crop,
             secondary_crops: formData.secondary_crops,
             irrigation_type: formData.irrigation_type,
-            soil_type: formData.soil_type
+            soil_type: formData.soil_type,
+            farm_name: formData.farm_name,
           })
-
-        if (farmerError) throw farmerError
+        })
+        if (!res.ok) {
+          const err = await res.json().catch(() => ({}))
+          throw new Error(err?.error || 'Failed to save farmer profile')
+        }
       } else if (profile?.role === 'agronomist') {
-        const { error: agronomistError } = await supabase
-          .from('agronomist_profiles')
-          .upsert({
+        const { data: sessionData } = await supabase.auth.getSession()
+        const accessToken = sessionData.session?.access_token
+        if (!accessToken) throw new Error('No session found')
+        const res = await fetch('/api/profiles/agronomist', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${accessToken}`,
+          },
+          body: JSON.stringify({
             id: user.id,
             title: formData.title,
             years_experience: formData.years_experience ? parseInt(formData.years_experience) : null,
@@ -202,10 +220,14 @@ export function ProfileEditor({ onUpdate }: ProfileEditorProps) {
             certifications: formData.certifications,
             hourly_rate: formData.hourly_rate ? parseFloat(formData.hourly_rate) : null,
             consultation_fee: formData.consultation_fee ? parseFloat(formData.consultation_fee) : null,
-            timezone: formData.timezone
+            timezone: formData.timezone,
+            company: formData.company,
           })
-
-        if (agronomistError) throw agronomistError
+        })
+        if (!res.ok) {
+          const err = await res.json().catch(() => ({}))
+          throw new Error(err?.error || 'Failed to save agronomist profile')
+        }
       }
 
       setIsEditing(false)
