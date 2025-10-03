@@ -79,23 +79,8 @@ export function NetworksFeed() {
     }
   ]
 
-  // Network suggestions (dummy data for now)
-  const networkSuggestions = [
-    {
-      name: "Dr. Sarah Johnson",
-      role: "Agronomist",
-      specialization: "Disease Management",
-      avatar: "/placeholder-user.jpg",
-      isVerified: true
-    },
-    {
-      name: "Michael Farm",
-      role: "Farmer",
-      location: "Nakuru, Kenya",
-      avatar: "/placeholder-user.jpg",
-      isVerified: false
-    }
-  ]
+  // Network suggestions fetched from real profiles (farmers + agronomists)
+  const [suggestions, setSuggestions] = useState<any[]>([])
 
   // Trending topics
   const trendingTopics = [
@@ -108,6 +93,7 @@ export function NetworksFeed() {
   useEffect(() => {
     if (user) {
       fetchPosts()
+      fetchSuggestions()
     }
   }, [user])
 
@@ -140,6 +126,23 @@ export function NetworksFeed() {
       console.error('Error fetching posts:', error)
     } finally {
       setIsLoading(false)
+    }
+  }
+
+  const fetchSuggestions = async () => {
+    try {
+      if (!user) return
+      const { data, error } = await supabase
+        .from('profiles')
+        .select('id, first_name, last_name, role, avatar_url, farm_name, company, is_verified')
+        .in('role', ['farmer', 'agronomist'])
+        .neq('id', user.id)
+        .limit(10)
+
+      if (error) throw error
+      setSuggestions(data || [])
+    } catch (e) {
+      console.error('Error fetching suggestions:', e)
     }
   }
 
@@ -358,26 +361,25 @@ export function NetworksFeed() {
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
-              {networkSuggestions.map((suggestion, index) => (
-                <div key={index} className="flex items-center gap-3">
+              {suggestions.map((s) => (
+                <div key={s.id} className="flex items-center gap-3">
                   <Avatar className="h-10 w-10">
-                    <AvatarImage src={suggestion.avatar} />
-                    <AvatarFallback>{suggestion.name[0]}</AvatarFallback>
+                    <AvatarImage src={s.avatar_url} />
+                    <AvatarFallback>{(s.first_name || 'U')[0]}</AvatarFallback>
                   </Avatar>
                   <div className="flex-1">
                     <div className="flex items-center gap-1">
-                      <span className="font-medium text-sm">{suggestion.name}</span>
-                      {suggestion.isVerified && (
+                      <span className="font-medium text-sm">{s.first_name} {s.last_name}</span>
+                      {s.is_verified && (
                         <Badge variant="secondary" className="text-xs">✓</Badge>
                       )}
                     </div>
                     <div className="text-xs text-gray-500">
-                      {suggestion.role} {suggestion.specialization && `• ${suggestion.specialization}`}
-                      {suggestion.location && `• ${suggestion.location}`}
+                      {s.role === 'farmer' ? (s.farm_name || 'Farmer') : (s.company || 'Agronomist')}
                     </div>
                   </div>
-                  <Button size="sm" variant="outline" className="text-xs">
-                    Connect
+                  <Button size="sm" variant="outline" className="text-xs" asChild>
+                    <Link href={`/profile?u=${s.id}`}>View</Link>
                   </Button>
                 </div>
               ))}

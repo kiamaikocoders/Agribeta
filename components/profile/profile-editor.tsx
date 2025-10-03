@@ -279,9 +279,14 @@ export function ProfileEditor({ onUpdate }: ProfileEditorProps) {
 
   return (
     <Tabs defaultValue="profile" className="w-full">
-      <TabsList className="grid w-full grid-cols-2">
+      <TabsList className="grid w-full grid-cols-3">
         <TabsTrigger value="profile">Profile</TabsTrigger>
         <TabsTrigger value="analytics">Analytics</TabsTrigger>
+        <TabsTrigger value="dashboard" asChild>
+          <a href={profile?.role === 'agronomist' ? '/dashboard/agronomist' : profile?.role === 'farmer' ? '/dashboard/farmer' : '/dashboard'}>
+            Dashboard
+          </a>
+        </TabsTrigger>
       </TabsList>
       
       <TabsContent value="profile">

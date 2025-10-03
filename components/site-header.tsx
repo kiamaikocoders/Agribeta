@@ -117,6 +117,12 @@ export function SiteHeader() {
                       </Link>
                     </DropdownMenuItem>
                     <DropdownMenuItem asChild>
+                      <Link href={profile?.role === 'agronomist' ? '/dashboard/agronomist' : profile?.role === 'farmer' ? '/dashboard/farmer' : '/dashboard'} className="flex items-center">
+                        <BarChart2 className="mr-2 h-4 w-4" />
+                        <span>Dashboard</span>
+                      </Link>
+                    </DropdownMenuItem>
+                    <DropdownMenuItem asChild>
                       <Link href="/settings" className="flex items-center">
                         <Settings className="mr-2 h-4 w-4" />
                         <span>Settings</span>

@@ -193,6 +193,22 @@ export function PostInteractions({ post, onUpdate }: PostInteractionsProps) {
         if (error) throw error
         setIsLiked(true)
         setLikeCount(prev => prev + 1)
+
+        // Create notification for post owner
+        try {
+          if (post.user_id !== user.id) {
+            await supabase.from('notifications').insert({
+              user_id: post.user_id,
+              sender_id: user.id,
+              type: 'like',
+              title: 'New Like',
+              message: `${profile?.first_name || 'Someone'} liked your post`,
+            })
+          }
+        } catch (err) {
+          // Non-blocking
+          console.warn('Failed to create like notification', err)
+        }
       }
     } catch (error) {
       console.error('Error toggling like:', error)
@@ -227,6 +243,22 @@ export function PostInteractions({ post, onUpdate }: PostInteractionsProps) {
         title: 'Comment added',
         description: 'Your comment has been posted!'
       })
+
+      // Create notification for post owner
+      try {
+        if (post.user_id !== user.id) {
+          await supabase.from('notifications').insert({
+            user_id: post.user_id,
+            sender_id: user.id,
+            type: 'comment',
+            title: 'New Comment',
+            message: `${profile?.first_name || 'Someone'} commented on your post`,
+          })
+        }
+      } catch (err) {
+        // Non-blocking
+        console.warn('Failed to create comment notification', err)
+      }
     } catch (error) {
       console.error('Error adding comment:', error)
       toast({

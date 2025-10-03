@@ -1,3 +1,4 @@
+"use client"
 import { ProtectedRoute } from '@/components/auth/protected-route'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
@@ -6,8 +7,63 @@ import { Label } from '@/components/ui/label'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { PageBackground } from '@/components/page-background'
 import { Bell, Shield, Globe, Palette, Smartphone, Mail, Save } from 'lucide-react'
+import { Input } from '@/components/ui/input'
+import { useAuth } from '@/contexts/auth-context'
+import { useEffect, useState } from 'react'
+import { supabase } from '@/lib/supabaseClient'
+import { toast } from '@/components/ui/use-toast'
 
 export default function SettingsPage() {
+  const { user, profile, updateProfile } = useAuth()
+  const [form, setForm] = useState({
+    first_name: '',
+    last_name: '',
+    email: '',
+    role: '' as 'farmer' | 'agronomist' | 'admin' | '',
+    phone: '',
+    country: '',
+    industry: ''
+  })
+  const [saving, setSaving] = useState(false)
+
+  useEffect(() => {
+    if (profile) {
+      setForm({
+        first_name: profile.first_name || '',
+        last_name: profile.last_name || '',
+        email: profile.email || '',
+        role: profile.role,
+        phone: profile.phone || '',
+        country: profile.country || '',
+        industry: profile.industry || ''
+      })
+    }
+  }, [profile])
+
+  const handleSave = async () => {
+    if (!user) return
+    setSaving(true)
+    try {
+      const { error } = await supabase
+        .from('profiles')
+        .update({
+          first_name: form.first_name,
+          last_name: form.last_name,
+          phone: form.phone,
+          country: form.country,
+          industry: form.industry,
+        })
+        .eq('id', user.id)
+      if (error) throw error
+      toast({ title: 'Saved', description: 'Your settings were updated.' })
+    } catch (e) {
+      console.error(e)
+      toast({ title: 'Error', description: 'Failed to save settings', variant: 'destructive' })
+    } finally {
+      setSaving(false)
+    }
+  }
+
   return (
     <ProtectedRoute>
       <PageBackground imageSrc="/greenhouse-robotics.png" opacity={0.1}>
@@ -18,6 +74,44 @@ export default function SettingsPage() {
           </div>
 
           <div className="space-y-6">
+            {/* Profile Basics */}
+            <Card>
+              <CardHeader>
+                <CardTitle>Profile</CardTitle>
+                <CardDescription>Update your personal details</CardDescription>
+              </CardHeader>
+              <CardContent className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                  <Label htmlFor="first_name">First name</Label>
+                  <Input id="first_name" value={form.first_name} onChange={(e) => setForm({ ...form, first_name: e.target.value })} />
+                </div>
+                <div>
+                  <Label htmlFor="last_name">Last name</Label>
+                  <Input id="last_name" value={form.last_name} onChange={(e) => setForm({ ...form, last_name: e.target.value })} />
+                </div>
+                <div>
+                  <Label htmlFor="email">Email</Label>
+                  <Input id="email" value={form.email} disabled />
+                </div>
+                <div>
+                  <Label htmlFor="role">Role</Label>
+                  <Input id="role" value={form.role} disabled />
+                </div>
+                <div>
+                  <Label htmlFor="phone">Phone</Label>
+                  <Input id="phone" value={form.phone} onChange={(e) => setForm({ ...form, phone: e.target.value })} />
+                </div>
+                <div>
+                  <Label htmlFor="country">Country</Label>
+                  <Input id="country" value={form.country} onChange={(e) => setForm({ ...form, country: e.target.value })} />
+                </div>
+                <div className="md:col-span-2">
+                  <Label htmlFor="industry">Industry</Label>
+                  <Input id="industry" value={form.industry} onChange={(e) => setForm({ ...form, industry: e.target.value })} />
+                </div>
+              </CardContent>
+            </Card>
+
             {/* Notification Settings */}
             <Card>
               <CardHeader>
@@ -180,9 +274,9 @@ export default function SettingsPage() {
 
             {/* Save Button */}
             <div className="flex justify-end">
-              <Button className="bg-agribeta-green hover:bg-agribeta-green/90">
+              <Button onClick={handleSave} disabled={saving} className="bg-agribeta-green hover:bg-agribeta-green/90">
                 <Save className="mr-2 h-4 w-4" />
-                Save Changes
+                {saving ? 'Saving...' : 'Save Changes'}
               </Button>
             </div>
           </div>

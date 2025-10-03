@@ -72,6 +72,7 @@ interface AuthContextType {
   signIn: (email: string, password: string) => Promise<{ error: any }>
   signOut: () => Promise<void>
   updateProfile: (updates: Partial<UserProfile>) => Promise<{ error: any }>
+  fetchUserProfile: (userId: string) => Promise<void>
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined)
@@ -172,11 +173,17 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     }
   }
 
-  const signUp = async (email: string, password: string, userData: any) => {
+  const signUp = async (email: string, password: string, _userData: any) => {
     try {
+      const redirectBase = typeof window !== 'undefined' && window.location?.origin
+        ? window.location.origin
+        : (process.env.NEXT_PUBLIC_SITE_URL || '')
+      const emailRedirectTo = redirectBase ? `${redirectBase}/profile/complete` : undefined
+
       const { data: authData, error: authError } = await supabase.auth.signUp({
         email,
         password,
+        options: emailRedirectTo ? { emailRedirectTo } : undefined,
       })
 
       if (authError) return { error: authError }
@@ -210,6 +217,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   const signOut = async () => {
     await supabase.auth.signOut()
+    // Redirect to landing page explicitly after logout
+    if (typeof window !== 'undefined') {
+      window.location.href = '/'
+    }
   }
 
   const updateProfile = async (updates: Partial<UserProfile>) => {
@@ -339,6 +350,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     signOut,
     updateProfile,
     completeProfileSetup,
+    fetchUserProfile,
   }
 
   return (
