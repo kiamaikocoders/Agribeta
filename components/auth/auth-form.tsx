@@ -21,19 +21,6 @@ export function AuthForm() {
   const { signIn, signUp, completeProfileSetup, profile, user, loading } = useAuth()
   const router = useRouter()
 
-  // Don't render the form if user is already authenticated
-  if (loading) {
-    return (
-      <div className="flex items-center justify-center min-h-screen">
-        <Loader2 className="h-8 w-8 animate-spin text-agribeta-green" />
-      </div>
-    )
-  }
-
-  if (user && profile) {
-    return null // The parent component will handle the redirect
-  }
-
   // Sign in form state
   const [signInData, setSignInData] = useState({
     email: '',
@@ -72,6 +59,35 @@ export function AuthForm() {
     consultation_fee: '',
     timezone: '',
   })
+
+  // Complete profile setup when user signs in for the first time
+  useEffect(() => {
+    if (profile && pendingSignupData && !profile.first_name) {
+      // User has signed in but profile is incomplete, complete the setup
+      const completeSetup = async () => {
+        const { error } = await completeProfileSetup(pendingSignupData)
+        if (error) {
+          console.error('Error completing profile setup:', error)
+        } else {
+          setPendingSignupData(null) // Clear the pending data
+        }
+      }
+      completeSetup()
+    }
+  }, [profile, pendingSignupData, completeProfileSetup])
+
+  // Don't render the form if user is already authenticated
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center min-h-screen">
+        <Loader2 className="h-8 w-8 animate-spin text-agribeta-green" />
+      </div>
+    )
+  }
+
+  if (user && profile) {
+    return null // The parent component will handle the redirect
+  }
 
   const handleSignIn = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -145,22 +161,6 @@ export function AuthForm() {
 
       setIsLoading(false)
     }
-
-  // Complete profile setup when user signs in for the first time
-  useEffect(() => {
-    if (profile && pendingSignupData && !profile.first_name) {
-      // User has signed in but profile is incomplete, complete the setup
-      const completeSetup = async () => {
-        const { error } = await completeProfileSetup(pendingSignupData)
-        if (error) {
-          console.error('Error completing profile setup:', error)
-        } else {
-          setPendingSignupData(null) // Clear the pending data
-        }
-      }
-      completeSetup()
-    }
-  }, [profile, pendingSignupData, completeProfileSetup])
 
   const industries = [
     'Avocado Farming',
