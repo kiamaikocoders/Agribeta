@@ -28,4 +28,3 @@ export function AdminSidebar() {
     </aside>
   )
 }
-
