@@ -18,8 +18,8 @@ export default function ResetPasswordPage() {
     setIsSubmitting(true)
     
     try {
-      // Always use localhost for development
-      const siteUrl = 'http://localhost:3000/'
+      // Use the utility function to get the correct site URL
+      const siteUrl = getSiteUrl()
       const redirectTo = `${siteUrl}auth/confirm`
       
       console.log('=== DEBUG INFO ===')

@@ -2,7 +2,7 @@
 
 import { createContext, useContext, useEffect, useState } from 'react'
 import { User, Session } from '@supabase/supabase-js'
-import { supabase } from '@/lib/supabaseClient'
+import { supabase, getSiteUrl } from '@/lib/supabaseClient'
 
 export type UserRole = 'farmer' | 'agronomist' | 'admin'
 
@@ -211,10 +211,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   const signUp = async (email: string, password: string, _userData: any) => {
     try {
-      const redirectBase = typeof window !== 'undefined' && window.location?.origin
-        ? window.location.origin
-        : (process.env.NEXT_PUBLIC_SITE_URL || '')
-      const emailRedirectTo = redirectBase ? `${redirectBase}/profile/complete` : undefined
+      // Use the utility function to get the correct site URL
+      const siteUrl = getSiteUrl()
+      const emailRedirectTo = `${siteUrl}profile/complete`
 
       const { data: authData, error: authError } = await supabase.auth.signUp({
         email,

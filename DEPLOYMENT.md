@@ -14,8 +14,10 @@ SUPABASE_SERVICE_ROLE_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhY
 ### Optional Variables:
 ```
 GROQ_API_KEY=your_groq_api_key_here
-NEXT_PUBLIC_SITE_URL=https://your-domain.com
+NEXT_PUBLIC_SITE_URL=https://agribeta.vercel.app
 ```
+
+**Important:** The `NEXT_PUBLIC_SITE_URL` is crucial for password reset and email confirmation functionality. It should be set to your production domain.
 
 ## Vercel Deployment
 
@@ -42,6 +44,11 @@ NEXT_PUBLIC_SITE_URL=https://your-domain.com
 - Name: `SUPABASE_SERVICE_ROLE_KEY`
 - Value: `eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFya3l6cGlrbm1uYnplZ2Fkb3pvIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc0NzAwMTY2OCwiZXhwIjoyMDYyNTc3NjY4fQ.J5DS4XBA9OQk9VWti2GsmnP0hJ_BsLWLDN`
 - Environment: Production, Preview, Development
+
+**Variable 4 (Recommended for Production):**
+- Name: `NEXT_PUBLIC_SITE_URL`
+- Value: `https://agribeta.vercel.app`
+- Environment: Production, Preview
 
 3. **Redeploy** your application by:
    - Going to Deployments tab
