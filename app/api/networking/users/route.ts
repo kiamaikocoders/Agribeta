@@ -10,7 +10,7 @@ export async function GET(request: NextRequest) {
     const location = searchParams.get('location')
 
     // Build the query for profiles
-    let query = supabaseAdmin
+    let query = supabaseAdmin()
       .from('profiles')
       .select(`
         id,
@@ -59,7 +59,7 @@ export async function GET(request: NextRequest) {
         }
 
         if (profile.role === 'farmer') {
-          const { data: farmerData, error: farmerError } = await supabaseAdmin
+          const { data: farmerData, error: farmerError } = await supabaseAdmin()
             .from('farmer_profiles')
             .select('farm_name, farm_size, farm_location, primary_crop, total_diagnoses')
             .eq('id', profile.id)
@@ -78,7 +78,7 @@ export async function GET(request: NextRequest) {
             location: farmerData?.farm_location || profile.country,
           }
         } else if (profile.role === 'agronomist') {
-          const { data: agronomistData, error: agronomistError } = await supabaseAdmin
+          const { data: agronomistData, error: agronomistError } = await supabaseAdmin()
             .from('agronomist_profiles')
             .select('title, years_experience, specializations, average_rating, total_consultations, consultation_fee, response_time_minutes')
             .eq('id', profile.id)

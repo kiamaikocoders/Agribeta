@@ -27,16 +27,16 @@ export async function POST(req: NextRequest) {
     }
 
     // Validate caller identity against provided id
-    const { data: user, error: userError } = await supabaseAdmin.auth.getUser(token)
+    const { data: user, error: userError } = await supabaseAdmin().auth.getUser(token)
     if (userError || !user?.user?.id || user.user.id !== id) {
       return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
     }
 
     if (company) {
-      await supabaseAdmin.from('profiles').update({ company }).eq('id', id)
+      await supabaseAdmin().from('profiles').update({ company }).eq('id', id)
     }
 
-    const { error: upsertError } = await supabaseAdmin.from('agronomist_profiles').upsert({
+    const { error: upsertError } = await supabaseAdmin().from('agronomist_profiles').upsert({
       id,
       title,
       years_experience,

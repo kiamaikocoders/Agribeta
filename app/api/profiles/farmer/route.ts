@@ -28,18 +28,18 @@ export async function POST(req: NextRequest) {
     }
 
     // Validate caller identity against provided id
-    const { data: user, error: userError } = await supabaseAdmin.auth.getUser(token)
+    const { data: user, error: userError } = await supabaseAdmin().auth.getUser(token)
     if (userError || !user?.user?.id || user.user.id !== id) {
       return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
     }
 
     // Ensure main profile exists and role is farmer; also update farm_name if provided
     if (farm_name) {
-      await supabaseAdmin.from('profiles').update({ farm_name }).eq('id', id)
+      await supabaseAdmin().from('profiles').update({ farm_name }).eq('id', id)
     }
 
     // Upsert farmer profile using service role to bypass RLS, while still enforcing identity checks above
-    const { error: upsertError } = await supabaseAdmin.from('farmer_profiles').upsert({
+    const { error: upsertError } = await supabaseAdmin().from('farmer_profiles').upsert({
       id,
       farm_size,
       farm_location,
