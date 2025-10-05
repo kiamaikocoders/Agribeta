@@ -25,7 +25,7 @@ import {
   MapPin as LocationIcon
 } from 'lucide-react'
 import { useState, useEffect } from 'react'
-import { useRouter } from 'next/navigation'
+import { useRouter, useSearchParams } from 'next/navigation'
 
 interface Agronomist {
   id: string
@@ -47,65 +47,84 @@ export default function AgronomistBookingPage() {
   const { user, profile } = useAuth()
   const { usage, canUseService, trackUsage } = useUsage()
   const router = useRouter()
+  const searchParams = useSearchParams()
   
   const [agronomists, setAgronomists] = useState<Agronomist[]>([])
   const [selectedAgronomist, setSelectedAgronomist] = useState<Agronomist | null>(null)
+  const [loading, setLoading] = useState(true)
   const [selectedDate, setSelectedDate] = useState('')
   const [selectedTime, setSelectedTime] = useState('')
   const [consultationType, setConsultationType] = useState<'video' | 'phone' | 'farm_visit'>('video')
   const [duration, setDuration] = useState(60)
   const [message, setMessage] = useState('')
-  const [loading, setLoading] = useState(false)
   const [step, setStep] = useState<'select' | 'schedule' | 'confirm'>('select')
 
-  // Mock agronomist data - in real app, this would come from API
+  // Fetch agronomist data from API
   useEffect(() => {
-    const mockAgronomists: Agronomist[] = [
-      {
-        id: '1',
-        name: 'Dr. Sarah Kimani',
-        title: 'Senior Agronomist',
-        rating: 4.9,
-        reviews: 127,
-        specializations: ['Avocado Farming', 'Pest Management', 'Soil Health'],
-        hourly_rate: 75,
-        consultation_fee: 150,
-        bio: 'Expert in tropical fruit farming with 15+ years experience',
-        experience: 15,
-        location: 'Nairobi, Kenya',
-        availability: ['09:00', '10:00', '14:00', '15:00']
-      },
-      {
-        id: '2',
-        name: 'John Mwangi',
-        title: 'Crop Specialist',
-        rating: 4.7,
-        reviews: 89,
-        specializations: ['Crop Rotation', 'Irrigation', 'Organic Farming'],
-        hourly_rate: 60,
-        consultation_fee: 120,
-        bio: 'Specialized in sustainable farming practices',
-        experience: 12,
-        location: 'Mombasa, Kenya',
-        availability: ['08:00', '11:00', '13:00', '16:00']
-      },
-      {
-        id: '3',
-        name: 'Dr. Grace Wanjiku',
-        title: 'Plant Pathologist',
-        rating: 4.8,
-        reviews: 156,
-        specializations: ['Disease Diagnosis', 'Treatment Plans', 'Prevention'],
-        hourly_rate: 80,
-        consultation_fee: 160,
-        bio: 'Leading expert in plant diseases and treatment',
-        experience: 18,
-        location: 'Kisumu, Kenya',
-        availability: ['10:00', '12:00', '14:00', '17:00']
+    const fetchAgronomists = async () => {
+      try {
+        setLoading(true)
+        const response = await fetch('/api/networking/users?role=agronomist')
+        const data = await response.json()
+        
+        if (response.ok && data.users) {
+          // Transform API data to match our interface
+          const transformedAgronomists: Agronomist[] = data.users.map((user: any) => ({
+            id: user.id,
+            name: `${user.first_name} ${user.last_name}`,
+            title: user.title || 'Agricultural Consultant',
+            rating: user.average_rating || 4.5,
+            reviews: user.total_consultations || 0,
+            specializations: user.specializations || ['General Agriculture'],
+            hourly_rate: user.consultation_fee || 100,
+            consultation_fee: user.consultation_fee || 100,
+            bio: user.bio || 'Experienced agricultural consultant ready to help with your farming needs.',
+            experience: user.years_experience || 5,
+            location: user.location || 'Location not specified',
+            availability: ['09:00', '10:00', '14:00', '15:00'] // Default availability
+          }))
+          
+          setAgronomists(transformedAgronomists)
+          
+          // If there's an agronomist parameter in URL, pre-select it
+          const agronomistId = searchParams.get('agronomist')
+          if (agronomistId) {
+            const foundAgronomist = transformedAgronomists.find(ag => ag.id === agronomistId)
+            if (foundAgronomist) {
+              setSelectedAgronomist(foundAgronomist)
+              setStep('schedule') // Skip selection step if agronomist is pre-selected
+            }
+          }
+        } else {
+          console.error('Failed to fetch agronomists:', data.error)
+          // Fallback to mock data if API fails
+          const mockAgronomists: Agronomist[] = [
+            {
+              id: '1',
+              name: 'Dr. Sarah Kimani',
+              title: 'Senior Agronomist',
+              rating: 4.9,
+              reviews: 127,
+              specializations: ['Avocado Farming', 'Pest Management', 'Soil Health'],
+              hourly_rate: 75,
+              consultation_fee: 150,
+              bio: 'Expert in tropical fruit farming with 15+ years experience',
+              experience: 15,
+              location: 'Nairobi, Kenya',
+              availability: ['09:00', '10:00', '14:00', '15:00']
+            }
+          ]
+          setAgronomists(mockAgronomists)
+        }
+      } catch (error) {
+        console.error('Error fetching agronomists:', error)
+      } finally {
+        setLoading(false)
       }
-    ]
-    setAgronomists(mockAgronomists)
-  }, [])
+    }
+    
+    fetchAgronomists()
+  }, [searchParams])
 
   const handleSelectAgronomist = (agronomist: Agronomist) => {
     setSelectedAgronomist(agronomist)

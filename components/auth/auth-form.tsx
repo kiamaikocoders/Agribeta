@@ -13,12 +13,12 @@ import { toast } from '@/components/ui/use-toast'
 import { Loader2, User, Briefcase, Users } from 'lucide-react'
 import { useRouter } from 'next/navigation'
 import { useEffect } from 'react'
+import Link from 'next/link'
 
 export function AuthForm() {
   const [isLoading, setIsLoading] = useState(false)
   const [activeTab, setActiveTab] = useState<'signin' | 'signup'>('signin')
-  const [pendingSignupData, setPendingSignupData] = useState<any>(null)
-  const { signIn, signUp, completeProfileSetup, profile, user, loading } = useAuth()
+  const { signIn, signUp, profile, user, loading } = useAuth()
   const router = useRouter()
 
   // Sign in form state
@@ -60,21 +60,7 @@ export function AuthForm() {
     timezone: '',
   })
 
-  // Complete profile setup when user signs in for the first time
-  useEffect(() => {
-    if (profile && pendingSignupData && !profile.first_name) {
-      // User has signed in but profile is incomplete, complete the setup
-      const completeSetup = async () => {
-        const { error } = await completeProfileSetup(pendingSignupData)
-        if (error) {
-          console.error('Error completing profile setup:', error)
-        } else {
-          setPendingSignupData(null) // Clear the pending data
-        }
-      }
-      completeSetup()
-    }
-  }, [profile, pendingSignupData, completeProfileSetup])
+  // Profile completion will be handled on `/profile/complete` after email confirmation
 
   // Don't render the form if user is already authenticated
   if (loading) {
@@ -140,24 +126,9 @@ export function AuthForm() {
       e.preventDefault()
       setIsLoading(true)
 
-      const { error } = await signUp(signUpData.email, signUpData.password, {
-        ...signUpData,
-        farm_size: signUpData.farm_size ? parseFloat(signUpData.farm_size) : null,
-        years_experience: signUpData.years_experience ? parseInt(signUpData.years_experience) : null,
-        hourly_rate: signUpData.hourly_rate ? parseFloat(signUpData.hourly_rate) : null,
-        consultation_fee: signUpData.consultation_fee ? parseFloat(signUpData.consultation_fee) : null,
-      })
+      const { error } = await signUp(signUpData.email, signUpData.password, null)
 
-      if (!error) {
-        // Store the signup data for later profile completion
-        setPendingSignupData({
-          ...signUpData,
-          farm_size: signUpData.farm_size ? parseFloat(signUpData.farm_size) : null,
-          years_experience: signUpData.years_experience ? parseInt(signUpData.years_experience) : null,
-          hourly_rate: signUpData.hourly_rate ? parseFloat(signUpData.hourly_rate) : null,
-          consultation_fee: signUpData.consultation_fee ? parseFloat(signUpData.consultation_fee) : null,
-        })
-      }
+      // No profile creation here; handled post-confirmation
 
       if (error) {
         console.error('Signup error details:', error)
@@ -182,7 +153,7 @@ export function AuthForm() {
       } else {
         toast({
           title: 'Success',
-          description: 'Account created successfully! Please check your email for verification, then sign in.',
+          description: 'Account created! Check your email to confirm, then complete your profile.',
         })
         // Don't redirect immediately - let user verify email first
         setActiveTab('signin')
@@ -276,6 +247,11 @@ export function AuthForm() {
                   {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
                   Sign In
                 </Button>
+                <div className="text-center text-sm">
+                  <Link href="/auth/reset-password" className="text-agribeta-green hover:underline">
+                    Forgot Password?
+                  </Link>
+                </div>
               </form>
             </TabsContent>
 

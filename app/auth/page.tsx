@@ -13,16 +13,38 @@ export default function AuthPage() {
 
   useEffect(() => {
     if (!loading && user && profile) {
+      console.log('Auth page: User authenticated, redirecting...', { role: profile.role })
       // User is already authenticated, redirect to appropriate dashboard
+      let redirectPath = '/dashboard/networks'
       if (profile.role === 'admin') {
-        router.push('/dashboard/admin')
+        redirectPath = '/dashboard/admin'
       } else if (profile.role === 'farmer') {
-        router.push('/dashboard/farmer')
+        redirectPath = '/dashboard/farmer'
       } else if (profile.role === 'agronomist') {
-        router.push('/dashboard/agronomist')
-      } else {
-        router.push('/dashboard/networks')
+        redirectPath = '/dashboard/agronomist'
       }
+      
+      router.replace(redirectPath)
+      
+      // Fallback redirect if router doesn't work
+      setTimeout(() => {
+        if (window.location.pathname === '/auth') {
+          console.log('Router redirect failed, using window.location...')
+          window.location.href = redirectPath
+        }
+      }, 1000)
+    } else if (!loading && user && !profile) {
+      // User is authenticated but profile is still loading or missing
+      console.log('Auth page: User authenticated but profile missing, redirecting to networks...')
+      router.replace('/dashboard/networks')
+      
+      // Fallback redirect
+      setTimeout(() => {
+        if (window.location.pathname === '/auth') {
+          console.log('Router redirect failed, using window.location...')
+          window.location.href = '/dashboard/networks'
+        }
+      }, 1000)
     }
   }, [user, profile, loading, router])
 

@@ -20,11 +20,11 @@ export function MainNav() {
       href: "/dashboard/networks",
       icon: <Users className="mr-2 h-4 w-4" />,
     },
-    {
-      title: "Agronomists",
-      href: "/agronomists",
-      icon: <Users className="mr-2 h-4 w-4" />,
-    },
+        {
+          title: "Network",
+          href: "/agronomists",
+          icon: <Users className="mr-2 h-4 w-4" />,
+        },
     {
       title: "Analytics",
       href: "/analytics",

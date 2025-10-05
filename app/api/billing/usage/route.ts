@@ -13,7 +13,7 @@ export async function POST(request: NextRequest) {
     // Get current user profile
     const { data: profile, error: fetchError } = await supabase
       .from('profiles')
-      .select('ai_predictions_used, ai_predictions_limit, consultations_used, consultations_limit, subscription_tier')
+      .select('*')
       .eq('id', userId)
       .single()
 
@@ -110,7 +110,7 @@ export async function GET(request: NextRequest) {
     // Get current usage
     const { data: profile, error } = await supabase
       .from('profiles')
-      .select('ai_predictions_used, ai_predictions_limit, consultations_used, consultations_limit, subscription_tier')
+      .select('*')
       .eq('id', userId)
       .single()
 

@@ -72,6 +72,8 @@ interface AuthContextType {
   signIn: (email: string, password: string) => Promise<{ error: any }>
   signOut: () => Promise<void>
   updateProfile: (updates: Partial<UserProfile>) => Promise<{ error: any }>
+  fetchUserProfile: (userId: string) => Promise<void>
+  clearAuthState: () => void
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined)
@@ -85,13 +87,21 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [agronomistProfile, setAgronomistProfile] = useState<AgronomistProfile | null>(null)
   const [session, setSession] = useState<Session | null>(null)
   const [loading, setLoading] = useState(true)
+  const [isLoggingOut, setIsLoggingOut] = useState(false)
 
   useEffect(() => {
+    // Check if user just logged out
+    if (typeof window !== 'undefined' && localStorage.getItem('agribeta_logout') === 'true') {
+      localStorage.removeItem('agribeta_logout')
+      setLoading(false)
+      return // Don't restore session if user just logged out
+    }
+
     // Get initial session
     supabase.auth.getSession().then(({ data: { session } }) => {
       setSession(session)
       setUser(session?.user ?? null)
-      if (session?.user) {
+      if (session?.user && !isLoggingOut) {
         fetchUserProfile(session.user.id)
       } else {
         setLoading(false)
@@ -100,10 +110,25 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
     // Listen for auth changes
     const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
+      if (process.env.NODE_ENV === 'development') {
+        console.log('Auth state change:', event, session?.user?.id)
+      }
+      
+      // Don't restore session if user is logging out
+      if (isLoggingOut) {
+        return
+      }
+      
       setSession(session)
       setUser(session?.user ?? null)
       
-      if (session?.user) {
+      if (event === 'SIGNED_OUT') {
+        // Explicitly clear all state on sign out
+        setProfile(null)
+        setFarmerProfile(null)
+        setAgronomistProfile(null)
+        setLoading(false)
+      } else if (session?.user) {
         await fetchUserProfile(session.user.id)
       } else {
         setProfile(null)
@@ -114,7 +139,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     })
 
     return () => subscription.unsubscribe()
-  }, [])
+  }, [isLoggingOut])
 
   const fetchUserProfile = async (userId: string) => {
     try {
@@ -135,21 +160,33 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
       // Fetch role-specific profile if it exists
       if (profileData.role === 'farmer') {
-        const { data: farmerData } = await supabase
+        const { data: farmerData, error: farmerError } = await supabase
           .from('farmer_profiles')
           .select('*')
           .eq('id', userId)
           .single()
         
-        setFarmerProfile(farmerData)
+        if (farmerError) {
+          console.warn('Farmer profile not found or access denied:', farmerError)
+          // Don't block the auth flow if farmer profile is missing
+          setFarmerProfile(null)
+        } else {
+          setFarmerProfile(farmerData)
+        }
       } else if (profileData.role === 'agronomist') {
-        const { data: agronomistData } = await supabase
+        const { data: agronomistData, error: agronomistError } = await supabase
           .from('agronomist_profiles')
           .select('*')
           .eq('id', userId)
           .single()
         
-        setAgronomistProfile(agronomistData)
+        if (agronomistError) {
+          console.warn('Agronomist profile not found or access denied:', agronomistError)
+          // Don't block the auth flow if agronomist profile is missing
+          setAgronomistProfile(null)
+        } else {
+          setAgronomistProfile(agronomistData)
+        }
       }
 
       // Auto-promote allowlisted emails to admin if needed
@@ -172,11 +209,17 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     }
   }
 
-  const signUp = async (email: string, password: string, userData: any) => {
+  const signUp = async (email: string, password: string, _userData: any) => {
     try {
+      const redirectBase = typeof window !== 'undefined' && window.location?.origin
+        ? window.location.origin
+        : (process.env.NEXT_PUBLIC_SITE_URL || '')
+      const emailRedirectTo = redirectBase ? `${redirectBase}/profile/complete` : undefined
+
       const { data: authData, error: authError } = await supabase.auth.signUp({
         email,
         password,
+        options: emailRedirectTo ? { emailRedirectTo } : undefined,
       })
 
       if (authError) return { error: authError }
@@ -209,7 +252,57 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   }
 
   const signOut = async () => {
-    await supabase.auth.signOut()
+    try {
+      setIsLoggingOut(true)
+      
+      // Clear all auth state first
+      setUser(null)
+      setProfile(null)
+      setFarmerProfile(null)
+      setAgronomistProfile(null)
+      setSession(null)
+
+      // Sign out from Supabase
+      await supabase.auth.signOut()
+
+      // Clear any cached data in localStorage/sessionStorage
+      if (typeof window !== 'undefined') {
+        // Set a logout flag to prevent session restoration
+        localStorage.setItem('agribeta_logout', 'true')
+        
+        // Clear ALL Supabase-related data more aggressively
+        const keys = Object.keys(localStorage)
+        keys.forEach(key => {
+          if (key.includes('supabase') || key.includes('sb-') || key.includes('auth')) {
+            localStorage.removeItem(key)
+          }
+        })
+
+        // Clear session storage completely
+        sessionStorage.clear()
+
+        // Clear any other auth-related data
+        localStorage.removeItem('supabase.auth.token')
+        localStorage.removeItem('supabase.auth.refresh_token')
+        localStorage.removeItem('supabase.auth.access_token')
+
+        // Force a hard refresh to clear any cached auth state
+        // This prevents Supabase from restoring the session
+        window.location.replace('/')
+      }
+    } catch (error) {
+      console.error('Error during sign out:', error)
+      // Even if there's an error, clear the local state and force redirect
+      setUser(null)
+      setProfile(null)
+      setFarmerProfile(null)
+      setAgronomistProfile(null)
+      setSession(null)
+      
+      if (typeof window !== 'undefined') {
+        window.location.replace('/')
+      }
+    }
   }
 
   const updateProfile = async (updates: Partial<UserProfile>) => {
@@ -327,6 +420,37 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     }
   }
 
+  // Function to force clear auth state (useful for debugging or manual logout)
+  const clearAuthState = () => {
+    setUser(null)
+    setProfile(null)
+    setFarmerProfile(null)
+    setAgronomistProfile(null)
+    setSession(null)
+    setLoading(false)
+
+    if (typeof window !== 'undefined') {
+      // Clear ALL Supabase-related data more aggressively
+      const keys = Object.keys(localStorage)
+      keys.forEach(key => {
+        if (key.includes('supabase') || key.includes('sb-') || key.includes('auth')) {
+          localStorage.removeItem(key)
+        }
+      })
+      
+      // Clear session storage completely
+      sessionStorage.clear()
+      
+      // Clear any other auth-related data
+      localStorage.removeItem('supabase.auth.token')
+      localStorage.removeItem('supabase.auth.refresh_token')
+      localStorage.removeItem('supabase.auth.access_token')
+
+      // Force a hard refresh to clear any cached auth state
+      window.location.replace('/')
+    }
+  }
+
   const value = {
     user,
     profile,
@@ -339,6 +463,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     signOut,
     updateProfile,
     completeProfileSetup,
+    fetchUserProfile,
+    clearAuthState,
   }
 
   return (

@@ -1,11 +1,13 @@
 import type React from "react"
 import { ThemeProvider } from "@/components/theme-provider"
 import { Toaster } from "@/components/ui/toaster"
+import { Toaster as SonnerToaster } from "sonner"
 import { AnalyticsWrapper } from "@/components/analytics-wrapper"
 import { SiteHeader } from "@/components/site-header"
 import { SiteFooter } from "@/components/site-footer"
 import { DiagnosisHistoryProvider } from "@/contexts/diagnosis-history-context"
 import { AuthProvider } from "@/contexts/auth-context"
+import { AuthDebug } from "@/components/debug/auth-debug"
 import { cn } from "@/lib/utils"
 import "@/app/globals.css"
 import { Suspense } from "react"
@@ -39,10 +41,12 @@ export default function RootLayout({
             </div>
                 <Suspense fallback={null}>
             <Toaster />
+            <SonnerToaster position="top-right" />
                 </Suspense>
                 <Suspense fallback={null}>
                   <AnalyticsWrapper />
                 </Suspense>
+                <AuthDebug />
           </DiagnosisHistoryProvider>
             </AuthProvider>
             </Suspense>

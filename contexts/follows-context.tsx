@@ -47,18 +47,11 @@ interface Connection {
 interface FollowsContextType {
   followers: Follow[]
   following: Follow[]
-  connections: Connection[]
-  pendingConnections: Connection[]
   loading: boolean
   error: string | null
   followUser: (userId: string) => Promise<void>
   unfollowUser: (userId: string) => Promise<void>
-  sendConnectionRequest: (userId: string) => Promise<void>
-  acceptConnection: (connectionId: string) => Promise<void>
-  rejectConnection: (connectionId: string) => Promise<void>
   isFollowing: (userId: string) => boolean
-  isConnected: (userId: string) => boolean
-  hasPendingConnection: (userId: string) => boolean
   refreshData: () => Promise<void>
 }
 
@@ -68,8 +61,7 @@ export function FollowsProvider({ children }: { children: React.ReactNode }) {
   const { user } = useAuth()
   const [followers, setFollowers] = useState<Follow[]>([])
   const [following, setFollowing] = useState<Follow[]>([])
-  const [connections, setConnections] = useState<Connection[]>([])
-  const [pendingConnections, setPendingConnections] = useState<Connection[]>([])
+  // Deprecated connections in favor of one-way follows
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
 
@@ -112,36 +104,9 @@ export function FollowsProvider({ children }: { children: React.ReactNode }) {
 
       if (followingError) throw followingError
 
-      // Fetch connections where user is requester or receiver
-      const { data: connectionsData, error: connectionsError } = await supabase
-        .from('connections')
-        .select(`
-          *,
-          requester:profiles!connections_requester_id_fkey(
-            first_name,
-            last_name,
-            avatar_url,
-            role
-          ),
-          receiver:profiles!connections_receiver_id_fkey(
-            first_name,
-            last_name,
-            avatar_url,
-            role
-          )
-        `)
-        .or(`requester_id.eq.${user.id},receiver_id.eq.${user.id}`)
-
-      if (connectionsError) throw connectionsError
-
       setFollowers(followersData || [])
       setFollowing(followingData || [])
-      setConnections(connectionsData || [])
-      setPendingConnections(
-        (connectionsData || []).filter(conn => 
-          conn.receiver_id === user.id && conn.status === 'pending'
-        )
-      )
+      
     } catch (err) {
       console.error('Error fetching follow/connection data:', err)
       setError(err instanceof Error ? err.message : 'Failed to fetch data')
@@ -204,102 +169,13 @@ export function FollowsProvider({ children }: { children: React.ReactNode }) {
     }
   }, [user, fetchData])
 
-  // Send connection request
-  const sendConnectionRequest = useCallback(async (userId: string) => {
-    if (!user) return
-
-    try {
-      const { error } = await supabase
-        .from('connections')
-        .insert({
-          requester_id: user.id,
-          receiver_id: userId,
-          status: 'pending'
-        })
-
-      if (error) throw error
-
-      // Refresh data
-      await fetchData()
-
-      // Create notification for the receiver
-      await supabase
-        .from('notifications')
-        .insert({
-          user_id: userId,
-          type: 'follow',
-          title: 'Connection Request',
-          message: `${user.user_metadata?.first_name || 'Someone'} wants to connect with you`,
-          sender_id: user.id
-        })
-    } catch (err) {
-      console.error('Error sending connection request:', err)
-      setError(err instanceof Error ? err.message : 'Failed to send connection request')
-    }
-  }, [user, fetchData])
-
-  // Accept connection
-  const acceptConnection = useCallback(async (connectionId: string) => {
-    if (!user) return
-
-    try {
-      const { error } = await supabase
-        .from('connections')
-        .update({ status: 'accepted' })
-        .eq('id', connectionId)
-        .eq('receiver_id', user.id)
-
-      if (error) throw error
-
-      // Refresh data
-      await fetchData()
-    } catch (err) {
-      console.error('Error accepting connection:', err)
-      setError(err instanceof Error ? err.message : 'Failed to accept connection')
-    }
-  }, [user, fetchData])
-
-  // Reject connection
-  const rejectConnection = useCallback(async (connectionId: string) => {
-    if (!user) return
-
-    try {
-      const { error } = await supabase
-        .from('connections')
-        .update({ status: 'rejected' })
-        .eq('id', connectionId)
-        .eq('receiver_id', user.id)
-
-      if (error) throw error
-
-      // Refresh data
-      await fetchData()
-    } catch (err) {
-      console.error('Error rejecting connection:', err)
-      setError(err instanceof Error ? err.message : 'Failed to reject connection')
-    }
-  }, [user, fetchData])
 
   // Check if following a user
   const isFollowing = useCallback((userId: string) => {
     return following.some(follow => follow.following_id === userId)
   }, [following])
 
-  // Check if connected to a user
-  const isConnected = useCallback((userId: string) => {
-    return connections.some(conn => 
-      (conn.requester_id === user?.id && conn.receiver_id === userId && conn.status === 'accepted') ||
-      (conn.receiver_id === user?.id && conn.requester_id === userId && conn.status === 'accepted')
-    )
-  }, [connections, user])
 
-  // Check if there's a pending connection
-  const hasPendingConnection = useCallback((userId: string) => {
-    return connections.some(conn => 
-      (conn.requester_id === user?.id && conn.receiver_id === userId && conn.status === 'pending') ||
-      (conn.receiver_id === user?.id && conn.requester_id === userId && conn.status === 'pending')
-    )
-  }, [connections, user])
 
   // Load data on mount
   useEffect(() => {
@@ -309,18 +185,11 @@ export function FollowsProvider({ children }: { children: React.ReactNode }) {
   const value: FollowsContextType = {
     followers,
     following,
-    connections,
-    pendingConnections,
     loading,
     error,
     followUser,
     unfollowUser,
-    sendConnectionRequest,
-    acceptConnection,
-    rejectConnection,
     isFollowing,
-    isConnected,
-    hasPendingConnection,
     refreshData: fetchData
   }
 

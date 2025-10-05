@@ -7,264 +7,346 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import { Badge } from '@/components/ui/badge'
 import { Input } from '@/components/ui/input'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { PageBackground } from '@/components/page-background'
-import { Search, Filter, Star, MapPin, Clock, Users, Award, MessageCircle, Calendar } from 'lucide-react'
+import { Search, Filter, Star, MapPin, Clock, Users, Award, MessageCircle, Calendar, User, Briefcase } from 'lucide-react'
 import Link from 'next/link'
 import { FollowsProvider } from '@/contexts/follows-context'
+import { MessagingProvider } from '@/contexts/messaging-context'
 import { FollowConnectButton } from '@/components/follows/follow-connect-button'
-import { useState } from 'react'
+import { useAuth } from '@/contexts/auth-context'
+import { useMessaging } from '@/contexts/messaging-context'
+import { NetworkingCard } from '@/components/networking/networking-card'
+import { useState, useEffect } from 'react'
 import { toast } from '@/components/ui/use-toast'
 
-export default function AgronomistsPage() {
+// Networking Page Component
+function NetworkingPage() {
+  const { profile } = useAuth()
   const [searchQuery, setSearchQuery] = useState('')
   const [selectedSpecialization, setSelectedSpecialization] = useState('all')
   const [selectedLocation, setSelectedLocation] = useState('all')
+  const [activeTab, setActiveTab] = useState<'all' | 'agronomists' | 'farmers'>('all')
+  const [users, setUsers] = useState<any[]>([])
+  const [loading, setLoading] = useState(true)
+
+  // Fetch users from API
+  const fetchUsers = async () => {
+    try {
+      setLoading(true)
+      const params = new URLSearchParams({
+        role: activeTab,
+        search: searchQuery,
+        specialization: selectedSpecialization,
+        location: selectedLocation,
+      })
+
+      const response = await fetch(`/api/networking/users?${params}`)
+      const data = await response.json()
+      
+      if (response.ok) {
+        setUsers(data.users || [])
+      } else {
+        console.error('Error fetching users:', data.error)
+        toast({
+          title: "Error",
+          description: "Failed to fetch users. Using sample data.",
+          variant: "destructive",
+        })
+        // Fallback to mock data if API fails
+        setUsers(getMockUsers())
+      }
+    } catch (error) {
+      console.error('Error fetching users:', error)
+      setUsers(getMockUsers())
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  // Mock data fallback
+  const getMockUsers = () => [
+    // Agronomists
+    {
+      id: 'agronomist-1',
+      first_name: 'Dr. Johnson',
+      last_name: 'Mwangi',
+      role: 'agronomist' as const,
+      avatar_url: '/placeholder-user.jpg',
+      bio: 'Expert in tropical fruit farming with 15+ years experience',
+      location: 'Nairobi, Kenya',
+      is_verified: true,
+      title: 'Senior Agronomist',
+      years_experience: 15,
+      specializations: ['Avocado Farming', 'Pest Management', 'Soil Health'],
+      average_rating: 4.9,
+      total_consultations: 127,
+      consultation_fee: 150,
+      response_time_minutes: 120
+    },
+    {
+      id: 'agronomist-2',
+      first_name: 'Sarah',
+      last_name: 'Kimani',
+      role: 'agronomist' as const,
+      avatar_url: '/placeholder-user.jpg',
+      bio: 'Specialized in rose cultivation and greenhouse management',
+      location: 'Nakuru, Kenya',
+      is_verified: true,
+      title: 'Rose Cultivation Specialist',
+      years_experience: 8,
+      specializations: ['Rose Cultivation', 'Greenhouse Management', 'Flower Farming'],
+      average_rating: 4.8,
+      total_consultations: 89,
+      consultation_fee: 120,
+      response_time_minutes: 240
+    },
+    {
+      id: 'agronomist-3',
+      first_name: 'Michael',
+      last_name: 'Ochieng',
+      role: 'agronomist' as const,
+      avatar_url: '/placeholder-user.jpg',
+      bio: 'Leading expert in pest management and integrated pest control',
+      location: 'Kisumu, Kenya',
+      is_verified: true,
+      title: 'Pest Management Expert',
+      years_experience: 12,
+      specializations: ['Pest Control', 'IPM', 'Crop Protection'],
+      average_rating: 4.7,
+      total_consultations: 156,
+      consultation_fee: 140,
+      response_time_minutes: 360
+    },
+    // Farmers
+    {
+      id: 'farmer-1',
+      first_name: 'Grace',
+      last_name: 'Wanjiku',
+      role: 'farmer' as const,
+      avatar_url: '/placeholder-user.jpg',
+      bio: 'Passionate avocado farmer with 5 hectares of organic avocado trees',
+      location: 'Murang\'a, Kenya',
+      is_verified: false,
+      farm_name: 'Green Valley Farm',
+      farm_size: 5,
+      primary_crop: 'Avocado',
+      total_diagnoses: 23
+    },
+    {
+      id: 'farmer-2',
+      first_name: 'Peter',
+      last_name: 'Mwangi',
+      role: 'farmer' as const,
+      avatar_url: '/placeholder-user.jpg',
+      bio: 'Experienced rose farmer specializing in greenhouse rose cultivation',
+      location: 'Naivasha, Kenya',
+      is_verified: true,
+      farm_name: 'Rose Garden Farm',
+      farm_size: 2.5,
+      primary_crop: 'Roses',
+      total_diagnoses: 45
+    },
+    {
+      id: 'farmer-3',
+      first_name: 'Mary',
+      last_name: 'Akinyi',
+      role: 'farmer' as const,
+      avatar_url: '/placeholder-user.jpg',
+      bio: 'Mixed crop farmer with expertise in vegetable farming and sustainable practices',
+      location: 'Kiambu, Kenya',
+      is_verified: false,
+      farm_name: 'Fresh Produce Farm',
+      farm_size: 3,
+      primary_crop: 'Vegetables',
+      total_diagnoses: 67
+    }
+  ]
+
+  // Fetch users when component mounts or filters change
+  useEffect(() => {
+    fetchUsers()
+  }, [activeTab, searchQuery, selectedSpecialization, selectedLocation])
 
   const handleSearch = (query: string) => {
     setSearchQuery(query)
-    toast({
-      title: "Search",
-      description: `Searching for agronomists matching "${query}"`,
-    })
   }
 
   const handleSpecializationChange = (specialization: string) => {
     setSelectedSpecialization(specialization)
-    toast({
-      title: "Filter Applied",
-      description: `Filtering by specialization: ${specialization}`,
-    })
   }
 
   const handleLocationChange = (location: string) => {
     setSelectedLocation(location)
-    toast({
-      title: "Filter Applied",
-      description: `Filtering by location: ${location}`,
-    })
   }
 
+  // Filter users based on active tab (API already filters by role, but we need to separate for display)
+  const agronomists = users.filter(user => user.role === 'agronomist')
+  const farmers = users.filter(user => user.role === 'farmer')
+  const filteredUsers = users
+
+  return (
+    <MessagingProvider>
+      <div className="container py-8">
+        <div className="mb-8">
+          <div className="flex items-center justify-between mb-4">
+            <div>
+              <h1 className="text-4xl font-bold text-agribeta-green mb-2">Network Hub</h1>
+              <p className="text-lg text-muted-foreground">Connect with agronomists and farmers to build your agricultural network</p>
+            </div>
+            <div className="flex gap-2">
+              <Button asChild variant="outline">
+                <Link href="/messages">
+                  <MessageCircle className="mr-2 h-4 w-4" />
+                  Messages
+                </Link>
+              </Button>
+              {profile?.role === 'farmer' && (
+                <Button asChild className="bg-agribeta-green hover:bg-agribeta-green/90">
+                  <Link href="/agronomists/booking">
+                    <Calendar className="mr-2 h-4 w-4" />
+                    Book Consultation
+                  </Link>
+                </Button>
+              )}
+            </div>
+          </div>
+        </div>
+
+        {/* Search and Filters */}
+        <div className="mb-8">
+          <Card>
+            <CardContent className="pt-6">
+              <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+                <div className="md:col-span-2">
+                  <div className="relative">
+                    <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground h-4 w-4" />
+                    <Input
+                      placeholder="Search by name, specialization, or location..."
+                      className="pl-10"
+                      value={searchQuery}
+                      onChange={(e) => handleSearch(e.target.value)}
+                    />
+                  </div>
+                </div>
+                
+                <Select value={selectedSpecialization} onValueChange={handleSpecializationChange}>
+                  <SelectTrigger>
+                    <SelectValue placeholder="Specialization" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">All Specializations</SelectItem>
+                    <SelectItem value="avocado">Avocado Farming</SelectItem>
+                    <SelectItem value="roses">Rose Cultivation</SelectItem>
+                    <SelectItem value="vegetables">Vegetable Farming</SelectItem>
+                    <SelectItem value="pest-management">Pest Management</SelectItem>
+                  </SelectContent>
+                </Select>
+
+                <Select value={selectedLocation} onValueChange={handleLocationChange}>
+                  <SelectTrigger>
+                    <SelectValue placeholder="Location" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">All Locations</SelectItem>
+                    <SelectItem value="nairobi">Nairobi</SelectItem>
+                    <SelectItem value="nakuru">Nakuru</SelectItem>
+                    <SelectItem value="kisumu">Kisumu</SelectItem>
+                    <SelectItem value="muranga">Murang'a</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+
+        {/* Tabs */}
+        <Tabs value={activeTab} onValueChange={(value) => setActiveTab(value as any)} className="mb-8">
+          <TabsList className="grid w-full grid-cols-3">
+            <TabsTrigger value="all" className="flex items-center gap-2">
+              <Users className="h-4 w-4" />
+              All Users ({filteredUsers.length})
+            </TabsTrigger>
+            <TabsTrigger value="agronomists" className="flex items-center gap-2">
+              <Briefcase className="h-4 w-4" />
+              Agronomists ({agronomists.length})
+            </TabsTrigger>
+            <TabsTrigger value="farmers" className="flex items-center gap-2">
+              <User className="h-4 w-4" />
+              Farmers ({farmers.length})
+            </TabsTrigger>
+          </TabsList>
+
+          <TabsContent value="all" className="mt-6">
+            {loading ? (
+              <div className="flex items-center justify-center py-8">
+                <div className="text-center">
+                  <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-agribeta-green mx-auto mb-4"></div>
+                  <p className="text-muted-foreground">Loading users...</p>
+                </div>
+              </div>
+            ) : (
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                {filteredUsers.map((user) => (
+                  <NetworkingCard key={user.id} user={user} />
+                ))}
+              </div>
+            )}
+          </TabsContent>
+
+          <TabsContent value="agronomists" className="mt-6">
+            {loading ? (
+              <div className="flex items-center justify-center py-8">
+                <div className="text-center">
+                  <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-agribeta-green mx-auto mb-4"></div>
+                  <p className="text-muted-foreground">Loading agronomists...</p>
+                </div>
+              </div>
+            ) : (
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                {agronomists.map((user) => (
+                  <NetworkingCard key={user.id} user={user} />
+                ))}
+              </div>
+            )}
+          </TabsContent>
+
+          <TabsContent value="farmers" className="mt-6">
+            {loading ? (
+              <div className="flex items-center justify-center py-8">
+                <div className="text-center">
+                  <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-agribeta-green mx-auto mb-4"></div>
+                  <p className="text-muted-foreground">Loading farmers...</p>
+                </div>
+              </div>
+            ) : (
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                {farmers.map((user) => (
+                  <NetworkingCard key={user.id} user={user} />
+                ))}
+              </div>
+            )}
+          </TabsContent>
+        </Tabs>
+
+        {/* Load More */}
+        <div className="text-center mt-8">
+          <Button variant="outline" size="lg">
+            Load More Users
+          </Button>
+        </div>
+      </div>
+    </MessagingProvider>
+  )
+}
+
+export default function AgronomistsPage() {
   return (
     <ProtectedRoute>
       <FollowsProvider>
         <PageBackground imageSrc="/greenhouse-robotics.png" opacity={0.1}>
-        <div className="container py-8">
-          <div className="mb-8">
-            <div className="flex items-center justify-between mb-4">
-              <div>
-                <h1 className="text-4xl font-bold text-agribeta-green mb-2">Find Agronomists</h1>
-                <p className="text-lg text-muted-foreground">Connect with experienced agricultural experts for personalized advice</p>
-              </div>
-              <Button asChild className="bg-agribeta-green hover:bg-agribeta-green/90">
-                <Link href="/agronomists/booking">
-                  <Calendar className="mr-2 h-4 w-4" />
-                  Book Consultation
-                </Link>
-              </Button>
-            </div>
-          </div>
-
-          {/* Search and Filters */}
-          <div className="mb-8">
-            <Card>
-              <CardContent className="pt-6">
-                <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-                  <div className="md:col-span-2">
-                    <div className="relative">
-                      <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground h-4 w-4" />
-                      <Input
-                        placeholder="Search agronomists by name, specialization, or location..."
-                        className="pl-10"
-                        value={searchQuery}
-                        onChange={(e) => handleSearch(e.target.value)}
-                      />
-                    </div>
-                  </div>
-                  
-                  <Select value={selectedSpecialization} onValueChange={handleSpecializationChange}>
-                    <SelectTrigger>
-                      <SelectValue placeholder="Specialization" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="all">All Specializations</SelectItem>
-                      <SelectItem value="avocado">Avocado Farming</SelectItem>
-                      <SelectItem value="roses">Rose Cultivation</SelectItem>
-                      <SelectItem value="maize">Maize Production</SelectItem>
-                      <SelectItem value="vegetables">Vegetable Farming</SelectItem>
-                      <SelectItem value="pest-management">Pest Management</SelectItem>
-                    </SelectContent>
-                  </Select>
-
-                  <Select value={selectedLocation} onValueChange={handleLocationChange}>
-                    <SelectTrigger>
-                      <SelectValue placeholder="Location" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="all">All Locations</SelectItem>
-                      <SelectItem value="kenya">Kenya</SelectItem>
-                      <SelectItem value="tanzania">Tanzania</SelectItem>
-                      <SelectItem value="uganda">Uganda</SelectItem>
-                      <SelectItem value="ethiopia">Ethiopia</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
-              </CardContent>
-            </Card>
-          </div>
-
-          {/* Agronomists Grid */}
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {/* Agronomist Card 1 */}
-            <Card className="hover:shadow-lg transition-shadow">
-              <CardHeader className="text-center">
-                <div className="flex justify-center mb-4">
-                  <Avatar className="h-20 w-20">
-                    <AvatarImage src="/placeholder-user.jpg" alt="Dr. Johnson" />
-                    <AvatarFallback className="text-xl">DJ</AvatarFallback>
-                  </Avatar>
-                </div>
-                <CardTitle className="text-lg">Dr. Johnson Mwangi</CardTitle>
-                <CardDescription>Senior Agronomist • 15+ Years Experience</CardDescription>
-                <div className="flex justify-center gap-2 mt-2">
-                  <Badge variant="secondary" className="bg-blue-100 text-blue-800">
-                    Verified
-                  </Badge>
-                  <Badge variant="outline">Avocado Expert</Badge>
-                </div>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                  <MapPin className="h-4 w-4" />
-                  <span>Nairobi, Kenya</span>
-                </div>
-                <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                  <Star className="h-4 w-4 text-yellow-500" />
-                  <span>4.9 (127 reviews)</span>
-                </div>
-                <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                  <Clock className="h-4 w-4" />
-                  <span>Usually responds in 2 hours</span>
-                </div>
-                <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                  <Users className="h-4 w-4" />
-                  <span>1,234 farmers helped</span>
-                </div>
-                <div className="flex gap-2">
-                  <FollowConnectButton 
-                    targetUserId="agronomist-1" 
-                    targetUserRole="agronomist" 
-                    className="flex-1"
-                  />
-                  <Button variant="outline" size="sm">
-                    <Award className="h-4 w-4" />
-                  </Button>
-                </div>
-              </CardContent>
-            </Card>
-
-            {/* Agronomist Card 2 */}
-            <Card className="hover:shadow-lg transition-shadow">
-              <CardHeader className="text-center">
-                <div className="flex justify-center mb-4">
-                  <Avatar className="h-20 w-20">
-                    <AvatarImage src="/placeholder-user.jpg" alt="Sarah Kimani" />
-                    <AvatarFallback className="text-xl">SK</AvatarFallback>
-                  </Avatar>
-                </div>
-                <CardTitle className="text-lg">Sarah Kimani</CardTitle>
-                <CardDescription>Rose Cultivation Specialist • 8+ Years Experience</CardDescription>
-                <div className="flex justify-center gap-2 mt-2">
-                  <Badge variant="secondary" className="bg-blue-100 text-blue-800">
-                    Verified
-                  </Badge>
-                  <Badge variant="outline">Rose Expert</Badge>
-                </div>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                  <MapPin className="h-4 w-4" />
-                  <span>Nakuru, Kenya</span>
-                </div>
-                <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                  <Star className="h-4 w-4 text-yellow-500" />
-                  <span>4.8 (89 reviews)</span>
-                </div>
-                <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                  <Clock className="h-4 w-4" />
-                  <span>Usually responds in 4 hours</span>
-                </div>
-                <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                  <Users className="h-4 w-4" />
-                  <span>567 farmers helped</span>
-                </div>
-                <div className="flex gap-2">
-                  <Button className="flex-1 bg-agribeta-green hover:bg-agribeta-green/90">
-                    <MessageCircle className="mr-2 h-4 w-4" />
-                    Connect
-                  </Button>
-                  <Button variant="outline" size="sm">
-                    <Award className="h-4 w-4" />
-                  </Button>
-                </div>
-              </CardContent>
-            </Card>
-
-            {/* Agronomist Card 3 */}
-            <Card className="hover:shadow-lg transition-shadow">
-              <CardHeader className="text-center">
-                <div className="flex justify-center mb-4">
-                  <Avatar className="h-20 w-20">
-                    <AvatarImage src="/placeholder-user.jpg" alt="Michael Ochieng" />
-                    <AvatarFallback className="text-xl">MO</AvatarFallback>
-                  </Avatar>
-                </div>
-                <CardTitle className="text-lg">Michael Ochieng</CardTitle>
-                <CardDescription>Pest Management Expert • 12+ Years Experience</CardDescription>
-                <div className="flex justify-center gap-2 mt-2">
-                  <Badge variant="secondary" className="bg-blue-100 text-blue-800">
-                    Verified
-                  </Badge>
-                  <Badge variant="outline">Pest Control</Badge>
-                </div>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                  <MapPin className="h-4 w-4" />
-                  <span>Kisumu, Kenya</span>
-                </div>
-                <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                  <Star className="h-4 w-4 text-yellow-500" />
-                  <span>4.7 (156 reviews)</span>
-                </div>
-                <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                  <Clock className="h-4 w-4" />
-                  <span>Usually responds in 6 hours</span>
-                </div>
-                <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                  <Users className="h-4 w-4" />
-                  <span>892 farmers helped</span>
-                </div>
-                <div className="flex gap-2">
-                  <Button className="flex-1 bg-agribeta-green hover:bg-agribeta-green/90">
-                    <MessageCircle className="mr-2 h-4 w-4" />
-                    Connect
-                  </Button>
-                  <Button variant="outline" size="sm">
-                    <Award className="h-4 w-4" />
-                  </Button>
-                </div>
-              </CardContent>
-            </Card>
-          </div>
-
-          {/* Load More */}
-          <div className="text-center mt-8">
-            <Button variant="outline" size="lg">
-              Load More Agronomists
-            </Button>
-          </div>
-        </div>
-      </PageBackground>
+          <NetworkingPage />
+        </PageBackground>
       </FollowsProvider>
     </ProtectedRoute>
   )

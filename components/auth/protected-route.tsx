@@ -19,15 +19,25 @@ export function ProtectedRoute({
   const { user, profile, loading } = useAuth()
   const router = useRouter()
 
+  // Force redirect if user is not authenticated and we're not loading
+  useEffect(() => {
+    if (!loading && !user && typeof window !== 'undefined') {
+      console.log('ProtectedRoute: Force redirecting to', redirectTo)
+      window.location.href = redirectTo
+    }
+  }, [loading, user, redirectTo])
+
   useEffect(() => {
     if (!loading) {
       if (!user) {
-        router.push(redirectTo)
+        console.log('ProtectedRoute: No user, redirecting to', redirectTo)
+        router.replace(redirectTo)
         return
       }
 
       if (profile && !allowedRoles.includes(profile.role)) {
-        router.push('/unauthorized')
+        console.log('ProtectedRoute: User role not allowed, redirecting to /unauthorized')
+        router.replace('/unauthorized')
         return
       }
     }
@@ -42,7 +52,15 @@ export function ProtectedRoute({
   }
 
   if (!user || (profile && !allowedRoles.includes(profile.role))) {
-    return null
+    // Show loading while redirecting
+    return (
+      <div className="flex items-center justify-center min-h-screen">
+        <div className="text-center">
+          <Loader2 className="h-8 w-8 animate-spin text-agribeta-green mx-auto mb-2" />
+          <p className="text-sm text-muted-foreground">Redirecting...</p>
+        </div>
+      </div>
+    )
   }
 
   return <>{children}</>

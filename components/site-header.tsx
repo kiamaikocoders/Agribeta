@@ -11,18 +11,25 @@ import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel,
 import { useAuth } from "@/contexts/auth-context"
 import { Bell, User, Settings, LogOut, BarChart2, Calendar, MessageCircle, BookOpen } from "lucide-react"
 import { Suspense } from "react"
+import { useRouter } from "next/navigation"
 import { NotificationsProvider } from "@/contexts/notifications-context"
 import { NotificationsBell } from "@/components/notifications/notifications-bell"
 
 export function SiteHeader() {
   const { user, profile, signOut, loading } = useAuth()
+  const router = useRouter()
 
   const handleSignOut = async () => {
     try {
       await signOut()
-      // The auth context will handle the state updates automatically
+      // The signOut function now handles the redirect with window.location.replace('/')
+      // No need for additional navigation here
     } catch (error) {
       console.error('Error signing out:', error)
+      // Force redirect even if there's an error
+      if (typeof window !== 'undefined') {
+        window.location.replace('/')
+      }
     }
   }
 
@@ -114,6 +121,12 @@ export function SiteHeader() {
                       <Link href="/profile" className="flex items-center">
                         <User className="mr-2 h-4 w-4" />
                         <span>Profile</span>
+                      </Link>
+                    </DropdownMenuItem>
+                    <DropdownMenuItem asChild>
+                      <Link href={profile?.role === 'agronomist' ? '/dashboard/agronomist' : profile?.role === 'farmer' ? '/dashboard/farmer' : '/dashboard'} className="flex items-center">
+                        <BarChart2 className="mr-2 h-4 w-4" />
+                        <span>Dashboard</span>
                       </Link>
                     </DropdownMenuItem>
                     <DropdownMenuItem asChild>
