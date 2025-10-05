@@ -363,8 +363,6 @@ export {
   ChartLegendContent,
   ChartStyle,
 }
-<<<<<<< Current (Your changes)
-=======
 
 // Lightweight wrapper used by admin analytics pages
 // Accepts series in the shape: [{ name: string, data: [{ x: any, y: number }] }]
@@ -459,4 +457,3 @@ export function Chart({
     </ChartContainer>
   )
 }
->>>>>>> Incoming (Background Agent changes)
