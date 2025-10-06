@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react'
 import { supabase } from '@/lib/supabaseClient'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 
 interface UserRow {
   id: string
@@ -13,6 +14,7 @@ interface UserRow {
   role: string
   subscription_tier: string
   is_active?: boolean
+  avatar_url?: string
 }
 
 export function AdminUsersPage() {
@@ -90,7 +92,17 @@ export function AdminUsersPage() {
               {users.map(u => (
                 <tr key={u.id} className="border-b">
                   <td className="py-2"><input type="checkbox" checked={!!selected[u.id]} onChange={(e) => setSelected({ ...selected, [u.id]: e.target.checked })} /></td>
-                  <td>{u.email}</td>
+                  <td>
+                    <div className="flex items-center gap-3">
+                      <Avatar className="h-8 w-8">
+                        <AvatarImage src={u.avatar_url} alt={`${u.first_name} ${u.last_name}`} />
+                        <AvatarFallback className="bg-agribeta-green text-white text-xs">
+                          {u.first_name?.[0] || u.email?.[0] || 'U'}
+                        </AvatarFallback>
+                      </Avatar>
+                      <span className="font-medium">{u.email}</span>
+                    </div>
+                  </td>
                   <td>{u.first_name} {u.last_name}</td>
                   <td>{u.role}</td>
                   <td>{u.subscription_tier}</td>

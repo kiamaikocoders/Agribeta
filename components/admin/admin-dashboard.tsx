@@ -32,6 +32,7 @@ interface User {
   created_at: string
   ai_predictions_used: number
   total_diagnoses: number
+  avatar_url?: string
 }
 
 interface PostItem {
@@ -180,28 +181,16 @@ export function AdminDashboard() {
   }
 
   return (
-    <div className="relative min-h-screen bg-[#F8F9FA]">
-      {/* Background Image with Overlay */}
-      <div className="absolute inset-0 z-0 overflow-hidden">
-        <Image
-          src="/greenhouse-robotics.png"
-          alt="Greenhouse Robotics"
-          fill
-          className="object-cover opacity-5"
-          priority
-        />
+    <div className="space-y-6">
+      <div className="mb-6 sm:mb-8">
+        <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-agribeta-green mb-2">Admin Dashboard</h1>
+        <p className="text-sm sm:text-base lg:text-lg text-muted-foreground">
+          Manage users, monitor platform activity, and oversee system operations
+        </p>
       </div>
-      
-      <div className="relative z-10 container py-8">
-        <div className="mb-8">
-          <h1 className="text-4xl font-bold text-agribeta-green mb-2">Admin Dashboard</h1>
-          <p className="text-lg text-muted-foreground">
-            Manage users, monitor platform activity, and oversee system operations
-          </p>
-        </div>
 
         {/* Statistics Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 mb-6 sm:mb-8">
           <Card>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
               <CardTitle className="text-sm font-medium">Total Users</CardTitle>
@@ -257,14 +246,14 @@ export function AdminDashboard() {
 
         {/* Main Admin Tabs */}
         <Tabs defaultValue="users" className="w-full">
-          <TabsList className="grid grid-cols-7 mb-8">
-            <TabsTrigger value="users">Users</TabsTrigger>
-            <TabsTrigger value="verification">Verification</TabsTrigger>
-            <TabsTrigger value="analytics">Analytics</TabsTrigger>
-            <TabsTrigger value="system">System</TabsTrigger>
-            <TabsTrigger value="moderation">Moderation</TabsTrigger>
-            <TabsTrigger value="communications">Comms</TabsTrigger>
-            <TabsTrigger value="finance">Finance</TabsTrigger>
+          <TabsList className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-7 mb-6 sm:mb-8 h-auto">
+            <TabsTrigger value="users" className="text-xs sm:text-sm">Users</TabsTrigger>
+            <TabsTrigger value="verification" className="text-xs sm:text-sm">Verification</TabsTrigger>
+            <TabsTrigger value="analytics" className="text-xs sm:text-sm">Analytics</TabsTrigger>
+            <TabsTrigger value="system" className="text-xs sm:text-sm">System</TabsTrigger>
+            <TabsTrigger value="moderation" className="text-xs sm:text-sm">Moderation</TabsTrigger>
+            <TabsTrigger value="communications" className="text-xs sm:text-sm">Comms</TabsTrigger>
+            <TabsTrigger value="finance" className="text-xs sm:text-sm">Finance</TabsTrigger>
           </TabsList>
 
           <TabsContent value="users" className="space-y-6">
@@ -291,40 +280,43 @@ export function AdminDashboard() {
                 ) : (
                   <div className="space-y-4">
                     {recentUsers.map((user) => (
-                      <div key={user.id} className="flex items-center justify-between">
+                      <div key={user.id} className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 p-4 border rounded-lg">
                         <div className="flex items-center space-x-4">
-                          <Avatar>
-                            <AvatarFallback>
-                              {user.first_name?.[0] || 'U'}
+                          <Avatar className="h-10 w-10">
+                            <AvatarImage src={user.avatar_url} alt={`${user.first_name} ${user.last_name}`} />
+                            <AvatarFallback className="bg-agribeta-green text-white font-semibold">
+                              {user.first_name?.[0] || user.email?.[0] || 'U'}
                             </AvatarFallback>
                           </Avatar>
-                          <div>
-                            <div className="font-medium">
+                          <div className="flex-1 min-w-0">
+                            <div className="font-medium truncate">
                               {user.first_name} {user.last_name}
                             </div>
-                            <div className="text-sm text-muted-foreground">
+                            <div className="text-sm text-muted-foreground truncate">
                               {user.email}
                             </div>
                           </div>
                         </div>
-                        <div className="flex items-center space-x-2">
-                          <Badge variant={user.role === 'farmer' ? 'default' : 'secondary'}>
-                            {user.role}
-                          </Badge>
-                          <Badge variant={user.subscription_tier === 'free' ? 'outline' : 'default'}>
-                            {user.subscription_tier}
-                          </Badge>
-                          {user.is_verified && (
-                            <Badge variant="default" className="bg-green-100 text-green-800">
-                              Verified
+                        <div className="flex flex-col sm:flex-row sm:items-center gap-2">
+                          <div className="flex flex-wrap gap-2">
+                            <Badge variant={user.role === 'farmer' ? 'default' : 'secondary'} className="text-xs">
+                              {user.role}
                             </Badge>
-                          )}
-                          <span className="text-sm text-muted-foreground">
-                            {formatDate(user.created_at)}
-                          </span>
-                          <div className="ml-2">
+                            <Badge variant={user.subscription_tier === 'free' ? 'outline' : 'default'} className="text-xs">
+                              {user.subscription_tier}
+                            </Badge>
+                            {user.is_verified && (
+                              <Badge variant="default" className="bg-green-100 text-green-800 text-xs">
+                                Verified
+                              </Badge>
+                            )}
+                          </div>
+                          <div className="flex items-center gap-2">
+                            <span className="text-xs text-muted-foreground">
+                              {formatDate(user.created_at)}
+                            </span>
                             <select
-                              className="border rounded px-2 py-1 text-sm"
+                              className="border rounded px-2 py-1 text-xs"
                               value={user.role}
                               onChange={(e) => handleChangeUserRole(user.id, e.target.value as any)}
                             >
@@ -571,7 +563,6 @@ export function AdminDashboard() {
             </Card>
           </TabsContent>
         </Tabs>
-      </div>
     </div>
   )
 }

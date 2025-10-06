@@ -2,7 +2,7 @@
 
 import { AuthForm } from '@/components/auth/auth-form'
 import { useAuth } from '@/contexts/auth-context'
-import { useRouter } from 'next/navigation'
+import { useRouter, useSearchParams } from 'next/navigation'
 import { useEffect } from 'react'
 import Image from 'next/image'
 import { Loader2 } from 'lucide-react'
@@ -10,6 +10,8 @@ import { Loader2 } from 'lucide-react'
 export default function AuthPage() {
   const { user, profile, loading } = useAuth()
   const router = useRouter()
+  const searchParams = useSearchParams()
+  const plan = searchParams.get('plan')
 
   useEffect(() => {
     // Check if user just logged out
@@ -20,8 +22,24 @@ export default function AuthPage() {
     }
 
     if (!loading && user && profile) {
-      console.log('Auth page: User authenticated, redirecting...', { role: profile.role })
-      // User is already authenticated, redirect to appropriate dashboard
+      console.log('Auth page: User authenticated, redirecting...', { role: profile.role, plan })
+      
+      // Check if user came from a plan selection
+      if (plan) {
+        // Redirect to billing upgrade flow
+        router.push(`/billing/upgrade?plan=${plan}`)
+        return
+      }
+      
+      // Check if there's a stored plan from localStorage
+      const storedPlan = localStorage.getItem('selectedPlan')
+      if (storedPlan) {
+        localStorage.removeItem('selectedPlan')
+        router.push(`/billing/upgrade?plan=${storedPlan}`)
+        return
+      }
+      
+      // Default redirect to appropriate dashboard
       let redirectPath = '/dashboard/networks'
       if (profile.role === 'admin') {
         redirectPath = '/dashboard/admin'

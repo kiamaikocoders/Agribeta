@@ -9,7 +9,7 @@ import { Button, buttonVariants } from "@/components/ui/button"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
 import { useAuth } from "@/contexts/auth-context"
-import { Bell, User, Settings, LogOut, BarChart2, Calendar, MessageCircle, BookOpen } from "lucide-react"
+import { Bell, User, Settings, LogOut, BarChart2, Calendar, MessageCircle, BookOpen, CreditCard } from "lucide-react"
 import { Suspense } from "react"
 import { useRouter } from "next/navigation"
 import { NotificationsProvider } from "@/contexts/notifications-context"
@@ -135,6 +135,16 @@ export function SiteHeader() {
                         <span>Settings</span>
                       </Link>
                     </DropdownMenuItem>
+                    
+                    {/* Billing for farmers and agronomists (not admin) */}
+                    {profile?.role !== 'admin' && (
+                      <DropdownMenuItem asChild>
+                        <Link href="/billing" className="flex items-center">
+                          <CreditCard className="mr-2 h-4 w-4" />
+                          <span>Billing</span>
+                        </Link>
+                      </DropdownMenuItem>
+                    )}
                     
                     {/* Agronomist-specific items */}
                     {profile?.role === 'agronomist' && (

@@ -90,10 +90,17 @@ export default function BillingPage() {
 
   const handleUpgrade = (planId: string) => {
     setSelectedPlan(planId)
-    // Here you would integrate with Stripe or your payment processor
-    console.log(`Upgrading to ${planId} plan`)
-    // For now, we'll just show a message
-    alert(`Upgrade to ${planId} plan - Payment integration coming soon!`)
+    
+    // Check if user is logged in
+    if (!user) {
+      // Store selected plan and redirect to auth
+      localStorage.setItem('selectedPlan', planId)
+      window.location.href = `/auth?plan=${planId}`
+      return
+    }
+
+    // For existing users, redirect to payment flow
+    window.location.href = `/billing/upgrade?plan=${planId}`
   }
 
   return (

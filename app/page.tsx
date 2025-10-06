@@ -67,15 +67,15 @@ export default function Home() {
           <div className="flex flex-col gap-4 sm:gap-6 min-[400px]:flex-row">
             <Link href="/auth">
               <Button size="lg" className="bg-agribeta-orange hover:bg-agribeta-orange/90 text-white font-bold px-6 sm:px-10 py-4 sm:py-5 text-base sm:text-lg rounded-full shadow-xl transition-all duration-300 ease-in-out hover:scale-105 w-full min-[400px]:w-auto border-2 border-white/20">
-                Start 30-Day Free Trial
+                Create Account
               </Button>
             </Link>
-            <Link href="/auth">
+            <Link href="/pricing">
               <Button
                 size="lg"
                 className="bg-white/10 backdrop-blur-sm border-2 border-white text-white hover:bg-white/20 font-bold px-6 sm:px-10 py-4 sm:py-5 text-base sm:text-lg rounded-full shadow-xl transition-all duration-300 ease-in-out hover:scale-105 w-full min-[400px]:w-auto"
               >
-                Create Account
+                View Pricing Plans
               </Button>
             </Link>
           </div>
