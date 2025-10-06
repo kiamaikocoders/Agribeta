@@ -132,6 +132,25 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         setLoading(false)
       } else if (session?.user) {
         await fetchUserProfile(session.user.id)
+        
+        // Check if this is a new user who needs profile completion
+        if (event === 'SIGNED_IN' && typeof window !== 'undefined') {
+          const signupData = localStorage.getItem('agribeta_signup_data')
+          if (signupData) {
+            try {
+              const userData = JSON.parse(signupData)
+              // Auto-complete profile setup for new users
+              if (userData.userId === session.user.id) {
+                console.log('Auto-completing profile setup for new user')
+                await completeProfileSetup(userData, session.user.id)
+                // Clear the stored data after successful completion
+                localStorage.removeItem('agribeta_signup_data')
+              }
+            } catch (error) {
+              console.error('Error auto-completing profile setup:', error)
+            }
+          }
+        }
       } else {
         setProfile(null)
         setFarmerProfile(null)
@@ -224,7 +243,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     try {
       // Use the utility function to get the correct site URL
       const siteUrl = getSiteUrl()
-      const emailRedirectTo = `${siteUrl}profile/complete`
+      const emailRedirectTo = `${siteUrl}profile`
 
       const { data: authData, error: authError } = await supabase.auth.signUp({
         email,

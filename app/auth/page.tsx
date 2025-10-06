@@ -35,14 +35,14 @@ export default function AuthPage() {
       }, 1000)
     } else if (!loading && user && !profile) {
       // User is authenticated but profile is still loading or missing
-      console.log('Auth page: User authenticated but profile missing, redirecting to networks...')
-      router.replace('/dashboard/networks')
+      console.log('Auth page: User authenticated but profile missing, redirecting to profile...')
+      router.replace('/profile')
       
       // Fallback redirect
       setTimeout(() => {
         if (window.location.pathname === '/auth') {
           console.log('Router redirect failed, using window.location...')
-          window.location.href = '/dashboard/networks'
+          window.location.href = '/profile'
         }
       }, 1000)
     }
