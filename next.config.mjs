@@ -24,3 +24,5 @@ const nextConfig = {
 }
 
 export default nextConfig
+// Deployment trigger - 2025-10-06_23:31:27
+
