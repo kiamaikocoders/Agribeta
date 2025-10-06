@@ -74,7 +74,7 @@ export default function ProfileCompletePage() {
       }
 
       await fetchUserProfile(user.id)
-      toast({ title: 'Profile initialized', description: 'Let's finish setting up your profile.' })
+      toast({ title: 'Profile initialized', description: 'Let\'s finish setting up your profile.' })
       router.push('/profile')
     } catch (err) {
       console.error('Error initializing profile:', err)
@@ -91,7 +91,7 @@ export default function ProfileCompletePage() {
           <CardTitle className="text-agribeta-green">Welcome! Complete your profile</CardTitle>
           <CardDescription>
             {signupData 
-              ? `We'll save your ${signupData.role} profile information and get you started.`
+              ? `We\'ll save your ${signupData.role} profile information and get you started.`
               : 'After confirming your email, select your role to start.'
             }
           </CardDescription>
