@@ -59,7 +59,7 @@ export function AIChatbot() {
 
       if (lowerCaseInput.includes("fcm") && lowerCaseInput.includes("regulation")) {
         responseContent =
-          "FCM management is regulated under EU regulations 2019/2072 and 2024/2004. These regulations require a systems approach following ISPM 14 international standards, with zero tolerance for FCM detection."
+          "FCM management is regulated under EU regulations 2019/2072 and 2024/2004. These regulations require a systems approach following ISPM 14 international standards, with zero tolerance for FCM pinpointing."
       } else if (lowerCaseInput.includes("monitor") || lowerCaseInput.includes("trap")) {
         responseContent =
           "FCM monitoring should be conducted twice weekly. Install 4 pheromone traps per hectare, check them regularly, and replace lures every 4-6 weeks. Document all findings and report to authorities monthly."

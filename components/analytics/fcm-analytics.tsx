@@ -198,8 +198,8 @@ export function FCMAnalytics() {
 
       <Card>
         <CardHeader>
-          <CardTitle>FCM Detection Trends</CardTitle>
-          <CardDescription>Historical FCM detection data across all greenhouses</CardDescription>
+          <CardTitle>FCM Pinpointing Trends</CardTitle>
+          <CardDescription>Historical FCM pinpointing data across all greenhouses</CardDescription>
         </CardHeader>
         <CardContent>
           <div className="h-80 w-full bg-gray-50 dark:bg-gray-800 rounded-lg flex items-end justify-between p-4">

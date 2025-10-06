@@ -39,7 +39,7 @@ export function FCMDocumentViewer() {
                 <CardDescription>Critical compliance requirement</CardDescription>
               </CardHeader>
               <CardContent>
-                <p>Even one FCM detection results in lot rejection</p>
+                <p>Even one FCM pinpoint results in lot rejection</p>
               </CardContent>
             </Card>
             <Card className="border-agribeta-orange/20">
@@ -181,7 +181,7 @@ export function FCMDocumentViewer() {
         <div className="space-y-4">
           <h3 className="text-xl font-bold text-agribeta-green">Monitoring Protocol</h3>
           <p>
-            Effective monitoring is the cornerstone of FCM management. Early detection allows for timely intervention
+            Effective monitoring is the cornerstone of FCM management. Early pinpointing allows for timely intervention
             and prevents export rejections.
           </p>
 
@@ -277,7 +277,7 @@ export function FCMDocumentViewer() {
           <h3 className="text-xl font-bold text-agribeta-green">Compliance Requirements</h3>
           <p>
             Meeting EU regulations requires strict adherence to established protocols and immediate action when issues
-            are detected.
+            are pinpointed.
           </p>
 
           <div className="space-y-6 mt-6">
@@ -286,7 +286,7 @@ export function FCMDocumentViewer() {
                 <CardTitle className="text-lg text-agribeta-orange">Corrective Action Protocol</CardTitle>
               </CardHeader>
               <CardContent>
-                <p className="mb-4">If FCM is detected, follow these steps immediately:</p>
+                <p className="mb-4">If FCM is pinpointed, follow these steps immediately:</p>
                 <ol className="list-decimal pl-5 space-y-2">
                   <li>
                     <span className="font-medium">Halt exports</span> from affected greenhouses
@@ -311,7 +311,7 @@ export function FCMDocumentViewer() {
               <CardContent>
                 <ul className="list-disc pl-5 space-y-2">
                   <li>30% of lots must be sampled</li>
-                  <li>Rejection if even one FCM is detected</li>
+                  <li>Rejection if even one FCM is pinpointed</li>
                   <li>Isolate and destroy rejected lots</li>
                   <li>Document all inspections and findings</li>
                 </ul>
@@ -482,7 +482,7 @@ export function FCMDocumentViewer() {
 
             <Card className="border-agribeta-orange/20">
               <CardHeader className="pb-2">
-                <CardTitle className="text-lg text-agribeta-orange">Detection</CardTitle>
+                <CardTitle className="text-lg text-agribeta-orange">Pinpointing</CardTitle>
               </CardHeader>
               <CardContent>
                 <p className="mb-2">Systematic monitoring via traps and scouting</p>
@@ -503,7 +503,7 @@ export function FCMDocumentViewer() {
               <CardContent>
                 <p className="mb-2">Zero-tolerance policy with swift corrective measures</p>
                 <ul className="list-disc pl-5 space-y-1">
-                  <li>Immediate action upon FCM detection</li>
+                  <li>Immediate action upon FCM pinpointing</li>
                   <li>Integrated pest management implementation</li>
                   <li>Isolation of affected areas</li>
                   <li>Increased monitoring frequency</li>

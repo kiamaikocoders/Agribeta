@@ -50,7 +50,7 @@ export default function PricingPage() {
         'Standard response time'
       ],
       popular: true,
-      buttonText: 'Create Account',
+      buttonText: 'Register',
       buttonVariant: 'default' as const
     },
     {
@@ -72,7 +72,7 @@ export default function PricingPage() {
       ],
       limitations: [],
       popular: false,
-      buttonText: 'Create Account',
+      buttonText: 'Register',
       buttonVariant: 'default' as const
     }
   ]

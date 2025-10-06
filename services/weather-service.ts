@@ -251,27 +251,27 @@ export function getWeatherRecommendations(weather: WeatherData): string[] {
 
   // Temperature-based recommendations
   if (temp_c > 30) {
-    recommendations.push("High temperatures detected. Consider additional irrigation to prevent heat stress.")
+    recommendations.push("High temperatures pinpointed. Consider additional irrigation to prevent heat stress.")
   } else if (temp_c < 15) {
-    recommendations.push("Low temperatures detected. Monitor plants for cold damage and consider protective measures.")
+    recommendations.push("Low temperatures pinpointed. Monitor plants for cold damage and consider protective measures.")
   }
 
   // Humidity-based recommendations
   if (humidity > 80) {
     recommendations.push(
-      "High humidity detected. Increase air circulation around plants and consider preventative fungicide application.",
+      "High humidity pinpointed. Increase air circulation around plants and consider preventative fungicide application.",
     )
   } else if (humidity < 40) {
-    recommendations.push("Low humidity detected. Consider misting plants to increase local humidity.")
+    recommendations.push("Low humidity pinpointed. Consider misting plants to increase local humidity.")
   }
 
   // Rainfall-based recommendations
   if (precip_mm > 5) {
     recommendations.push(
-      "Heavy rainfall detected. Ensure proper drainage and monitor for signs of water-related diseases.",
+      "Heavy rainfall pinpointed. Ensure proper drainage and monitor for signs of water-related diseases.",
     )
   } else if (precip_mm < 0.1 && weather.forecast.forecastday.every((day) => day.day.totalrecip_mm < 0.5)) {
-    recommendations.push("Dry conditions detected. Increase irrigation to maintain soil moisture.")
+    recommendations.push("Dry conditions pinpointed. Increase irrigation to maintain soil moisture.")
   }
 
   // Disease-specific recommendations based on risk
@@ -283,7 +283,7 @@ export function getWeatherRecommendations(weather: WeatherData): string[] {
       const factor = avocadoDiseaseRiskFactors.find((f) => f.disease === disease.disease)
       if (factor) {
         recommendations.push(
-          `High risk of ${disease.disease} detected (${disease.risk}%). Monitor plants closely and consider preventative treatments.`,
+          `High risk of ${disease.disease} pinpointed (${disease.risk}%). Monitor plants closely and consider preventative treatments.`,
         )
       }
     })

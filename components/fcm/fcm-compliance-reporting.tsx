@@ -240,9 +240,9 @@ export function FCMComplianceReporting() {
                       </Label>
                     </div>
                     <div className="flex items-center space-x-2">
-                      <Checkbox id="detections" defaultChecked />
-                      <Label htmlFor="detections" className="text-sm font-normal">
-                        FCM Detections & Actions
+                      <Checkbox id="pinpoints" defaultChecked />
+                      <Label htmlFor="pinpoints" className="text-sm font-normal">
+                        FCM Pinpoints & Actions
                       </Label>
                     </div>
                     <div className="flex items-center space-x-2">

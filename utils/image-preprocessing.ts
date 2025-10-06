@@ -1,5 +1,5 @@
 /**
- * Preprocesses an image for better disease detection
+ * Preprocesses an image for better disease pinpointing
  * @param imageData Base64 encoded image data
  * @returns Promise with processed image data
  */
@@ -45,9 +45,9 @@ export async function preprocessImage(imageData: string): Promise<string> {
           // Alpha channel remains unchanged
         }
 
-        // 2. Enhance green channel for better plant disease detection
+        // 2. Enhance green channel for better plant disease pinpointing
         for (let i = 0; i < data.length; i += 4) {
-          // Slightly boost green channel for plant disease detection
+          // Slightly boost green channel for plant disease pinpointing
           data[i + 1] = Math.min(255, data[i + 1] * 1.1)
         }
 

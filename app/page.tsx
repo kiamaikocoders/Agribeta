@@ -62,12 +62,12 @@ export default function Home() {
             WE POWER. YOU GROW.
           </h2>
           <p className="max-w-[900px] text-xl md:text-2xl lg:text-3xl mb-12 leading-relaxed">
-            AI-Powered Disease Detection for Avocado & Rose Farmers in Africa
+            AI-Powered Disease Pinpointing for Avocado & Rose Farmers in Africa
           </p>
           <div className="flex flex-col gap-4 sm:gap-6 min-[400px]:flex-row">
             <Link href="/auth">
               <Button size="lg" className="bg-agribeta-orange hover:bg-agribeta-orange/90 text-white font-bold px-6 sm:px-10 py-4 sm:py-5 text-base sm:text-lg rounded-full shadow-xl transition-all duration-300 ease-in-out hover:scale-105 w-full min-[400px]:w-auto border-2 border-white/20">
-                Create Account
+                Register
               </Button>
             </Link>
             <Link href="/pricing">
@@ -105,7 +105,7 @@ export default function Home() {
                   size="lg" 
                   className="bg-orange-500 hover:bg-orange-600 text-white font-semibold px-6 py-3 text-base rounded-full shadow-lg transition-all duration-300 hover:scale-105"
                 >
-                  DETECT
+                  PINPOINT
                 </Button>
                 <Button 
                   size="lg" 
@@ -254,7 +254,7 @@ export default function Home() {
                   <div className="w-20 h-20 bg-orange-500 rounded-full flex items-center justify-center mx-auto mb-6 shadow-lg">
                     <span className="text-3xl">🔍</span>
                   </div>
-                  <CardTitle className="text-2xl text-orange-800 mb-4">2. DETECTION</CardTitle>
+                  <CardTitle className="text-2xl text-orange-800 mb-4">2. PINPOINTING</CardTitle>
                   <div className="space-y-2 text-left">
                     <div className="flex items-center gap-2">
                       <div className="w-1.5 h-1.5 bg-orange-500 rounded-full"></div>
@@ -342,7 +342,7 @@ export default function Home() {
                 <div className="w-20 h-20 bg-orange-500 rounded-full flex items-center justify-center mx-auto mb-6 shadow-lg">
                   <span className="text-3xl">🔍</span>
                 </div>
-                <CardTitle className="text-2xl text-orange-800 mb-4">2. DETECTION</CardTitle>
+                <CardTitle className="text-2xl text-orange-800 mb-4">2. PINPOINTING</CardTitle>
                 <div className="space-y-2 text-left">
                   <div className="flex items-center gap-2">
                     <div className="w-1.5 h-1.5 bg-orange-500 rounded-full"></div>
@@ -401,7 +401,7 @@ export default function Home() {
           <div className="text-center mb-16">
             <h2 className="text-4xl font-bold text-agribeta-orange mb-4">WHY WE EXIST</h2>
             <p className="text-xl text-muted-foreground max-w-4xl mx-auto leading-relaxed">
-              We're on a mission to transform avocado and rose farming in Africa through AI-powered disease detection—empowering every farmer to detect problems early, treat effectively, and maximize their harvest.
+              We're on a mission to transform avocado and rose farming in Africa through AI-powered disease pinpointing—empowering every farmer to pinpoint problems early, treat effectively, and maximize their harvest.
             </p>
           </div>
           
@@ -580,7 +580,7 @@ export default function Home() {
         <div className="container px-4 md:px-6 text-center">
           <h2 className="text-3xl font-bold text-white mb-4">Ready to Transform Your Farm with AGRIBETA ONE?</h2>
           <p className="text-xl text-green-100 mb-8 max-w-2xl mx-auto">
-            Join thousands of farmers across Africa who are already using AGRIBETA ONE to predict, detect, and protect their crops with AI-powered precision.
+            Join thousands of farmers across Africa who are already using AGRIBETA ONE to predict, pinpoint, and protect their crops with AI-powered precision.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
           <Link href="/auth">
@@ -590,7 +590,7 @@ export default function Home() {
           </Link>
             <Link href="/auth">
               <Button size="lg" variant="outline" className="border-white text-white hover:bg-white/20 font-semibold px-8 py-3 text-lg rounded-full shadow-lg transition-all duration-300 ease-in-out hover:scale-105">
-                Create Account
+                Register
               </Button>
             </Link>
           </div>

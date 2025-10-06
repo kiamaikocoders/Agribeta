@@ -13,7 +13,7 @@ export function FCMOverview() {
           <CardContent>
             <Alert variant="destructive" className="bg-red-50">
               <AlertTriangle className="h-4 w-4" />
-              <AlertDescription>Even one FCM detection results in lot rejection</AlertDescription>
+              <AlertDescription>Even one FCM pinpoint results in lot rejection</AlertDescription>
             </Alert>
           </CardContent>
         </Card>

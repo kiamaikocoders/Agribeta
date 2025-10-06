@@ -29,7 +29,7 @@ export default function FarmerDashboard() {
   const quickActions = [
     {
       title: "New Diagnosis",
-      description: "AI-powered disease detection",
+      description: "AI-powered disease pinpointing",
       icon: <Leaf className="h-6 w-6" />,
       href: "/diagnosis",
       color: "bg-green-500",

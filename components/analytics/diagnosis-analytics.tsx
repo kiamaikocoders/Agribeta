@@ -220,7 +220,7 @@ export function DiagnosisAnalytics() {
             <ul className="list-disc pl-5 space-y-1 text-sm">
               <li>Anthracnose remains the most common disease, consistent with seasonal patterns</li>
               <li>Root rot cases have increased by 15% compared to the previous period</li>
-              <li>Early detection has improved treatment success rates by 22%</li>
+              <li>Early pinpointing has improved treatment success rates by 22%</li>
               <li>Recommended preventative measures have been updated based on recent diagnoses</li>
             </ul>
           </div>

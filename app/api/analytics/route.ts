@@ -25,13 +25,13 @@ export async function GET(req: NextRequest) {
             {
               type: "diagnosis",
               title: "Avocado Disease Diagnosis",
-              description: "Anthracnose detected with 92% confidence",
+              description: "Anthracnose pinpointed with 92% confidence",
               timestamp: "2023-05-12T10:24:00Z",
             },
             {
               type: "fcm",
               title: "FCM Monitoring Completed",
-              description: "Greenhouse A - No FCM detected",
+              description: "Greenhouse A - No FCM pinpointed",
               timestamp: "2023-05-11T16:15:00Z",
             },
             {
@@ -102,7 +102,7 @@ export async function GET(req: NextRequest) {
           insights: [
             "Anthracnose remains the most common disease, consistent with seasonal patterns",
             "Root rot cases have increased by 15% compared to the previous period",
-            "Early detection has improved treatment success rates by 22%",
+            "Early pinpointing has improved treatment success rates by 22%",
             "Recommended preventative measures have been updated based on recent diagnoses",
           ],
         }

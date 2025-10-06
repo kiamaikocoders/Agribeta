@@ -117,7 +117,7 @@ export default function PinpointPage() {
                   </div>
                   <h3 className="font-semibold mb-2">Image Analysis</h3>
                   <p className="text-sm text-muted-foreground">
-                    Advanced computer vision technology for precise disease detection
+                    Advanced computer vision technology for precise disease pinpointing
                   </p>
                 </CardContent>
               </Card>

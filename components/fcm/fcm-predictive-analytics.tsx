@@ -48,7 +48,7 @@ export function FCMPredictiveAnalytics() {
         risk += 5 // Low risk humidity range
       }
 
-      // Previous detections factor
+      // Previous pinpoints factor
       if (previousDetections === "5+") {
         risk += 25
       } else if (previousDetections === "1-4") {
@@ -201,20 +201,20 @@ export function FCMPredictiveAnalytics() {
                 </div>
 
                 <div className="space-y-2">
-                  <Label htmlFor="previous-detections" className="text-base">
-                    Previous FCM Detections (last 3 months)
+                  <Label htmlFor="previous-pinpoints" className="text-base">
+                    Previous FCM Pinpoints (last 3 months)
                   </Label>
                   <Select value={previousDetections} onValueChange={setPreviousDetections}>
                     <SelectTrigger
-                      id="previous-detections"
+                      id="previous-pinpoints"
                       className="border-agribeta-green focus-visible:ring-agribeta-green"
                     >
-                      <SelectValue placeholder="Select number of detections" />
+                      <SelectValue placeholder="Select number of pinpoints" />
                     </SelectTrigger>
                     <SelectContent>
                       <SelectItem value="0">None</SelectItem>
-                      <SelectItem value="1-4">1-4 detections</SelectItem>
-                      <SelectItem value="5+">5+ detections</SelectItem>
+                      <SelectItem value="1-4">1-4 pinpoints</SelectItem>
+                      <SelectItem value="5+">5+ pinpoints</SelectItem>
                     </SelectContent>
                   </Select>
                 </div>
@@ -307,7 +307,7 @@ export function FCMPredictiveAnalytics() {
                         {riskLevel === "low"
                           ? "Current conditions indicate a low probability of FCM infestation. Continue standard monitoring protocols."
                           : riskLevel === "medium"
-                            ? "Moderate risk of FCM activity detected. Consider increasing monitoring frequency and implementing preventative measures."
+                            ? "Moderate risk of FCM activity pinpointed. Consider increasing monitoring frequency and implementing preventative measures."
                             : "High risk alert! Conditions are highly favorable for FCM development. Immediate preventative action recommended."}
                       </p>
                     </div>
@@ -337,7 +337,7 @@ export function FCMPredictiveAnalytics() {
                             <li>Conduct thorough inspection of all plants</li>
                             <li>Increase packhouse inspection rate to 50% of lots</li>
                             <li>Alert neighboring farms of increased risk</li>
-                            <li>Prepare for potential corrective actions if FCM is detected</li>
+                            <li>Prepare for potential corrective actions if FCM is pinpointed</li>
                           </>
                         )}
                       </ul>
@@ -369,7 +369,7 @@ export function FCMPredictiveAnalytics() {
           <Card className="border-agribeta-orange/20">
             <CardHeader>
               <CardTitle className="text-agribeta-orange">Historical FCM Patterns</CardTitle>
-              <CardDescription>Analysis of FCM detection patterns and environmental correlations</CardDescription>
+              <CardDescription>Analysis of FCM pinpointing patterns and environmental correlations</CardDescription>
             </CardHeader>
             <CardContent className="space-y-6">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -480,7 +480,7 @@ export function FCMPredictiveAnalytics() {
                     <ul className="list-disc pl-5 mt-2 space-y-1 text-amber-700 dark:text-amber-400">
                       <li>Sustained temperatures between 22-28°C for more than 7 days</li>
                       <li>Humidity levels above 65% combined with temperatures above 25°C</li>
-                      <li>Previous FCM detections within the last 3 months</li>
+                      <li>Previous FCM pinpoints within the last 3 months</li>
                       <li>Proximity to other rose farms with known FCM issues</li>
                       <li>Structural vulnerabilities in greenhouse (tears, gaps in netting)</li>
                     </ul>

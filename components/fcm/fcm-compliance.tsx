@@ -141,7 +141,7 @@ export function FCMCompliance() {
       <Card>
         <CardHeader>
           <CardTitle>Corrective Action Protocol</CardTitle>
-          <CardDescription>Steps to take if FCM is detected in your facility</CardDescription>
+          <CardDescription>Steps to take if FCM is pinpointed in your facility</CardDescription>
         </CardHeader>
         <CardContent>
           <div className="space-y-4">
@@ -186,7 +186,7 @@ export function FCMCompliance() {
               <div>
                 <h3 className="font-medium">Verify Effectiveness</h3>
                 <p className="text-gray-600">
-                  Continue monitoring until no FCM is detected for at least 14 consecutive days before resuming exports.
+                  Continue monitoring until no FCM is pinpointed for at least 14 consecutive days before resuming exports.
                 </p>
               </div>
             </div>

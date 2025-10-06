@@ -208,7 +208,7 @@ export function AuthForm() {
 
       if (error) {
         console.error('Signup error details:', error)
-        let errorMessage = 'Failed to create account. Please try again.'
+        let errorMessage = 'Failed to register. Please try again.'
         let errorTitle = 'Signup Error'
         
         if (error.message?.includes('User already registered')) {
@@ -561,7 +561,7 @@ export function AuthForm() {
                   disabled={isLoading}
                 >
                   {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-                  Create Account
+                  Register
                 </Button>
               </form>
             </TabsContent>

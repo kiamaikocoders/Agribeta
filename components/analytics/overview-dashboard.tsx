@@ -9,7 +9,7 @@ export function OverviewDashboard() {
   // State for summary stats
   const [complianceScore, setComplianceScore] = useState<number | null>(null);
   const [diagnosisCount, setDiagnosisCount] = useState<number | null>(null);
-  const [detections, setDetections] = useState<number | null>(null);
+  const [pinpoints, setPinpoints] = useState<number | null>(null);
   const [monitoringSessions, setMonitoringSessions] = useState<number | null>(null);
   const [loading, setLoading] = useState(true);
 
@@ -26,15 +26,15 @@ export function OverviewDashboard() {
         .from('diagnosis_results')
         .select('*')
         .gte('date', new Date(new Date().getFullYear(), new Date().getMonth(), 1).toISOString().split('T')[0]);
-      // Detections: FCM caught in last 30 days
-      let detectionCount = 0;
+      // Pinpoints: FCM caught in last 30 days
+      let pinpointCount = 0;
       if (monitoring) {
         monitoring.forEach((m) => {
           if (m.trap_data) {
             try {
               const traps = JSON.parse(m.trap_data);
               traps.forEach((t: any) => {
-                detectionCount += Number(t.count) || 0;
+                pinpointCount += Number(t.count) || 0;
               });
             } catch {}
           }
@@ -51,7 +51,7 @@ export function OverviewDashboard() {
       let compliance = scheduled ? Math.round((completed / scheduled) * 100) : 0;
       setComplianceScore(compliance);
       setDiagnosisCount(diagnoses ? diagnoses.length : 0);
-      setDetections(detectionCount);
+      setPinpoints(pinpointCount);
       setMonitoringSessions(sessions ? sessions.length : 0);
       setLoading(false);
     };
@@ -86,11 +86,11 @@ export function OverviewDashboard() {
         </Card>
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">FCM Detections</CardTitle>
+            <CardTitle className="text-sm font-medium">FCM Pinpoints</CardTitle>
             <AlertTriangle className="h-4 w-4 text-amber-600" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{loading ? '...' : detections ?? 0}</div>
+            <div className="text-2xl font-bold">{loading ? '...' : pinpoints ?? 0}</div>
             <p className="text-xs text-gray-500">Last 30 days</p>
           </CardContent>
         </Card>
@@ -120,7 +120,7 @@ export function OverviewDashboard() {
                 </div>
                 <div>
                   <p className="font-medium">Avocado Disease Diagnosis</p>
-                  <p className="text-sm text-gray-500">Anthracnose detected with 92% confidence</p>
+                  <p className="text-sm text-gray-500">Anthracnose pinpointed with 92% confidence</p>
                   <p className="text-xs text-gray-400">Today, 10:24 AM</p>
                 </div>
               </div>
@@ -130,7 +130,7 @@ export function OverviewDashboard() {
                 </div>
                 <div>
                   <p className="font-medium">FCM Monitoring Completed</p>
-                  <p className="text-sm text-gray-500">Greenhouse A - No FCM detected</p>
+                  <p className="text-sm text-gray-500">Greenhouse A - No FCM pinpointed</p>
                   <p className="text-xs text-gray-400">Yesterday, 4:15 PM</p>
                 </div>
               </div>

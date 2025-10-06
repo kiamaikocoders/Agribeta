@@ -144,7 +144,7 @@ export default function PredictPage() {
                     <AlertTriangle className="h-5 w-5" />
                     Pest & Disease Outbreaks
                   </CardTitle>
-                  <CardDescription>Early detection and prevention strategies</CardDescription>
+                  <CardDescription>Early pinpointing and prevention strategies</CardDescription>
                 </CardHeader>
                 <CardContent>
                   <ul className="space-y-2 text-sm">
