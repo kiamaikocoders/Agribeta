@@ -12,6 +12,13 @@ export default function AuthPage() {
   const router = useRouter()
 
   useEffect(() => {
+    // Check if user just logged out
+    if (typeof window !== 'undefined' && localStorage.getItem('agribeta_logout') === 'true') {
+      // Clear the logout flag and don't redirect
+      localStorage.removeItem('agribeta_logout')
+      return
+    }
+
     if (!loading && user && profile) {
       console.log('Auth page: User authenticated, redirecting...', { role: profile.role })
       // User is already authenticated, redirect to appropriate dashboard

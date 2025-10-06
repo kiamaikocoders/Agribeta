@@ -326,6 +326,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
         // Force a hard refresh to clear any cached auth state
         // This prevents Supabase from restoring the session
+        // Use replace to avoid back button issues
         window.location.replace('/')
       }
     } catch (error) {

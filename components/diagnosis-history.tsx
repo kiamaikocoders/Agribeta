@@ -18,7 +18,7 @@ export function DiagnosisHistory() {
   useEffect(() => {
     const fetchHistory = async () => {
       setLoading(true)
-      const { data, error } = await supabase.from('diagnosis_results').select('*').order('timestamp', { ascending: false })
+      const { data, error } = await supabase.from('diagnosis_results').select('*').order('created_at', { ascending: false })
       if (!error && data) setHistory(data)
       setLoading(false)
     }
@@ -96,10 +96,10 @@ export function DiagnosisHistory() {
                         <h4 className="font-medium text-agribeta-green truncate">{diagnosis.disease}</h4>
                       </div>
                       <p className="text-sm text-muted-foreground mt-1">
-                        {formatDistanceToNow(diagnosis.timestamp, { addSuffix: true })}
+                        {formatDistanceToNow(diagnosis.created_at, { addSuffix: true })}
                       </p>
                       <p className="text-xs text-muted-foreground mt-0.5">
-                        {format(diagnosis.timestamp, "PPP 'at' p")}
+                        {format(diagnosis.created_at, "PPP 'at' p")}
                       </p>
                     </div>
 
@@ -125,7 +125,7 @@ export function DiagnosisHistory() {
               </div>
             </Card>
 
-            <DiagnosisResultEnhanced result={selectedDiagnosis} timestamp={selectedDiagnosis.timestamp} />
+            <DiagnosisResultEnhanced result={selectedDiagnosis} timestamp={selectedDiagnosis.created_at} />
           </div>
         )}
       </TabsContent>

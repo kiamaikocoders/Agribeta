@@ -139,20 +139,20 @@ export default function PinpointPage() {
           {/* Supported Crops */}
           <div className="mb-12">
             <h2 className="text-2xl font-bold text-center mb-8">Supported Crops</h2>
-            <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4 max-w-2xl mx-auto">
+            <div className="flex justify-center gap-8 max-w-2xl mx-auto">
               {[
                 { name: 'Avocado', icon: '🥑', color: 'bg-green-100' },
                 { name: 'Roses', icon: '🌹', color: 'bg-red-100' }
               ].map((crop) => (
-                <Card key={crop.name} className="text-center hover:shadow-md transition-shadow">
-                  <CardContent className="pt-4">
-                    <div className="text-3xl mb-2">{crop.icon}</div>
-                    <p className="text-sm font-medium">{crop.name}</p>
+                <Card key={crop.name} className="text-center hover:shadow-lg transition-all duration-300 hover:scale-105 flex-1 max-w-[200px]">
+                  <CardContent className="pt-6 pb-6">
+                    <div className="text-5xl mb-4">{crop.icon}</div>
+                    <p className="text-lg font-semibold">{crop.name}</p>
                   </CardContent>
                 </Card>
               ))}
             </div>
-            <p className="text-center text-muted-foreground mt-4">
+            <p className="text-center text-muted-foreground mt-6">
               Currently supporting Avocado and Roses. More crops coming soon!
             </p>
           </div>

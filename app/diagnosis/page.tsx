@@ -106,6 +106,7 @@ export default function DiagnosisPage() {
           description: diagnosisResult.description,
           treatment: diagnosisResult.treatment,
           prevention_tips: diagnosisResult.preventionTips,
+          crop_type: 'Avocado', // Since this is the avocado diagnosis page
         }])
 
       if (dbError) {
