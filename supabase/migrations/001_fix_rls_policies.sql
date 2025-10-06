@@ -70,7 +70,7 @@ BEGIN
   VALUES (
     new.id,
     new.email,
-    'farmer', -- Default role, will be updated during profile setup
+    NULL, -- No default role - will be set during profile completion
     'free',
     0,
     5,

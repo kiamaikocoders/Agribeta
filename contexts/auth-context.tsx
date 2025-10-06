@@ -220,7 +220,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     }
   }
 
-  const signUp = async (email: string, password: string, _userData: any) => {
+  const signUp = async (email: string, password: string, userData: any) => {
     try {
       // Use the utility function to get the correct site URL
       const siteUrl = getSiteUrl()
@@ -236,6 +236,15 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
       if (authData.user) {
         console.log('User created successfully:', authData.user.id)
+        
+        // Store user data in localStorage for profile completion
+        if (userData && typeof window !== 'undefined') {
+          localStorage.setItem('agribeta_signup_data', JSON.stringify({
+            ...userData,
+            userId: authData.user.id
+          }))
+        }
+        
         // Do NOT attempt profile writes now; user may not have a session yet due to email verification.
         // Profile completion will be handled after first sign-in from the client using a secure API route.
         if (ADMIN_EMAILS.includes(email)) {

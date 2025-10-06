@@ -202,9 +202,9 @@ export function AuthForm() {
         return
       }
 
-      const { error } = await signUp(signUpData.email, signUpData.password, null)
+      const { error } = await signUp(signUpData.email, signUpData.password, signUpData)
 
-      // No profile creation here; handled post-confirmation
+      // Profile data will be saved after email confirmation
 
       if (error) {
         console.error('Signup error details:', error)
