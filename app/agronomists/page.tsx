@@ -164,12 +164,12 @@ function NetworkingPage() {
       last_name: 'Akinyi',
       role: 'farmer' as const,
       avatar_url: '/placeholder-user.jpg',
-      bio: 'Mixed crop farmer with expertise in vegetable farming and sustainable practices',
+      bio: 'Avocado farmer with expertise in sustainable farming practices',
       location: 'Kiambu, Kenya',
       is_verified: false,
-      farm_name: 'Fresh Produce Farm',
+      farm_name: 'Green Valley Farm',
       farm_size: 3,
-      primary_crop: 'Vegetables',
+      primary_crop: 'Avocado',
       total_diagnoses: 67
     }
   ]

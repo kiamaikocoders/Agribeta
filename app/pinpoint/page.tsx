@@ -139,20 +139,10 @@ export default function PinpointPage() {
           {/* Supported Crops */}
           <div className="mb-12">
             <h2 className="text-2xl font-bold text-center mb-8">Supported Crops</h2>
-            <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4">
+            <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4 max-w-2xl mx-auto">
               {[
                 { name: 'Avocado', icon: '🥑', color: 'bg-green-100' },
-                { name: 'Roses', icon: '🌹', color: 'bg-red-100' },
-                { name: 'Maize', icon: '🌽', color: 'bg-yellow-100' },
-                { name: 'Tomatoes', icon: '🍅', color: 'bg-red-100' },
-                { name: 'Potatoes', icon: '🥔', color: 'bg-yellow-100' },
-                { name: 'Beans', icon: '🫘', color: 'bg-green-100' },
-                { name: 'Coffee', icon: '☕', color: 'bg-brown-100' },
-                { name: 'Tea', icon: '🫖', color: 'bg-green-100' },
-                { name: 'Bananas', icon: '🍌', color: 'bg-yellow-100' },
-                { name: 'Oranges', icon: '🍊', color: 'bg-orange-100' },
-                { name: 'Mangoes', icon: '🥭', color: 'bg-yellow-100' },
-                { name: 'Pineapples', icon: '🍍', color: 'bg-yellow-100' }
+                { name: 'Roses', icon: '🌹', color: 'bg-red-100' }
               ].map((crop) => (
                 <Card key={crop.name} className="text-center hover:shadow-md transition-shadow">
                   <CardContent className="pt-4">
@@ -162,6 +152,9 @@ export default function PinpointPage() {
                 </Card>
               ))}
             </div>
+            <p className="text-center text-muted-foreground mt-4">
+              Currently supporting Avocado and Roses. More crops coming soon!
+            </p>
           </div>
 
           {/* How It Works */}

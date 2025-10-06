@@ -268,15 +268,7 @@ export function AuthForm() {
 
   const crops = [
     'Avocado',
-    'Roses',
-    'Tomatoes',
-    'Peppers',
-    'Lettuce',
-    'Spinach',
-    'Herbs',
-    'Cucumber',
-    'Beans',
-    'Other'
+    'Roses'
   ]
 
   const specializations = [

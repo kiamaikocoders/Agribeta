@@ -105,16 +105,10 @@ export function ProfileAnalytics({ userId }: ProfileAnalyticsProps) {
           },
           secondaryCrops: [
             {
-              name: 'Mango',
-              yield: 320,
-              quality: 88,
-              revenue: 4800
-            },
-            {
-              name: 'Coffee',
-              yield: 80,
-              quality: 91,
-              revenue: 2400
+              name: 'Roses',
+              yield: 500,
+              quality: 90,
+              revenue: 1500
             }
           ]
         },
