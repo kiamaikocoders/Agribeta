@@ -86,7 +86,7 @@ export default function ProfileCompletePage() {
 // Local hook to surface fetchUserProfile from context via a thin wrapper
 function useProfileCompleteAuth() {
   const auth = useAuth() as ReturnType<typeof useAuth> & { fetchUserProfile?: (id: string) => Promise<void> }
-  // @ts-expect-error – using internal method via cast for this page
+  // Using internal method via cast for this page
   const fetchUserProfile = (auth as any).fetchUserProfile || (async () => {})
   return { ...auth, fetchUserProfile }
 }

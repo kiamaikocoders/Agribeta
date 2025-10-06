@@ -104,7 +104,7 @@ export function PostInteractions({ post, onUpdate }: PostInteractionsProps) {
         .from('post_interactions')
         .select('id')
         .eq('post_id', post.id)
-        .eq('user_id', user.id)
+        .eq('user_id', user?.id)
         .eq('interaction_type', 'like')
         .single()
 
@@ -159,7 +159,7 @@ export function PostInteractions({ post, onUpdate }: PostInteractionsProps) {
           .from('post_interactions')
           .delete()
           .eq('post_id', post.id)
-          .eq('user_id', user.id)
+          .eq('user_id', user?.id)
           .eq('interaction_type', 'like')
 
         if (error) throw error
@@ -171,7 +171,7 @@ export function PostInteractions({ post, onUpdate }: PostInteractionsProps) {
           .from('post_interactions')
           .select('id')
           .eq('post_id', post.id)
-          .eq('user_id', user.id)
+          .eq('user_id', user?.id)
           .eq('interaction_type', 'like')
           .single()
 
@@ -287,7 +287,7 @@ export function PostInteractions({ post, onUpdate }: PostInteractionsProps) {
         .from('post_interactions')
         .select('id')
         .eq('post_id', post.id)
-        .eq('user_id', user.id)
+        .eq('user_id', user?.id)
         .eq('interaction_type', 'share')
         .single()
 
@@ -425,7 +425,7 @@ export function PostInteractions({ post, onUpdate }: PostInteractionsProps) {
                         {comment.profiles?.first_name} {comment.profiles?.last_name}
                       </span>
                       <Badge variant="outline" className="text-xs">
-                        {comment.profiles?.role?.charAt(0).toUpperCase() + comment.profiles?.role?.slice(1)}
+                        {comment.profiles?.role ? comment.profiles.role.charAt(0).toUpperCase() + comment.profiles.role.slice(1) : 'User'}
                       </Badge>
                       <span className="text-xs text-gray-500">
                         {formatTimeAgo(comment.created_at)}

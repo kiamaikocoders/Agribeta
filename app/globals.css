@@ -2,6 +2,11 @@
 @tailwind components;
 @tailwind utilities;
 
+/* Prevent horizontal overflow */
+html, body {
+  overflow-x: hidden;
+}
+
 /* Using system fonts instead of custom Athena font */
 
 @layer base {

@@ -1,6 +1,42 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { supabaseAdmin } from '@/lib/supabaseAdmin'
 
+interface Profile {
+  id: string
+  first_name: string | null
+  last_name: string | null
+  role: string
+  avatar_url: string | null
+  bio: string | null
+  country: string | null
+  is_verified: boolean | null
+  created_at: string
+  farm_name?: string | null
+  total_diagnoses?: number | null
+}
+
+interface User {
+  id: string
+  first_name: string
+  last_name: string
+  role: string
+  avatar_url: string | null
+  bio: string | null
+  location: string | null
+  is_verified: boolean
+  farm_name?: string
+  farm_size?: number
+  primary_crop?: string
+  total_diagnoses?: number
+  title?: string
+  years_experience?: number
+  specializations?: string[]
+  average_rating?: number
+  total_consultations?: number
+  consultation_fee?: number
+  response_time_minutes?: number
+}
+
 export async function GET(request: NextRequest) {
   try {
     const { searchParams } = new URL(request.url)
@@ -44,10 +80,13 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ error: 'Failed to fetch profiles', details: error.message }, { status: 500 })
     }
 
+    console.log(`Found ${profiles?.length || 0} profiles for role: ${role}`)
+
     // Fetch role-specific data for each user
-    const transformedUsers = await Promise.all(
-      profiles?.map(async (profile) => {
-        const baseUser = {
+    const transformedUsers: User[] = await Promise.all(
+      (profiles as Profile[])?.map(async (profile: Profile) => {
+        try {
+        const baseUser: User = {
           id: profile.id,
           first_name: profile.first_name || '',
           last_name: profile.last_name || '',
@@ -61,46 +100,60 @@ export async function GET(request: NextRequest) {
         if (profile.role === 'farmer') {
           const { data: farmerData, error: farmerError } = await supabaseAdmin()
             .from('farmer_profiles')
-            .select('farm_name, farm_size, farm_location, primary_crop, total_diagnoses')
+            .select('farm_size, farm_location, primary_crop, successful_treatments')
             .eq('id', profile.id)
-            .single()
+            .maybeSingle() // Use maybeSingle() instead of single() to handle missing records
 
-          if (farmerError && farmerError.code !== 'PGRST116') { // PGRST116 = no rows returned
+          if (farmerError) {
             console.warn('Error fetching farmer profile for', profile.id, farmerError)
           }
 
           return {
             ...baseUser,
-            farm_name: farmerData?.farm_name,
-            farm_size: farmerData?.farm_size,
-            primary_crop: farmerData?.primary_crop,
-            total_diagnoses: farmerData?.total_diagnoses || 0,
-            location: farmerData?.farm_location || profile.country,
-          }
+            farm_name: profile.farm_name || 'Farm',
+            farm_size: farmerData?.farm_size || 0,
+            primary_crop: farmerData?.primary_crop || 'Mixed Crops',
+            total_diagnoses: farmerData?.successful_treatments || profile.total_diagnoses || 0,
+            location: farmerData?.farm_location || profile.country || 'Unknown',
+          } as User
         } else if (profile.role === 'agronomist') {
           const { data: agronomistData, error: agronomistError } = await supabaseAdmin()
             .from('agronomist_profiles')
             .select('title, years_experience, specializations, average_rating, total_consultations, consultation_fee, response_time_minutes')
             .eq('id', profile.id)
-            .single()
+            .maybeSingle() // Use maybeSingle() instead of single() to handle missing records
 
-          if (agronomistError && agronomistError.code !== 'PGRST116') { // PGRST116 = no rows returned
+          if (agronomistError) {
             console.warn('Error fetching agronomist profile for', profile.id, agronomistError)
           }
 
           return {
             ...baseUser,
-            title: agronomistData?.title,
-            years_experience: agronomistData?.years_experience,
-            specializations: agronomistData?.specializations || [],
-            average_rating: agronomistData?.average_rating,
+            title: agronomistData?.title || 'Agronomist',
+            years_experience: agronomistData?.years_experience || 0,
+            specializations: agronomistData?.specializations || ['General Agriculture'],
+            average_rating: agronomistData?.average_rating || 0,
             total_consultations: agronomistData?.total_consultations || 0,
-            consultation_fee: agronomistData?.consultation_fee,
-            response_time_minutes: agronomistData?.response_time_minutes,
-          }
+            consultation_fee: agronomistData?.consultation_fee || 0,
+            response_time_minutes: agronomistData?.response_time_minutes || 60,
+          } as User
         }
 
         return baseUser
+        } catch (profileError) {
+          console.error('Error processing profile:', profile.id, profileError)
+          // Return basic user data even if role-specific data fails
+          return {
+            id: profile.id,
+            first_name: profile.first_name || '',
+            last_name: profile.last_name || '',
+            role: profile.role,
+            avatar_url: profile.avatar_url,
+            bio: profile.bio,
+            location: profile.country,
+            is_verified: profile.is_verified || false,
+          } as User
+        }
       }) || []
     )
 
@@ -126,6 +179,7 @@ export async function GET(request: NextRequest) {
       })
     }
 
+    console.log(`Returning ${filteredUsers.length} filtered users`)
     return NextResponse.json({ users: filteredUsers })
 
   } catch (error) {

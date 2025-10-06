@@ -9,7 +9,7 @@ import { Badge } from '@/components/ui/badge'
 import { useAuth } from '@/contexts/auth-context'
 import { supabase } from '@/lib/supabaseClient'
 import { cn } from '@/lib/utils'
-import { Heart, MessageCircle, Share, Users, Target, Leaf, Shield, TrendingUp, Calendar, BookOpen, Zap } from 'lucide-react'
+import { Heart, MessageCircle, Share, Users, Target, Leaf, Shield, TrendingUp, Calendar, BookOpen, Zap, BarChart2, TreesIcon } from 'lucide-react'
 import { toast } from '@/components/ui/use-toast'
 import { PostCreator } from './post-creator'
 import { PostInteractions } from './post-interactions'
@@ -168,12 +168,13 @@ export function NetworksFeed() {
   }
 
   return (
-    <div>
+    <div className="min-h-screen bg-[#F8F9FA]">
       <SecondaryNav />
-      <div className="container py-8">
-        <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
-        {/* Left Sidebar - User Profile & Quick Actions */}
-        <div className="lg:col-span-1 space-y-6 sticky top-0 max-h-screen overflow-y-auto">
+      <div className="container mx-auto px-4 py-4 lg:py-8">
+        {/* Mobile: Single column, Desktop: Grid layout */}
+        <div className="flex flex-col lg:grid lg:grid-cols-4 gap-4 lg:gap-6 min-h-screen">
+        {/* Left Sidebar - User Profile & Quick Actions - Hidden on mobile */}
+        <div className="hidden lg:block lg:col-span-1 space-y-6 sticky top-0 max-h-screen overflow-y-auto">
           {/* User Profile Card */}
           <Card className="bg-gradient-to-br from-agribeta-green to-agribeta-green/80 text-white">
             <CardContent className="p-6">
@@ -246,8 +247,8 @@ export function NetworksFeed() {
           </Card>
         </div>
 
-        {/* Main Feed */}
-        <div className="lg:col-span-2 space-y-6">
+        {/* Main Feed - Full width on mobile, 2 columns on desktop */}
+        <div className="w-full lg:col-span-2 space-y-4 max-h-screen overflow-y-auto">
           {/* Post Creation */}
           <PostCreator onPostCreated={fetchPosts} />
 
@@ -270,10 +271,10 @@ export function NetworksFeed() {
               ))}
             </div>
           ) : (
-            <div className="space-y-6">
+            <div className="space-y-4">
               {posts.map((post) => (
-                <Card key={post.id} className="hover:shadow-md transition-shadow">
-                  <CardContent className="p-6">
+                <Card key={post.id} className="hover:shadow-md transition-shadow overflow-hidden">
+                  <CardContent className="p-4">
                     <div className="flex items-start gap-3">
                       <Avatar>
                         <AvatarImage src={post.profiles?.avatar_url} />
@@ -308,20 +309,20 @@ export function NetworksFeed() {
                           {post.profiles?.farm_name || post.profiles?.company}
                         </div>
                         <div className="mb-4">
-                          <p className="text-gray-800">{post.content}</p>
+                          <p className="text-gray-800 break-words">{post.content}</p>
                         </div>
                         
                         {/* Media Content */}
                         {post.media_urls && post.media_urls.length > 0 && (
                           <div className="mb-4">
-                            <div className="grid grid-cols-1 gap-2">
+                            <div className="space-y-2">
                               {post.media_urls.map((url, index) => (
-                                <div key={index} className="relative">
+                                <div key={index} className="relative w-full max-w-full overflow-hidden rounded-lg">
                                   {post.media_types?.[index] === 'video' ? (
                                     <video 
                                       src={url} 
                                       controls 
-                                      className="w-full h-auto rounded-lg"
+                                      className="w-full h-auto max-w-full rounded-lg"
                                     />
                                         ) : (
                                           <Image
@@ -329,8 +330,9 @@ export function NetworksFeed() {
                                             alt={`Post media ${index + 1}`}
                                             width={500}
                                             height={300}
-                                            className="w-full h-auto rounded-lg object-cover"
+                                            className="w-full h-auto max-w-full rounded-lg object-cover"
                                             priority={index === 0}
+                                            style={{ maxWidth: '100%', height: 'auto' }}
                                           />
                                         )}
                                 </div>
@@ -350,8 +352,8 @@ export function NetworksFeed() {
           )}
         </div>
 
-        {/* Right Sidebar - Network Growth & Trending */}
-        <div className="lg:col-span-1 space-y-6 sticky top-0 max-h-screen overflow-y-auto">
+        {/* Right Sidebar - Network Growth & Trending - Hidden on mobile */}
+        <div className="hidden lg:block lg:col-span-1 space-y-6 sticky top-0 max-h-screen overflow-y-auto">
           {/* Grow Your Network */}
           <Card>
             <CardHeader>

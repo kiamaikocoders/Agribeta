@@ -42,12 +42,14 @@ export function NotificationsProvider({ children }: { children: React.ReactNode 
 
   const unreadCount = notifications.filter(n => !n.read).length
 
-  // Fetch notifications for the current user
-  const fetchNotifications = useCallback(async () => {
+  // Fetch notifications for the current user with retry logic
+  const fetchNotifications = useCallback(async (retries = 3) => {
     if (!user) return
 
     try {
       setLoading(true)
+      setError(null) // Clear previous errors
+      
       const { data, error } = await supabase
         .from('notifications')
         .select(`
@@ -66,7 +68,18 @@ export function NotificationsProvider({ children }: { children: React.ReactNode 
       setNotifications(data || [])
     } catch (err) {
       console.error('Error fetching notifications:', err)
-      setError(err instanceof Error ? err.message : 'Failed to fetch notifications')
+      
+      // Retry on network errors
+      if (err instanceof Error && err.message.includes('NetworkError') && retries > 0) {
+        console.log(`Retrying notifications fetch, ${retries} attempts left...`)
+        await new Promise(resolve => setTimeout(resolve, 1000)) // Wait 1 second
+        return fetchNotifications(retries - 1)
+      }
+      
+      // Only set error for non-network errors to avoid spam
+      if (err instanceof Error && !err.message.includes('NetworkError')) {
+        setError(err.message)
+      }
     } finally {
       setLoading(false)
     }
@@ -185,10 +198,17 @@ export function NotificationsProvider({ children }: { children: React.ReactNode 
     }
   }, [user])
 
-  // Load notifications on mount
+  // Load notifications on mount with a small delay to prevent race conditions
   useEffect(() => {
-    fetchNotifications()
-  }, [fetchNotifications])
+    if (!user) return
+    
+    // Add a small delay to prevent race conditions during sign-in
+    const timer = setTimeout(() => {
+      fetchNotifications()
+    }, 1000) // 1 second delay
+    
+    return () => clearTimeout(timer)
+  }, [user, fetchNotifications])
 
   const value: NotificationsContextType = {
     notifications,

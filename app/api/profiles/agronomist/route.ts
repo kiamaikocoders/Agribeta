@@ -28,8 +28,17 @@ export async function POST(req: NextRequest) {
 
     // Validate caller identity against provided id
     const { data: user, error: userError } = await supabaseAdmin().auth.getUser(token)
-    if (userError || !user?.user?.id || user.user.id !== id) {
-      return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
+    if (userError) {
+      console.error('Token validation error:', userError)
+      return NextResponse.json({ error: 'Invalid token' }, { status: 401 })
+    }
+    if (!user?.user?.id) {
+      console.error('No user ID in token')
+      return NextResponse.json({ error: 'No user ID in token' }, { status: 401 })
+    }
+    if (user.user.id !== id) {
+      console.error('User ID mismatch:', { tokenUserId: user.user.id, requestId: id })
+      return NextResponse.json({ error: 'User ID mismatch' }, { status: 403 })
     }
 
     if (company) {

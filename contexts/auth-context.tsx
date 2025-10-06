@@ -17,6 +17,8 @@ export interface UserProfile {
   phone?: string
   country?: string
   industry?: string
+  facebook_url?: string
+  date_of_birth?: string
   farm_name?: string
   company?: string
   is_verified: boolean
@@ -151,7 +153,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         .single()
 
       if (profileError) {
-        console.error('Error fetching profile:', profileError)
+        // Only log non-network errors to avoid spam
+        if (!profileError.message?.includes('NetworkError')) {
+          console.error('Error fetching profile:', profileError)
+        }
         setLoading(false)
         return
       }
@@ -167,7 +172,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           .single()
         
         if (farmerError) {
-          console.warn('Farmer profile not found or access denied:', farmerError)
+          // Only log non-network errors
+          if (!farmerError.message?.includes('NetworkError')) {
+            console.warn('Farmer profile not found or access denied:', farmerError)
+          }
           // Don't block the auth flow if farmer profile is missing
           setFarmerProfile(null)
         } else {
@@ -181,7 +189,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           .single()
         
         if (agronomistError) {
-          console.warn('Agronomist profile not found or access denied:', agronomistError)
+          // Only log non-network errors
+          if (!agronomistError.message?.includes('NetworkError')) {
+            console.warn('Agronomist profile not found or access denied:', agronomistError)
+          }
           // Don't block the auth flow if agronomist profile is missing
           setAgronomistProfile(null)
         } else {

@@ -2,6 +2,7 @@
 
 import React, { createContext, useContext, useEffect, useState, useCallback } from 'react'
 import { supabase } from '@/lib/supabaseClient'
+import { initializeUserPresence } from '@/utils/presence-utils'
 import { useAuth } from './auth-context'
 
 interface Message {
@@ -46,6 +47,7 @@ interface MessagingContextType {
   startConversation: (participantIds: string[]) => Promise<string | null>
   markAsRead: (conversationId: string) => Promise<void>
   setCurrentConversation: (conversation: Conversation | null) => void
+  setCurrentConversationById: (conversationId: string) => void
   refreshConversations: () => Promise<void>
 }
 
@@ -277,9 +279,8 @@ export function MessagingProvider({ children }: { children: React.ReactNode }) {
         setMessages(prev => [...prev, newMessage])
         
         // Update conversations if this is for the current conversation
-        if (currentConversation && newMessage.conversation_id === currentConversation.id) {
-          fetchConversations()
-        }
+        // Note: We'll refresh conversations for any new message since we can't easily match by conversation_id
+        fetchConversations()
       })
       .subscribe()
 
@@ -307,6 +308,21 @@ export function MessagingProvider({ children }: { children: React.ReactNode }) {
     fetchConversations()
   }, [fetchConversations])
 
+  // Initialize presence records for conversation participants
+  useEffect(() => {
+    if (conversations.length > 0) {
+      conversations.forEach(conversation => {
+        conversation.participants.forEach(participant => {
+          if (participant.id) {
+            initializeUserPresence(participant.id).catch(err => {
+              console.error('Error initializing presence for participant:', participant.id, err)
+            })
+          }
+        })
+      })
+    }
+  }, [conversations])
+
   // Load messages when conversation changes
   useEffect(() => {
     if (currentConversation) {
@@ -316,6 +332,11 @@ export function MessagingProvider({ children }: { children: React.ReactNode }) {
       setMessages([])
     }
   }, [currentConversation, fetchMessages, markAsRead])
+
+  const setCurrentConversationById = useCallback((conversationId: string) => {
+    const conversation = conversations.find(conv => conv.id === conversationId)
+    setCurrentConversation(conversation || null)
+  }, [conversations])
 
   const value: MessagingContextType = {
     conversations,
@@ -327,6 +348,7 @@ export function MessagingProvider({ children }: { children: React.ReactNode }) {
     startConversation,
     markAsRead,
     setCurrentConversation,
+    setCurrentConversationById,
     refreshConversations: fetchConversations
   }
 

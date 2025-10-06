@@ -9,7 +9,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { Textarea } from '@/components/ui/textarea'
 import { useAuth } from '@/contexts/auth-context'
-import { toast } from '@/components/ui/use-toast'
+import { toast } from '@/hooks/use-toast'
 import { Loader2, User, Briefcase, Users } from 'lucide-react'
 import { useRouter } from 'next/navigation'
 import { useEffect } from 'react'
@@ -79,33 +79,78 @@ export function AuthForm() {
     e.preventDefault()
     setIsLoading(true)
 
+
+    // Client-side validation
+    if (!signInData.email || !signInData.password) {
+      toast({
+        title: 'Missing Information',
+        description: 'Please enter both email and password.',
+        variant: 'destructive',
+      })
+      setIsLoading(false)
+      return
+    }
+
+    if (!signInData.email.includes('@')) {
+      toast({
+        title: 'Invalid Email',
+        description: 'Please enter a valid email address.',
+        variant: 'destructive',
+      })
+      setIsLoading(false)
+      return
+    }
+
     const { error } = await signIn(signInData.email, signInData.password)
 
     if (error) {
       console.error('Signin error details:', error)
       let errorMessage = 'Failed to sign in. Please try again.'
+      let errorTitle = 'Sign In Error'
       
       if (error.message?.includes('Email not confirmed')) {
         errorMessage = 'Please check your email and click the verification link before signing in.'
-      } else if (error.message?.includes('Invalid login credentials')) {
+        errorTitle = 'Email Verification Required'
+      } else if (error.message?.includes('Invalid login credentials') || error.message?.includes('invalid login credentials')) {
         errorMessage = 'Invalid email or password. Please check your credentials and try again.'
+        errorTitle = 'Invalid Credentials'
       } else if (error.message?.includes('Too many requests')) {
         errorMessage = 'Too many failed attempts. Please wait a few minutes before trying again.'
+        errorTitle = 'Too Many Attempts'
       } else if (error.message?.includes('Signups not allowed')) {
         errorMessage = 'This account may not exist. Try signing up first.'
+        errorTitle = 'Account Not Found'
+      } else if (error.message?.includes('User not found')) {
+        errorMessage = 'No account found with this email address. Please check your email or sign up for a new account.'
+        errorTitle = 'Account Not Found'
+      } else if (error.message?.includes('Invalid email')) {
+        errorMessage = 'Please enter a valid email address.'
+        errorTitle = 'Invalid Email'
+      } else if (error.message?.includes('Password is too weak')) {
+        errorMessage = 'Password is too weak. Please use a stronger password.'
+        errorTitle = 'Weak Password'
+      } else if (error.message?.includes('Network')) {
+        errorMessage = 'Network error. Please check your internet connection and try again.'
+        errorTitle = 'Connection Error'
       } else if (error.message) {
         errorMessage = error.message
       }
       
+      // Fallback for any unrecognized error
+      if (errorMessage === 'Failed to sign in. Please try again.') {
+        errorMessage = 'Invalid email or password. Please check your credentials and try again.'
+        errorTitle = 'Invalid Credentials'
+      }
+      
       toast({
-        title: 'Sign In Error',
+        title: errorTitle,
         description: errorMessage,
         variant: 'destructive',
       })
     } else {
       toast({
-        title: 'Success',
-        description: 'Signed in successfully!',
+        title: 'Welcome Back!',
+        description: 'You have been signed in successfully.',
       })
       // Redirect based on user role
       if (profile?.role === 'admin') {
@@ -126,6 +171,37 @@ export function AuthForm() {
       e.preventDefault()
       setIsLoading(true)
 
+      // Client-side validation
+      if (!signUpData.email || !signUpData.password || !signUpData.first_name || !signUpData.last_name) {
+        toast({
+          title: 'Missing Information',
+          description: 'Please fill in all required fields.',
+          variant: 'destructive',
+        })
+        setIsLoading(false)
+        return
+      }
+
+      if (!signUpData.email.includes('@')) {
+        toast({
+          title: 'Invalid Email',
+          description: 'Please enter a valid email address.',
+          variant: 'destructive',
+        })
+        setIsLoading(false)
+        return
+      }
+
+      if (signUpData.password.length < 6) {
+        toast({
+          title: 'Password Too Short',
+          description: 'Password must be at least 6 characters long.',
+          variant: 'destructive',
+        })
+        setIsLoading(false)
+        return
+      }
+
       const { error } = await signUp(signUpData.email, signUpData.password, null)
 
       // No profile creation here; handled post-confirmation
@@ -133,27 +209,43 @@ export function AuthForm() {
       if (error) {
         console.error('Signup error details:', error)
         let errorMessage = 'Failed to create account. Please try again.'
+        let errorTitle = 'Signup Error'
         
         if (error.message?.includes('User already registered')) {
           errorMessage = 'This email is already registered. Try signing in instead.'
+          errorTitle = 'Email Already Registered'
           setActiveTab('signin')
         } else if (error.message?.includes('Password should be')) {
           errorMessage = 'Password must be at least 6 characters long.'
+          errorTitle = 'Password Too Short'
         } else if (error.message?.includes('signup is disabled')) {
           errorMessage = 'Account registration is currently disabled.'
+          errorTitle = 'Registration Disabled'
+        } else if (error.message?.includes('Invalid email')) {
+          errorMessage = 'Please enter a valid email address.'
+          errorTitle = 'Invalid Email'
+        } else if (error.message?.includes('Password is too weak')) {
+          errorMessage = 'Password is too weak. Please use a stronger password with at least 6 characters.'
+          errorTitle = 'Weak Password'
+        } else if (error.message?.includes('Email rate limit exceeded')) {
+          errorMessage = 'Too many verification emails sent. Please wait before requesting another.'
+          errorTitle = 'Email Rate Limit'
+        } else if (error.message?.includes('Network')) {
+          errorMessage = 'Network error. Please check your internet connection and try again.'
+          errorTitle = 'Connection Error'
         } else if (error.message) {
           errorMessage = error.message
         }
         
         toast({
-          title: 'Signup Error',
+          title: errorTitle,
           description: errorMessage,
           variant: 'destructive',
         })
       } else {
         toast({
-          title: 'Success',
-          description: 'Account created! Check your email to confirm, then complete your profile.',
+          title: 'Account Created!',
+          description: 'Check your email to confirm your account, then complete your profile.',
         })
         // Don't redirect immediately - let user verify email first
         setActiveTab('signin')
@@ -226,6 +318,7 @@ export function AuthForm() {
                     placeholder="your@email.com"
                     value={signInData.email}
                     onChange={(e) => setSignInData(prev => ({ ...prev, email: e.target.value }))}
+                    disabled={isLoading}
                     required
                   />
                 </div>
@@ -236,6 +329,7 @@ export function AuthForm() {
                     type="password"
                     value={signInData.password}
                     onChange={(e) => setSignInData(prev => ({ ...prev, password: e.target.value }))}
+                    disabled={isLoading}
                     required
                   />
                 </div>

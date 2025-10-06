@@ -36,7 +36,7 @@ export function SiteHeader() {
   return (
     <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
       <div className="container flex h-16 items-center relative">
-        <Link href="/" className="mr-6 flex items-center space-x-2">
+        <Link href="/" className="flex items-center space-x-2">
           <Image 
             src="/agribeta-logo.png" 
             alt="AgriBeta Logo" 
@@ -53,16 +53,16 @@ export function SiteHeader() {
           </div>
         ) : user ? (
           <>
-        <MainNav />
-        <Suspense fallback={null}>
-        <MobileNav />
-        </Suspense>
-        <div className="flex flex-1 items-center justify-end space-x-4">
-          <nav className="flex items-center space-x-2">
-            <Suspense fallback={null}>
-            <ThemeToggle />
-            </Suspense>
-                
+            <MainNav />
+            <div className="flex flex-1 items-center justify-end space-x-3 md:space-x-6">
+              <nav className="flex items-center space-x-3 md:space-x-4">
+                {/* Theme Toggle - Hidden on mobile, visible on desktop */}
+                <div className="hidden md:block">
+                  <Suspense fallback={null}>
+                    <ThemeToggle />
+                  </Suspense>
+                </div>
+                    
                 {/* Notifications */}
                 <NotificationsProvider>
                   <NotificationsBell />
@@ -70,25 +70,25 @@ export function SiteHeader() {
 
                 {/* Profile Dropdown */}
                 <DropdownMenu>
-                  <DropdownMenuTrigger asChild>
-                    <Button variant="ghost" className="relative h-8 w-auto rounded-full px-2">
-                      <div className="flex items-center gap-2">
-                        <Avatar className="h-6 w-6">
-                          <AvatarImage src={profile?.avatar_url} alt={profile?.first_name || "User"} />
-                          <AvatarFallback>
-                            {profile?.first_name?.[0] || "U"}
-                          </AvatarFallback>
-                        </Avatar>
-                        <span className="text-sm font-medium hidden sm:block">
-                          {profile?.first_name && profile?.last_name 
-                            ? `${profile.first_name} ${profile.last_name}`
-                            : profile?.first_name || profile?.email || 'User'
-                          }
-                        </span>
-                      </div>
-                    </Button>
-                  </DropdownMenuTrigger>
-                  <DropdownMenuContent className="w-56" align="end" forceMount>
+              <DropdownMenuTrigger asChild>
+                <Button variant="ghost" className="relative h-8 w-auto rounded-full px-2">
+                  <div className="flex items-center gap-2">
+                    <Avatar className="h-6 w-6">
+                      <AvatarImage src={profile?.avatar_url} alt={profile?.first_name || "User"} />
+                      <AvatarFallback>
+                        {profile?.first_name?.[0] || "U"}
+                      </AvatarFallback>
+                    </Avatar>
+                    <span className="text-sm font-medium hidden sm:block">
+                      {profile?.first_name && profile?.last_name 
+                        ? `${profile.first_name} ${profile.last_name}`
+                        : profile?.first_name || profile?.email || 'User'
+                      }
+                    </span>
+                  </div>
+                </Button>
+              </DropdownMenuTrigger>
+                  <DropdownMenuContent className="w-56 z-[100]" align="end" forceMount>
                     <DropdownMenuLabel className="font-normal">
                       <div className="flex flex-col space-y-1">
                         <p className="text-sm font-medium leading-none">
@@ -106,7 +106,7 @@ export function SiteHeader() {
                             profile?.role === 'agronomist' ? 'bg-blue-100 text-blue-800' :
                             'bg-purple-100 text-purple-800'
                           }`}>
-                            {profile?.role?.charAt(0).toUpperCase() + profile?.role?.slice(1)}
+                            {profile?.role ? profile.role.charAt(0).toUpperCase() + profile.role.slice(1) : 'User'}
                           </span>
                           {profile?.is_verified && (
                             <span className="px-2 py-1 text-xs rounded-full bg-yellow-100 text-yellow-800">
@@ -175,14 +175,36 @@ export function SiteHeader() {
                         </DropdownMenuItem>
                       </>
                     )}
+                    
+                    {/* Admin-specific items */}
+                    {profile?.role === 'admin' && (
+                      <>
+                        <DropdownMenuSeparator />
+                        <DropdownMenuLabel className="text-xs font-medium text-muted-foreground">
+                          Admin
+                        </DropdownMenuLabel>
+                        <DropdownMenuItem asChild>
+                          <Link href="/dashboard/admin" className="flex items-center">
+                            <Settings className="mr-2 h-4 w-4" />
+                            <span>Admin Dashboard</span>
+                          </Link>
+                        </DropdownMenuItem>
+                      </>
+                    )}
+                    
                     <DropdownMenuSeparator />
                     <DropdownMenuItem onClick={handleSignOut} className="flex items-center">
                       <LogOut className="mr-2 h-4 w-4" />
                       <span>Log out</span>
                     </DropdownMenuItem>
-                  </DropdownMenuContent>
-                </DropdownMenu>
-              </nav>
+            </DropdownMenuContent>
+          </DropdownMenu>
+            </nav>
+            
+            {/* Mobile Navigation - Added at the end */}
+            <Suspense fallback={null}>
+              <MobileNav />
+            </Suspense>
             </div>
           </>
         ) : (

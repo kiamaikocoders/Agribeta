@@ -30,12 +30,23 @@ function NetworkingPage() {
   const [users, setUsers] = useState<any[]>([])
   const [loading, setLoading] = useState(true)
 
+  // Convert tab value to API role parameter
+  const getApiRole = (tab: string) => {
+    switch (tab) {
+      case 'agronomists': return 'agronomist'
+      case 'farmers': return 'farmer'
+      case 'all': return 'all'
+      default: return 'all'
+    }
+  }
+
   // Fetch users from API
   const fetchUsers = async () => {
     try {
       setLoading(true)
+      // Always fetch all users, then filter on frontend for better UX
       const params = new URLSearchParams({
-        role: activeTab,
+        role: 'all', // Always fetch all users
         search: searchQuery,
         specialization: selectedSpecialization,
         location: selectedLocation,
@@ -166,7 +177,7 @@ function NetworkingPage() {
   // Fetch users when component mounts or filters change
   useEffect(() => {
     fetchUsers()
-  }, [activeTab, searchQuery, selectedSpecialization, selectedLocation])
+  }, [searchQuery, selectedSpecialization, selectedLocation])
 
   const handleSearch = (query: string) => {
     setSearchQuery(query)
@@ -180,10 +191,31 @@ function NetworkingPage() {
     setSelectedLocation(location)
   }
 
-  // Filter users based on active tab (API already filters by role, but we need to separate for display)
+  // Filter users based on active tab
   const agronomists = users.filter(user => user.role === 'agronomist')
   const farmers = users.filter(user => user.role === 'farmer')
-  const filteredUsers = users
+  
+  // Get filtered users based on active tab
+  const getFilteredUsers = () => {
+    switch (activeTab) {
+      case 'agronomists': return agronomists
+      case 'farmers': return farmers
+      case 'all': 
+      default: return users
+    }
+  }
+  
+  const filteredUsers = getFilteredUsers()
+  
+  // Debug logging
+  console.log('Network Hub Debug:', {
+    activeTab,
+    totalUsers: users.length,
+    agronomistsCount: agronomists.length,
+    farmersCount: farmers.length,
+    filteredUsersCount: filteredUsers.length,
+    agronomists: agronomists.map(u => ({ id: u.id, name: `${u.first_name} ${u.last_name}`, role: u.role }))
+  })
 
   return (
     <MessagingProvider>
@@ -304,7 +336,7 @@ function NetworkingPage() {
               </div>
             ) : (
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                {agronomists.map((user) => (
+                {filteredUsers.map((user) => (
                   <NetworkingCard key={user.id} user={user} />
                 ))}
               </div>
@@ -321,7 +353,7 @@ function NetworkingPage() {
               </div>
             ) : (
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                {farmers.map((user) => (
+                {filteredUsers.map((user) => (
                   <NetworkingCard key={user.id} user={user} />
                 ))}
               </div>

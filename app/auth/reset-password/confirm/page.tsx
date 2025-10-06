@@ -33,17 +33,14 @@ export default function ResetPasswordConfirmPage() {
           const { error } = await supabase.auth.exchangeCodeForSession(code)
           if (error) {
             console.error('Code exchange error:', error)
-            toast({
-              title: '❌ Invalid reset link',
+            toast.error('❌ Invalid reset link', {
               description: 'This password reset link is invalid or expired. Please request a new one.',
-              variant: 'destructive',
               duration: 5000,
             })
             router.push('/auth/reset-password')
             return
           }
-          toast({
-            title: '✅ Link verified!',
+          toast.success('✅ Link verified!', {
             description: 'Please set your new password below.',
             duration: 3000,
           })
@@ -60,10 +57,8 @@ export default function ResetPasswordConfirmPage() {
         }
       } catch (err) {
         console.error('Session establishment error:', err)
-        toast({
-          title: '❌ Session error',
+        toast.error('❌ Session error', {
           description: 'There was an error processing your reset link. Please try again.',
-          variant: 'destructive',
           duration: 5000,
         })
         router.push('/auth/reset-password')

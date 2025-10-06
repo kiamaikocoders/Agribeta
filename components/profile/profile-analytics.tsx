@@ -1,122 +1,171 @@
 "use client"
 
 import { useState, useEffect } from 'react'
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
+import { Button } from '@/components/ui/button'
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { useAuth } from '@/contexts/auth-context'
-import { supabase } from '@/lib/supabaseClient'
+import { ProfileUpcomingSessions } from './profile-upcoming-sessions'
 import { 
-  Eye, 
-  Users, 
-  UserPlus, 
-  MessageCircle, 
+  BarChart3, 
   TrendingUp,
+  TrendingDown, 
+  DollarSign, 
+  Leaf, 
+  Droplets, 
+  Sun, 
+  Thermometer,
   Calendar,
-  MapPin
+  Target,
+  Award,
+  PieChart,
+  Activity,
+  Zap
 } from 'lucide-react'
 
-interface ProfileView {
-  id: string
-  viewer_id: string
-  viewed_at: string
-  viewer: {
-    first_name: string
-    last_name: string
-    avatar_url?: string
-    role: string
-  }
-}
-
 interface AnalyticsData {
-  totalViews: number
-  uniqueViewers: number
-  recentViews: ProfileView[]
-  followersCount: number
-  followingCount: number
-  connectionsCount: number
-  viewsThisWeek: number
-  viewsThisMonth: number
+  farmPerformance: {
+    totalYield: number
+    yieldGrowth: number
+    efficiency: number
+    sustainability: number
+  }
+  cropAnalytics: {
+    primaryCrop: {
+      name: string
+      yield: number
+      quality: number
+      revenue: number
+    }
+    secondaryCrops: Array<{
+      name: string
+      yield: number
+      quality: number
+      revenue: number
+    }>
+  }
+  revenueTracking: {
+    monthlyRevenue: Array<{
+      month: string
+      amount: number
+    }>
+    totalRevenue: number
+    revenueGrowth: number
+    profitMargin: number
+  }
+  weatherImpact: {
+    temperature: number
+    humidity: number
+    rainfall: number
+    impact: 'positive' | 'neutral' | 'negative'
+  }
+  goals: Array<{
+    id: string
+    title: string
+    target: number
+    current: number
+    unit: string
+    deadline: string
+  }>
 }
 
-export function ProfileAnalytics() {
-  const { user, profile } = useAuth()
-  const [analytics, setAnalytics] = useState<AnalyticsData | null>(null)
+interface ProfileAnalyticsProps {
+  userId?: string
+}
+
+export function ProfileAnalytics({ userId }: ProfileAnalyticsProps) {
+  const { user, profile, farmerProfile } = useAuth()
+  const [analyticsData, setAnalyticsData] = useState<AnalyticsData | null>(null)
   const [loading, setLoading] = useState(true)
+  const [selectedPeriod, setSelectedPeriod] = useState('6months')
 
   useEffect(() => {
-    if (!user) return
+    fetchAnalytics()
+  }, [selectedPeriod])
 
     const fetchAnalytics = async () => {
       try {
         setLoading(true)
 
-        // Fetch profile views
-        const { data: viewsData, error: viewsError } = await supabase
-          .from('profile_views')
-          .select(`
-            *,
-            viewer:profiles!profile_views_viewer_id_fkey(
-              first_name,
-              last_name,
-              avatar_url,
-              role
-            )
-          `)
-          .eq('profile_id', user.id)
-          .order('viewed_at', { ascending: false })
-          .limit(10)
+      // Mock analytics data - in a real app, this would come from your analytics API
+      const mockData: AnalyticsData = {
+        farmPerformance: {
+          totalYield: 1250,
+          yieldGrowth: 15.2,
+          efficiency: 87,
+          sustainability: 92
+        },
+        cropAnalytics: {
+          primaryCrop: {
+            name: farmerProfile?.primary_crop || 'Avocado',
+            yield: 850,
+            quality: 94,
+            revenue: 12750
+          },
+          secondaryCrops: [
+            {
+              name: 'Mango',
+              yield: 320,
+              quality: 88,
+              revenue: 4800
+            },
+            {
+              name: 'Coffee',
+              yield: 80,
+              quality: 91,
+              revenue: 2400
+            }
+          ]
+        },
+        revenueTracking: {
+          monthlyRevenue: [
+            { month: 'Jan', amount: 2100 },
+            { month: 'Feb', amount: 2300 },
+            { month: 'Mar', amount: 2800 },
+            { month: 'Apr', amount: 3200 },
+            { month: 'May', amount: 3100 },
+            { month: 'Jun', amount: 2850 }
+          ],
+          totalRevenue: 16350,
+          revenueGrowth: 12.5,
+          profitMargin: 68
+        },
+        weatherImpact: {
+          temperature: 24,
+          humidity: 65,
+          rainfall: 45,
+          impact: 'positive' as const
+        },
+        goals: [
+          {
+            id: '1',
+            title: 'Increase Avocado Yield',
+            target: 1000,
+            current: 850,
+            unit: 'kg',
+            deadline: 'Dec 2024'
+          },
+          {
+            id: '2',
+            title: 'Improve Water Efficiency',
+            target: 95,
+            current: 87,
+            unit: '%',
+            deadline: 'Oct 2024'
+          },
+          {
+            id: '3',
+            title: 'Monthly Revenue Target',
+            target: 3500,
+            current: 2850,
+            unit: '$',
+            deadline: 'Dec 2024'
+          }
+        ]
+      }
 
-        if (viewsError) throw viewsError
-
-        // Fetch followers count
-        const { count: followersCount, error: followersError } = await supabase
-          .from('follows')
-          .select('*', { count: 'exact', head: true })
-          .eq('following_id', user.id)
-
-        if (followersError) throw followersError
-
-        // Fetch following count
-        const { count: followingCount, error: followingError } = await supabase
-          .from('follows')
-          .select('*', { count: 'exact', head: true })
-          .eq('follower_id', user.id)
-
-        if (followingError) throw followingError
-
-        // Fetch connections count
-        const { count: connectionsCount, error: connectionsError } = await supabase
-          .from('connections')
-          .select('*', { count: 'exact', head: true })
-          .or(`requester_id.eq.${user.id},receiver_id.eq.${user.id}`)
-          .eq('status', 'accepted')
-
-        if (connectionsError) throw connectionsError
-
-        // Calculate weekly and monthly views
-        const now = new Date()
-        const weekAgo = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000)
-        const monthAgo = new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000)
-
-        const viewsThisWeek = viewsData?.filter(view => 
-          new Date(view.viewed_at) >= weekAgo
-        ).length || 0
-
-        const viewsThisMonth = viewsData?.filter(view => 
-          new Date(view.viewed_at) >= monthAgo
-        ).length || 0
-
-        setAnalytics({
-          totalViews: viewsData?.length || 0,
-          uniqueViewers: new Set(viewsData?.map(v => v.viewer_id)).size,
-          recentViews: viewsData || [],
-          followersCount: followersCount || 0,
-          followingCount: followingCount || 0,
-          connectionsCount: connectionsCount || 0,
-          viewsThisWeek,
-          viewsThisMonth
-        })
+      setAnalyticsData(mockData)
       } catch (error) {
         console.error('Error fetching analytics:', error)
       } finally {
@@ -124,196 +173,336 @@ export function ProfileAnalytics() {
       }
     }
 
-    fetchAnalytics()
-  }, [user])
+  const formatCurrency = (amount: number) => {
+    return new Intl.NumberFormat('en-US', {
+      style: 'currency',
+      currency: 'USD'
+    }).format(amount)
+  }
+
+  const getGrowthIcon = (growth: number) => {
+    return growth >= 0 ? (
+      <TrendingUp className="h-4 w-4 text-green-500" />
+    ) : (
+      <TrendingDown className="h-4 w-4 text-red-500" />
+    )
+  }
+
+  const getGrowthColor = (growth: number) => {
+    return growth >= 0 ? 'text-green-600' : 'text-red-600'
+  }
 
   if (loading) {
     return (
-      <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <TrendingUp className="h-5 w-5" />
-            Profile Analytics
-          </CardTitle>
-          <CardDescription>Loading your profile statistics...</CardDescription>
-        </CardHeader>
-        <CardContent>
-          <div className="animate-pulse space-y-4">
-            <div className="h-4 bg-gray-200 rounded w-3/4"></div>
-            <div className="h-4 bg-gray-200 rounded w-1/2"></div>
-            <div className="h-4 bg-gray-200 rounded w-2/3"></div>
+      <div className="space-y-6">
+        <div className="flex items-center justify-between">
+          <h3 className="text-xl font-semibold text-gray-900">📊 Analytics</h3>
+          <Select value={selectedPeriod} onValueChange={setSelectedPeriod}>
+            <SelectTrigger className="w-40">
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="3months">Last 3 months</SelectItem>
+              <SelectItem value="6months">Last 6 months</SelectItem>
+              <SelectItem value="1year">Last year</SelectItem>
+            </SelectContent>
+          </Select>
+        </div>
+        
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+          {[1, 2, 3, 4].map((i) => (
+            <div key={i} className="bg-white border rounded-lg p-6 animate-pulse">
+              <div className="h-4 w-20 bg-gray-200 rounded mb-2"></div>
+              <div className="h-8 w-16 bg-gray-200 rounded mb-2"></div>
+              <div className="h-3 w-24 bg-gray-200 rounded"></div>
+            </div>
+          ))}
+        </div>
           </div>
-        </CardContent>
-      </Card>
     )
   }
 
-  if (!analytics) {
+  if (!analyticsData) {
     return (
-      <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <TrendingUp className="h-5 w-5" />
-            Profile Analytics
-          </CardTitle>
-          <CardDescription>Unable to load analytics data</CardDescription>
-        </CardHeader>
-      </Card>
+      <div className="space-y-6">
+        <h3 className="text-xl font-semibold text-gray-900">📊 Analytics</h3>
+        <div className="bg-gray-50 rounded-lg p-8 text-center">
+          <BarChart3 className="h-12 w-12 text-gray-400 mx-auto mb-4" />
+          <h4 className="text-lg font-medium text-gray-900 mb-2">No Analytics Data</h4>
+          <p className="text-gray-600">Start tracking your farm performance to see detailed analytics.</p>
+        </div>
+      </div>
     )
-  }
-
-  const formatTimeAgo = (dateString: string) => {
-    const date = new Date(dateString)
-    const now = new Date()
-    const diffInMinutes = Math.floor((now.getTime() - date.getTime()) / (1000 * 60))
-    
-    if (diffInMinutes < 1) return 'Just now'
-    if (diffInMinutes < 60) return `${diffInMinutes}m ago`
-    if (diffInMinutes < 1440) return `${Math.floor(diffInMinutes / 60)}h ago`
-    return `${Math.floor(diffInMinutes / 1440)}d ago`
   }
 
   return (
-    <div className="space-y-6">
-      {/* Overview Stats */}
-      <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <TrendingUp className="h-5 w-5" />
-            Profile Analytics
-          </CardTitle>
-          <CardDescription>Your profile performance and engagement metrics</CardDescription>
-        </CardHeader>
-        <CardContent>
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-            <div className="text-center">
-              <div className="text-2xl font-bold text-agribeta-green">{analytics.totalViews}</div>
-              <div className="text-sm text-muted-foreground">Total Views</div>
-            </div>
-            <div className="text-center">
-              <div className="text-2xl font-bold text-blue-600">{analytics.uniqueViewers}</div>
-              <div className="text-sm text-muted-foreground">Unique Viewers</div>
-            </div>
-            <div className="text-center">
-              <div className="text-2xl font-bold text-purple-600">{analytics.followersCount}</div>
-              <div className="text-sm text-muted-foreground">Followers</div>
-            </div>
-            <div className="text-center">
-              <div className="text-2xl font-bold text-orange-600">{analytics.connectionsCount}</div>
-              <div className="text-sm text-muted-foreground">Connections</div>
-            </div>
-          </div>
-        </CardContent>
-      </Card>
-
-      {/* Weekly/Monthly Stats */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <Calendar className="h-5 w-5" />
-              This Week
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="text-3xl font-bold text-agribeta-green mb-2">
-              {analytics.viewsThisWeek}
-            </div>
-            <div className="text-sm text-muted-foreground">Profile views this week</div>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <Calendar className="h-5 w-5" />
-              This Month
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="text-3xl font-bold text-blue-600 mb-2">
-              {analytics.viewsThisMonth}
-            </div>
-            <div className="text-sm text-muted-foreground">Profile views this month</div>
-          </CardContent>
-        </Card>
+    <div className="space-y-8">
+      {/* Header */}
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+        <h3 className="text-xl font-semibold text-gray-900">📊 Farm Analytics</h3>
+        <Select value={selectedPeriod} onValueChange={setSelectedPeriod}>
+          <SelectTrigger className="w-40">
+            <SelectValue />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="3months">Last 3 months</SelectItem>
+            <SelectItem value="6months">Last 6 months</SelectItem>
+            <SelectItem value="1year">Last year</SelectItem>
+          </SelectContent>
+        </Select>
       </div>
 
-      {/* Recent Viewers */}
-      <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <Eye className="h-5 w-5" />
-            Recent Profile Views
-          </CardTitle>
-          <CardDescription>People who recently viewed your profile</CardDescription>
-        </CardHeader>
-        <CardContent>
-          {analytics.recentViews.length === 0 ? (
-            <div className="text-center py-8 text-muted-foreground">
-              <Eye className="h-12 w-12 mx-auto mb-4 opacity-50" />
-              <p>No profile views yet</p>
-              <p className="text-sm">Your profile views will appear here</p>
+      {/* Farm Performance Overview */}
+      <div className="space-y-4">
+        <h4 className="text-lg font-medium text-gray-900">🏡 Farm Performance</h4>
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+          <div className="bg-white border rounded-lg p-6">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm font-medium text-gray-600">Total Yield</p>
+                <p className="text-2xl font-bold text-gray-900">{analyticsData.farmPerformance.totalYield} kg</p>
+              </div>
+              <Leaf className="h-8 w-8 text-green-500" />
             </div>
-          ) : (
+            <div className="flex items-center gap-1 mt-2">
+              {getGrowthIcon(analyticsData.farmPerformance.yieldGrowth)}
+              <span className={`text-sm ${getGrowthColor(analyticsData.farmPerformance.yieldGrowth)}`}>
+                +{analyticsData.farmPerformance.yieldGrowth}%
+              </span>
+            </div>
+          </div>
+
+          <div className="bg-white border rounded-lg p-6">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm font-medium text-gray-600">Efficiency</p>
+                <p className="text-2xl font-bold text-gray-900">{analyticsData.farmPerformance.efficiency}%</p>
+              </div>
+              <Zap className="h-8 w-8 text-blue-500" />
+            </div>
+            <div className="w-full bg-gray-200 rounded-full h-2 mt-2">
+              <div 
+                className="bg-blue-500 h-2 rounded-full" 
+                style={{ width: `${analyticsData.farmPerformance.efficiency}%` }}
+              ></div>
+            </div>
+          </div>
+
+          <div className="bg-white border rounded-lg p-6">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm font-medium text-gray-600">Sustainability</p>
+                <p className="text-2xl font-bold text-gray-900">{analyticsData.farmPerformance.sustainability}%</p>
+              </div>
+              <Award className="h-8 w-8 text-green-500" />
+            </div>
+            <div className="w-full bg-gray-200 rounded-full h-2 mt-2">
+              <div 
+                className="bg-green-500 h-2 rounded-full" 
+                style={{ width: `${analyticsData.farmPerformance.sustainability}%` }}
+              ></div>
+            </div>
+          </div>
+
+          <div className="bg-white border rounded-lg p-6">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm font-medium text-gray-600">Total Revenue</p>
+                <p className="text-2xl font-bold text-gray-900">
+                  {formatCurrency(analyticsData.revenueTracking.totalRevenue)}
+                </p>
+              </div>
+              <DollarSign className="h-8 w-8 text-green-500" />
+            </div>
+            <div className="flex items-center gap-1 mt-2">
+              {getGrowthIcon(analyticsData.revenueTracking.revenueGrowth)}
+              <span className={`text-sm ${getGrowthColor(analyticsData.revenueTracking.revenueGrowth)}`}>
+                +{analyticsData.revenueTracking.revenueGrowth}%
+              </span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Crop Analytics */}
+      <div className="space-y-4">
+        <h4 className="text-lg font-medium text-gray-900">🌱 Crop Analytics</h4>
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          {/* Primary Crop */}
+          <div className="bg-white border rounded-lg p-6">
+            <div className="flex items-center justify-between mb-4">
+              <h5 className="font-medium text-gray-900">Primary Crop: {analyticsData.cropAnalytics.primaryCrop.name}</h5>
+              <Badge variant="secondary" className="bg-green-100 text-green-800">Primary</Badge>
+            </div>
+            
             <div className="space-y-3">
-              {analytics.recentViews.map((view) => (
-                <div key={view.id} className="flex items-center gap-3 p-3 rounded-lg hover:bg-gray-50">
-                  <Avatar className="h-10 w-10">
-                    <AvatarImage src={view.viewer.avatar_url} />
-                    <AvatarFallback>
-                      {view.viewer.first_name[0]}{view.viewer.last_name[0]}
-                    </AvatarFallback>
-                  </Avatar>
-                  <div className="flex-1 min-w-0">
-                    <div className="flex items-center gap-2">
-                      <p className="font-medium truncate">
-                        {view.viewer.first_name} {view.viewer.last_name}
-                      </p>
-                      <Badge variant="secondary" className="text-xs">
-                        {view.viewer.role}
-                      </Badge>
+              <div className="flex justify-between items-center">
+                <span className="text-sm text-gray-600">Yield</span>
+                <span className="font-medium">{analyticsData.cropAnalytics.primaryCrop.yield} kg</span>
+              </div>
+              <div className="flex justify-between items-center">
+                <span className="text-sm text-gray-600">Quality Score</span>
+                <span className="font-medium">{analyticsData.cropAnalytics.primaryCrop.quality}%</span>
+              </div>
+              <div className="flex justify-between items-center">
+                <span className="text-sm text-gray-600">Revenue</span>
+                <span className="font-medium text-green-600">
+                  {formatCurrency(analyticsData.cropAnalytics.primaryCrop.revenue)}
+                </span>
+              </div>
+            </div>
+          </div>
+
+          {/* Secondary Crops */}
+          <div className="bg-white border rounded-lg p-6">
+            <h5 className="font-medium text-gray-900 mb-4">Secondary Crops</h5>
+            <div className="space-y-4">
+              {analyticsData.cropAnalytics.secondaryCrops.map((crop, index) => (
+                <div key={index} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+                  <div>
+                    <p className="font-medium text-gray-900">{crop.name}</p>
+                    <p className="text-sm text-gray-600">{crop.yield} kg • {crop.quality}% quality</p>
+                  </div>
+                  <p className="font-medium text-green-600">
+                    {formatCurrency(crop.revenue)}
+                  </p>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Revenue Tracking */}
+      <div className="space-y-4">
+        <h4 className="text-lg font-medium text-gray-900">💰 Revenue Tracking</h4>
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          <div className="lg:col-span-2 bg-white border rounded-lg p-6">
+            <h5 className="font-medium text-gray-900 mb-4">Monthly Revenue Trend</h5>
+            <div className="space-y-3">
+              {analyticsData.revenueTracking.monthlyRevenue.map((month, index) => (
+                <div key={month.month} className="flex items-center gap-4">
+                  <div className="w-12 text-sm text-gray-600">{month.month}</div>
+                  <div className="flex-1 bg-gray-200 rounded-full h-2">
+                    <div 
+                      className="bg-green-500 h-2 rounded-full" 
+                      style={{ 
+                        width: `${(month.amount / Math.max(...analyticsData.revenueTracking.monthlyRevenue.map(m => m.amount))) * 100}%` 
+                      }}
+                    ></div>
                     </div>
-                    <p className="text-sm text-muted-foreground">
-                      {formatTimeAgo(view.viewed_at)}
-                    </p>
+                  <div className="w-20 text-right text-sm font-medium">
+                    {formatCurrency(month.amount)}
                   </div>
                 </div>
               ))}
             </div>
-          )}
-        </CardContent>
-      </Card>
+          </div>
 
-      {/* Network Summary */}
-      <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <Users className="h-5 w-5" />
-            Network Summary
-          </CardTitle>
-          <CardDescription>Your connections and followers</CardDescription>
-        </CardHeader>
-        <CardContent>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            <div className="text-center p-4 border rounded-lg">
-              <UserPlus className="h-8 w-8 mx-auto mb-2 text-green-600" />
-              <div className="text-2xl font-bold">{analytics.followersCount}</div>
-              <div className="text-sm text-muted-foreground">Followers</div>
-            </div>
-            <div className="text-center p-4 border rounded-lg">
-              <Users className="h-8 w-8 mx-auto mb-2 text-blue-600" />
-              <div className="text-2xl font-bold">{analytics.followingCount}</div>
-              <div className="text-sm text-muted-foreground">Following</div>
-            </div>
-            <div className="text-center p-4 border rounded-lg">
-              <MessageCircle className="h-8 w-8 mx-auto mb-2 text-purple-600" />
-              <div className="text-2xl font-bold">{analytics.connectionsCount}</div>
-              <div className="text-sm text-muted-foreground">Connections</div>
+          <div className="bg-white border rounded-lg p-6">
+            <h5 className="font-medium text-gray-900 mb-4">Financial Health</h5>
+            <div className="space-y-4">
+              <div className="text-center">
+                <p className="text-sm text-gray-600">Profit Margin</p>
+                <p className="text-2xl font-bold text-green-600">
+                  {analyticsData.revenueTracking.profitMargin}%
+                </p>
+              </div>
+              
+              <div className="text-center">
+                <p className="text-sm text-gray-600">Revenue Growth</p>
+                <div className="flex items-center justify-center gap-1">
+                  {getGrowthIcon(analyticsData.revenueTracking.revenueGrowth)}
+                  <span className={`text-lg font-bold ${getGrowthColor(analyticsData.revenueTracking.revenueGrowth)}`}>
+                    +{analyticsData.revenueTracking.revenueGrowth}%
+                  </span>
+                </div>
+              </div>
             </div>
           </div>
-        </CardContent>
-      </Card>
+        </div>
+      </div>
+
+      {/* Goals & Targets */}
+      <div className="space-y-4">
+        <h4 className="text-lg font-medium text-gray-900">🎯 Goals & Targets</h4>
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+          {analyticsData.goals.map((goal) => {
+            const progress = (goal.current / goal.target) * 100
+            return (
+              <div key={goal.id} className="bg-white border rounded-lg p-6">
+                <div className="flex items-center justify-between mb-3">
+                  <h5 className="font-medium text-gray-900 text-sm">{goal.title}</h5>
+                  <Badge variant="outline" className="text-xs">
+                    {goal.deadline}
+                  </Badge>
+                </div>
+                
+                <div className="space-y-2">
+                  <div className="flex justify-between text-sm">
+                    <span className="text-gray-600">Progress</span>
+                    <span className="font-medium">
+                      {goal.current} / {goal.target} {goal.unit}
+                    </span>
+                  </div>
+                  
+                  <div className="w-full bg-gray-200 rounded-full h-2">
+                    <div 
+                      className={`h-2 rounded-full ${
+                        progress >= 80 ? 'bg-green-500' : 
+                        progress >= 60 ? 'bg-yellow-500' : 'bg-red-500'
+                      }`}
+                      style={{ width: `${Math.min(progress, 100)}%` }}
+                    ></div>
+                  </div>
+                  
+                  <p className="text-xs text-gray-500 text-right">
+                    {Math.round(progress)}% complete
+                  </p>
+                </div>
+              </div>
+            )
+          })}
+        </div>
+      </div>
+
+      {/* Weather Impact */}
+      <div className="space-y-4">
+        <h4 className="text-lg font-medium text-gray-900">🌤️ Weather Impact</h4>
+        <div className="bg-white border rounded-lg p-6">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <div className="text-center">
+              <Thermometer className="h-8 w-8 text-orange-500 mx-auto mb-2" />
+              <p className="text-sm text-gray-600">Temperature</p>
+              <p className="text-xl font-bold text-gray-900">{analyticsData.weatherImpact.temperature}°C</p>
+            </div>
+            
+            <div className="text-center">
+              <Droplets className="h-8 w-8 text-blue-500 mx-auto mb-2" />
+              <p className="text-sm text-gray-600">Humidity</p>
+              <p className="text-xl font-bold text-gray-900">{analyticsData.weatherImpact.humidity}%</p>
+            </div>
+            
+            <div className="text-center">
+              <Sun className="h-8 w-8 text-yellow-500 mx-auto mb-2" />
+              <p className="text-sm text-gray-600">Rainfall</p>
+              <p className="text-xl font-bold text-gray-900">{analyticsData.weatherImpact.rainfall}mm</p>
+            </div>
+          </div>
+          
+          <div className="mt-4 p-3 rounded-lg bg-green-50 border border-green-200">
+            <div className="flex items-center gap-2">
+              <Activity className="h-4 w-4 text-green-600" />
+              <span className="text-sm font-medium text-green-800">
+                Weather conditions are favorable for crop growth
+              </span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Upcoming Sessions for Farmers */}
+      <ProfileUpcomingSessions userId={userId} />
     </div>
   )
 }

@@ -7,7 +7,7 @@ import { SiteHeader } from "@/components/site-header"
 import { SiteFooter } from "@/components/site-footer"
 import { DiagnosisHistoryProvider } from "@/contexts/diagnosis-history-context"
 import { AuthProvider } from "@/contexts/auth-context"
-import { AuthDebug } from "@/components/debug/auth-debug"
+import { PresenceProvider } from "@/contexts/presence-context"
 import { cn } from "@/lib/utils"
 import "@/app/globals.css"
 import { Suspense } from "react"
@@ -31,6 +31,7 @@ export default function RootLayout({
         <ThemeProvider attribute="class" defaultTheme="light">
             <Suspense fallback={null}>
             <AuthProvider>
+          <PresenceProvider>
           <DiagnosisHistoryProvider>
             <div className="relative flex min-h-screen flex-col">
               <SiteHeader />
@@ -46,8 +47,8 @@ export default function RootLayout({
                 <Suspense fallback={null}>
                   <AnalyticsWrapper />
                 </Suspense>
-                <AuthDebug />
           </DiagnosisHistoryProvider>
+          </PresenceProvider>
             </AuthProvider>
             </Suspense>
         </ThemeProvider>

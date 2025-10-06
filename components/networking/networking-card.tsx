@@ -51,7 +51,7 @@ export function NetworkingCard({ user }: NetworkingCardProps) {
 
     setIsStartingConversation(true)
     try {
-      await startConversation(user.id)
+      await startConversation([user.id])
       toast({
         title: "Conversation Started",
         description: `Started a conversation with ${user.first_name} ${user.last_name}`,

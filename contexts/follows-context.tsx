@@ -132,6 +132,17 @@ export function FollowsProvider({ children }: { children: React.ReactNode }) {
       // Refresh data
       await fetchData()
 
+      // Get the current user's profile information for the notification
+      const { data: currentUserProfile } = await supabase
+        .from('profiles')
+        .select('first_name, last_name')
+        .eq('id', user.id)
+        .single()
+
+      const followerName = currentUserProfile 
+        ? `${currentUserProfile.first_name} ${currentUserProfile.last_name}`.trim()
+        : 'Someone'
+
       // Create notification for the followed user
       await supabase
         .from('notifications')
@@ -139,7 +150,7 @@ export function FollowsProvider({ children }: { children: React.ReactNode }) {
           user_id: userId,
           type: 'follow',
           title: 'New Follower',
-          message: `${user.user_metadata?.first_name || 'Someone'} started following you`,
+          message: `${followerName} started following you`,
           sender_id: user.id
         })
     } catch (err) {

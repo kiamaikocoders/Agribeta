@@ -7,10 +7,16 @@ import { cn } from "@/lib/utils"
 import { Sheet, SheetContent, SheetTrigger, SheetTitle, SheetDescription } from "@/components/ui/sheet"
 import { Button } from "@/components/ui/button"
 import { ScrollArea } from "@/components/ui/scroll-area"
-import { TreesIcon as Plant, Shield, Users, BarChart2, Menu, Leaf } from "lucide-react"
+import { Separator } from "@/components/ui/separator"
+import { TreesIcon as Plant, Shield, Users, BarChart2, Menu, Leaf, Sun, Moon, Settings, LogOut } from "lucide-react"
+import { useAuth } from "@/contexts/auth-context"
+import { useTheme } from "next-themes"
+import { ThemeToggle } from "@/components/theme-toggle"
 
 export function MobileNav() {
   const [open, setOpen] = React.useState(false)
+  const { user, profile, signOut } = useAuth()
+  const { theme, setTheme } = useTheme()
 
   const routes = [
     {
@@ -20,7 +26,7 @@ export function MobileNav() {
     },
     {
       href: "/agronomists",
-      label: "Agronomists",
+      label: "AgriBeta Network",
       icon: <Users className="mr-2 h-4 w-4" />,
     },
     {
@@ -35,15 +41,20 @@ export function MobileNav() {
     },
     {
       href: "/diagnosis",
-      label: "Disease Diagnosis",
+      label: "AgriBeta Pinpoint",
       icon: <Plant className="mr-2 h-4 w-4" />,
     },
     {
       href: "/fcm-management",
-      label: "FCM Management",
+      label: "AgriBeta Protect",
       icon: <Shield className="mr-2 h-4 w-4" />,
     },
   ]
+
+  const handleSignOut = async () => {
+    setOpen(false)
+    await signOut()
+  }
 
   return (
     <Sheet open={open} onOpenChange={setOpen}>
@@ -86,6 +97,52 @@ export function MobileNav() {
                 {route.label}
               </Link>
             ))}
+            
+            <Separator className="my-4" />
+            
+            {/* Admin Section - Only show if user is admin */}
+            {profile?.role === 'admin' && (
+              <>
+                <Link
+                  href="/dashboard/admin"
+                  className="flex items-center py-2 text-base font-medium transition-colors hover:text-agribeta-green"
+                  onClick={() => setOpen(false)}
+                >
+                  <Settings className="mr-2 h-4 w-4" />
+                  Admin Dashboard
+                </Link>
+                <Separator className="my-4" />
+              </>
+            )}
+            
+            {/* Theme Toggle */}
+            <div className="flex items-center justify-between py-2">
+              <span className="text-base font-medium">Theme</span>
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
+                className="h-8 w-8 p-0"
+              >
+                {theme === 'dark' ? (
+                  <Sun className="h-4 w-4" />
+                ) : (
+                  <Moon className="h-4 w-4" />
+                )}
+              </Button>
+            </div>
+            
+            <Separator className="my-4" />
+            
+            {/* Logout */}
+            <Button
+              variant="ghost"
+              onClick={handleSignOut}
+              className="flex items-center py-2 text-base font-medium text-red-600 hover:text-red-700 hover:bg-red-50 justify-start"
+            >
+              <LogOut className="mr-2 h-4 w-4" />
+              Logout
+            </Button>
           </div>
         </ScrollArea>
       </SheetContent>

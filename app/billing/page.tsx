@@ -115,7 +115,7 @@ export default function BillingPage() {
                   <div>
                     <h3 className="text-lg font-semibold">Current Plan</h3>
                     <p className="text-muted-foreground">
-                      {profile?.subscription_tier?.charAt(0).toUpperCase() + profile?.subscription_tier?.slice(1)} Plan
+                      {profile?.subscription_tier ? profile.subscription_tier.charAt(0).toUpperCase() + profile.subscription_tier.slice(1) : 'Free'} Plan
                     </p>
                   </div>
                   <div className="text-right">

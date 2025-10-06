@@ -296,7 +296,7 @@ export default function ConsultationsPage() {
                               <Star 
                                 key={i} 
                                 className={`h-3 w-3 ${
-                                  i < consultation.rating ? 'text-yellow-400 fill-current' : 'text-gray-300'
+                                  i < (consultation.rating || 0) ? 'text-yellow-400 fill-current' : 'text-gray-300'
                                 }`} 
                               />
                             ))}
@@ -393,7 +393,7 @@ export default function ConsultationsPage() {
                             <Star 
                               key={i} 
                               className={`h-4 w-4 ${
-                                i < consultation.rating ? 'text-yellow-400 fill-current' : 'text-gray-300'
+                                i < (consultation.rating || 0) ? 'text-yellow-400 fill-current' : 'text-gray-300'
                               }`} 
                             />
                           ))}
@@ -428,7 +428,7 @@ export default function ConsultationsPage() {
                             <Star 
                               key={i} 
                               className={`h-4 w-4 ${
-                                i < consultation.rating ? 'text-yellow-400 fill-current' : 'text-gray-300'
+                                i < (consultation.rating || 0) ? 'text-yellow-400 fill-current' : 'text-gray-300'
                               }`} 
                             />
                           ))}

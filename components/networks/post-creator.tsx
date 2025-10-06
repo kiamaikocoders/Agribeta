@@ -161,8 +161,8 @@ export function PostCreator({ onPostCreated }: PostCreatorProps) {
 
 
   return (
-    <Card className="mb-6">
-      <CardHeader>
+    <Card className="mb-4">
+      <CardHeader className="p-4 pb-2">
         <CardTitle className="flex items-center gap-2">
           <div className="flex items-center gap-3">
             <Avatar className="h-10 w-10">
@@ -185,7 +185,7 @@ export function PostCreator({ onPostCreated }: PostCreatorProps) {
           </div>
         </CardTitle>
       </CardHeader>
-      <CardContent>
+      <CardContent className="p-4 pt-0">
         <div className="space-y-4">
           <Textarea
             placeholder="What's happening in your farm today? Share your agricultural insights, ask questions, or showcase your crops..."
@@ -197,7 +197,7 @@ export function PostCreator({ onPostCreated }: PostCreatorProps) {
 
           {/* Media Preview */}
           {mediaFiles.length > 0 && (
-            <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+            <div className="grid grid-cols-2 gap-2">
               {mediaFiles.map((mediaFile, index) => (
                 <div key={index} className="relative group">
                   <div className="aspect-square rounded-lg overflow-hidden bg-gray-100">

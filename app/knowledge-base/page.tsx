@@ -318,7 +318,7 @@ export default function KnowledgeBasePage() {
                         <div className="flex items-center gap-2 mb-2">
                           {getTypeIcon(item.type)}
                           <h3 className="text-lg font-semibold">{item.title}</h3>
-                          {item.isFeatured && (
+                          {'isFeatured' in item && item.isFeatured && (
                             <Badge className="bg-yellow-100 text-yellow-800">
                               Featured
                             </Badge>
@@ -329,15 +329,15 @@ export default function KnowledgeBasePage() {
                         <div className="flex items-center gap-4 text-sm text-muted-foreground mb-3">
                           <span className="flex items-center gap-1">
                             <Clock className="h-3 w-3" />
-                            {item.readTime || item.duration}
+                            {'readTime' in item ? item.readTime : 'duration' in item ? item.duration : 'N/A'}
                           </span>
                           <span className="flex items-center gap-1">
                             <Eye className="h-3 w-3" />
-                            {item.views || item.downloads} {item.views ? 'views' : 'downloads'}
+                            {'views' in item ? item.views : 'downloads' in item ? item.downloads : 0} {'views' in item ? 'views' : 'downloads' in item ? 'downloads' : 'interactions'}
                           </span>
                           <span className="flex items-center gap-1">
                             <Star className="h-3 w-3" />
-                            {item.rating}
+                            {'rating' in item ? item.rating : 'N/A'}
                           </span>
                         </div>
                         
@@ -534,7 +534,7 @@ export default function KnowledgeBasePage() {
 
           <TabsContent value="featured" className="space-y-6">
             <div className="space-y-4">
-              {allContent.filter(item => item.isFeatured).map((item) => (
+              {allContent.filter(item => 'isFeatured' in item && item.isFeatured).map((item) => (
                 <Card key={item.id} className="hover:shadow-lg transition-shadow border-yellow-200">
                   <CardContent className="p-6">
                     <div className="flex items-start justify-between">

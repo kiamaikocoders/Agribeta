@@ -278,7 +278,7 @@ export default function FarmerDashboard() {
                   <div className="flex items-center justify-between">
                     <span className="text-sm font-medium">Current Plan</span>
                     <Badge variant="secondary">
-                      {profile?.subscription_tier?.charAt(0).toUpperCase() + profile?.subscription_tier?.slice(1)}
+                      {profile?.subscription_tier ? profile.subscription_tier.charAt(0).toUpperCase() + profile.subscription_tier.slice(1) : 'Free'}
                     </Badge>
                   </div>
                   
