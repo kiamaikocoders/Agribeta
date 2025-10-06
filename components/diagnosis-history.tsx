@@ -125,7 +125,13 @@ export function DiagnosisHistory() {
               </div>
             </Card>
 
-            <DiagnosisResultEnhanced result={selectedDiagnosis} timestamp={selectedDiagnosis.created_at} />
+            <DiagnosisResultEnhanced 
+              result={{
+                ...selectedDiagnosis,
+                preventionTips: selectedDiagnosis.prevention_tips || selectedDiagnosis.preventionTips || []
+              }} 
+              timestamp={selectedDiagnosis.created_at} 
+            />
           </div>
         )}
       </TabsContent>

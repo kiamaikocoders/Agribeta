@@ -169,7 +169,7 @@ export function DiagnosisResultEnhanced({
               Treatment Recommendations
             </h4>
             <ul className="space-y-3">
-              {result.treatment.map((item, index) => (
+              {(result.treatment || []).map((item, index) => (
                 <li key={index} className="bg-agribeta-orange/5 p-3 rounded-lg flex items-start gap-3">
                   <span className="bg-agribeta-orange text-white rounded-full w-6 h-6 flex items-center justify-center text-xs flex-shrink-0 mt-0.5">
                     {index + 1}
@@ -186,7 +186,7 @@ export function DiagnosisResultEnhanced({
               Prevention Tips
             </h4>
             <ul className="space-y-3">
-              {result.preventionTips.map((item, index) => (
+              {(result.preventionTips || result.prevention_tips || []).map((item, index) => (
                 <li key={index} className="bg-agribeta-green/5 p-3 rounded-lg flex items-start gap-3">
                   <span className="bg-agribeta-green text-white rounded-full w-6 h-6 flex items-center justify-center text-xs flex-shrink-0 mt-0.5">
                     {index + 1}
