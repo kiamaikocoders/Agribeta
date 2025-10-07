@@ -18,6 +18,11 @@ html, body {
   scrollbar-width: none;  /* Firefox */
 }
 
+/* Hide footer on messages page for mobile messaging interface */
+body:has(.messages-page) footer {
+  display: none !important;
+}
+
 /* Using system fonts instead of custom Athena font */
 
 @layer base {

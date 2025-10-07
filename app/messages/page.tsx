@@ -10,7 +10,7 @@ export default function MessagesPage() {
   return (
     <ProtectedRoute>
       <MessagingProvider>
-        <div className="h-screen overflow-hidden">
+        <div className="h-screen overflow-hidden messages-page">
           {/* Messaging Interface */}
           <MessagingErrorBoundary>
             <ResponsiveMessagingInterface />
