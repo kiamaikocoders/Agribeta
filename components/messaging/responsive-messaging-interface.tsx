@@ -48,7 +48,7 @@ export function ResponsiveMessagingInterface() {
   if (isMobile) {
     if (currentView === 'chat' && selectedConversationId) {
       return (
-        <div className="transition-all duration-300 ease-in-out">
+        <div className="h-full transition-all duration-300 ease-in-out">
           <IndividualChat
             conversationId={selectedConversationId}
             onBack={handleBackToList}
@@ -58,7 +58,7 @@ export function ResponsiveMessagingInterface() {
     }
 
     return (
-      <div className="transition-all duration-300 ease-in-out">
+      <div className="h-full transition-all duration-300 ease-in-out">
         <ConversationsList
           onSelectConversation={handleSelectConversation}
         />
@@ -67,9 +67,8 @@ export function ResponsiveMessagingInterface() {
   }
 
   // For desktop: Use traditional side-by-side layout
-  console.log('Rendering desktop view')
   return (
-    <div className="transition-all duration-300 ease-in-out">
+    <div className="h-full transition-all duration-300 ease-in-out">
       <EnhancedMessagingInterface />
     </div>
   )
