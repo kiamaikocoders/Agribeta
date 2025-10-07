@@ -11,7 +11,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Get current user profile
-    const { data: profile, error: fetchError } = await supabaseAdmin
+    const { data: profile, error: fetchError } = await supabaseAdmin()
       .from('profiles')
       .select('*')
       .eq('id', userId)
@@ -80,7 +80,7 @@ export async function POST(request: NextRequest) {
       newUsage
     })
 
-    const { error: updateError } = await supabaseAdmin
+    const { error: updateError } = await supabaseAdmin()
       .from('profiles')
       .update(updateData)
       .eq('id', userId)
@@ -118,7 +118,7 @@ export async function GET(request: NextRequest) {
     }
 
     // Get current usage
-    const { data: profile, error } = await supabaseAdmin
+    const { data: profile, error } = await supabaseAdmin()
       .from('profiles')
       .select('*')
       .eq('id', userId)

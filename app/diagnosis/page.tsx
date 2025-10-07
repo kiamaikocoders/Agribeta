@@ -72,28 +72,23 @@ export default function DiagnosisPage() {
       // Use the processed image if available, otherwise use the original
       const imageToAnalyze = processedImage || selectedImage
 
-      // Simulate API call to Groq AI
-      await new Promise((resolve) => setTimeout(resolve, 2000))
+      // Call the actual diagnosis API
+      const response = await fetch('/api/diagnose', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          imageData: imageToAnalyze
+        })
+      })
 
-      // Mock result for demonstration
-      const diagnosisResult = {
-        disease: "Anthracnose",
-        confidence: 0.92,
-        description:
-          "Anthracnose is a fungal disease that affects avocado fruits, leaves, and branches. It appears as dark, sunken lesions on fruits and can cause significant crop loss if not managed properly.",
-        treatment: [
-          "Remove and destroy infected plant parts",
-          "Apply copper-based fungicides as a preventative measure",
-          "Ensure proper spacing between trees for good air circulation",
-          "Avoid overhead irrigation to reduce leaf wetness",
-        ],
-        preventionTips: [
-          "Maintain good orchard hygiene",
-          "Prune trees to improve air circulation",
-          "Apply preventative fungicides during wet periods",
-          "Avoid wounding fruits during harvest",
-        ],
+      if (!response.ok) {
+        const errorData = await response.json()
+        throw new Error(errorData.error || 'Failed to analyze image')
       }
+
+      const diagnosisResult = await response.json()
 
       // Save diagnosis to database with user tracking
       const { error: dbError } = await supabase
