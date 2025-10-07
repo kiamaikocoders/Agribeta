@@ -43,9 +43,10 @@ export async function POST(req: NextRequest) {
     }
 
     // Ensure main profile exists and role is farmer; also update farm_name if provided
-    if (farm_name) {
-      await supabaseAdmin().from('profiles').update({ farm_name }).eq('id', id)
-    }
+    await supabaseAdmin().from('profiles').update({ 
+      farm_name,
+      role: 'farmer'
+    }).eq('id', id)
 
     // Upsert farmer profile using service role to bypass RLS, while still enforcing identity checks above
     const { error: upsertError } = await supabaseAdmin().from('farmer_profiles').upsert({

@@ -233,6 +233,21 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           .single()
         if (refreshed) setProfile(refreshed)
       }
+
+      // If user has no role (NULL), set a default role of 'farmer' to prevent redirect loops
+      if (profileData && !profileData.role) {
+        console.log('User has no role, setting default role to farmer')
+        await supabase
+          .from('profiles')
+          .update({ role: 'farmer' })
+          .eq('id', userId)
+        const { data: refreshed } = await supabase
+          .from('profiles')
+          .select('*')
+          .eq('id', userId)
+          .single()
+        if (refreshed) setProfile(refreshed)
+      }
     } catch (error) {
       console.error('Error fetching user profiles:', error)
     } finally {
@@ -393,6 +408,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       const accessToken = sessionData.session?.access_token
 
       if (!accessToken) {
+        console.error('No session available for secure profile creation')
         // Cannot create role-specific profile without a user session
         return { error: 'No session available for secure profile creation' }
       }

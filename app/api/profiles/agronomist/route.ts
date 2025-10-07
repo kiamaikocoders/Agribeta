@@ -41,9 +41,11 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'User ID mismatch' }, { status: 403 })
     }
 
-    if (company) {
-      await supabaseAdmin().from('profiles').update({ company }).eq('id', id)
-    }
+    // Update main profile with company and ensure role is set to agronomist
+    await supabaseAdmin().from('profiles').update({ 
+      company,
+      role: 'agronomist'
+    }).eq('id', id)
 
     const { error: upsertError } = await supabaseAdmin().from('agronomist_profiles').upsert({
       id,

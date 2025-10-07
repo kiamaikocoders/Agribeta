@@ -36,6 +36,12 @@ export function ProtectedRoute({
       }
 
       if (profile && !allowedRoles.includes(profile.role)) {
+        // If user has no role (NULL), redirect to profile completion instead of unauthorized
+        if (!profile.role) {
+          console.log('ProtectedRoute: User has no role, redirecting to /profile/complete')
+          router.replace('/profile/complete')
+          return
+        }
         console.log('ProtectedRoute: User role not allowed, redirecting to /unauthorized')
         router.replace('/unauthorized')
         return
