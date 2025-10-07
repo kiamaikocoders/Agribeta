@@ -75,6 +75,7 @@ interface AuthContextType {
   signOut: () => Promise<void>
   updateProfile: (updates: Partial<UserProfile>) => Promise<{ error: any }>
   fetchUserProfile: (userId: string) => Promise<void>
+  refreshProfile: () => Promise<void>
   clearAuthState: () => void
 }
 
@@ -459,6 +460,13 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     }
   }
 
+  // Function to refresh profile data (useful after usage updates)
+  const refreshProfile = async () => {
+    if (user) {
+      await fetchUserProfile(user.id)
+    }
+  }
+
   // Function to force clear auth state (useful for debugging or manual logout)
   const clearAuthState = () => {
     setUser(null)
@@ -503,6 +511,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     updateProfile,
     completeProfileSetup,
     fetchUserProfile,
+    refreshProfile,
     clearAuthState,
   }
 

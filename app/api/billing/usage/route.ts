@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { supabase } from '@/lib/supabaseClient'
+import { supabaseAdmin } from '@/lib/supabaseAdmin'
 
 export async function POST(request: NextRequest) {
   try {
@@ -11,7 +11,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Get current user profile
-    const { data: profile, error: fetchError } = await supabase
+    const { data: profile, error: fetchError } = await supabaseAdmin
       .from('profiles')
       .select('*')
       .eq('id', userId)
@@ -72,7 +72,15 @@ export async function POST(request: NextRequest) {
       updateData.consultations_used = newUsage
     }
 
-    const { error: updateError } = await supabase
+    console.log('POST Usage API - Updating usage:', {
+      userId,
+      serviceType,
+      updateData,
+      currentUsage: profile.ai_predictions_used || 0,
+      newUsage
+    })
+
+    const { error: updateError } = await supabaseAdmin
       .from('profiles')
       .update(updateData)
       .eq('id', userId)
@@ -81,6 +89,8 @@ export async function POST(request: NextRequest) {
       console.error('Error updating usage:', updateError)
       return NextResponse.json({ error: 'Failed to update usage' }, { status: 500 })
     }
+
+    console.log('POST Usage API - Usage updated successfully')
 
     return NextResponse.json({ 
       success: true,
@@ -108,7 +118,7 @@ export async function GET(request: NextRequest) {
     }
 
     // Get current usage
-    const { data: profile, error } = await supabase
+    const { data: profile, error } = await supabaseAdmin
       .from('profiles')
       .select('*')
       .eq('id', userId)
@@ -123,7 +133,7 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ error: 'User profile not found' }, { status: 404 })
     }
 
-    return NextResponse.json({
+    const usageData = {
       usage: {
         ai_predictions: {
           used: profile.ai_predictions_used || 0,
@@ -137,7 +147,16 @@ export async function GET(request: NextRequest) {
         },
         subscription_tier: profile.subscription_tier
       }
+    }
+    
+    console.log('GET Usage API - Profile data:', {
+      userId,
+      ai_predictions_used: profile.ai_predictions_used,
+      ai_predictions_limit: profile.ai_predictions_limit,
+      usageData
     })
+    
+    return NextResponse.json(usageData)
   } catch (error) {
     console.error('Usage fetch error:', error)
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 })

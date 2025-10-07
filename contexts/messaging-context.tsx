@@ -214,8 +214,29 @@ export function MessagingProvider({ children }: { children: React.ReactNode }) {
     if (!user) return null
 
     try {
-      const allParticipants = [...participantIds, user.id]
+      const allParticipants = [...participantIds, user.id].sort()
       
+      // First, check if a conversation already exists between these participants
+      const { data: existingConversations, error: checkError } = await supabase
+        .from('conversations')
+        .select('id, participant_ids')
+        .contains('participant_ids', allParticipants)
+
+      if (checkError) throw checkError
+
+      // Check if any existing conversation has exactly the same participants
+      const existingConversation = existingConversations?.find(conv => 
+        conv.participant_ids.length === allParticipants.length &&
+        conv.participant_ids.sort().every((id: string, index: number) => id === allParticipants[index])
+      )
+
+      if (existingConversation) {
+        // Return existing conversation ID
+        await fetchConversations()
+        return existingConversation.id
+      }
+
+      // Create new conversation only if none exists
       const { data, error } = await supabase
         .from('conversations')
         .insert({

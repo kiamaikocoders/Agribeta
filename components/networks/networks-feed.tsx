@@ -7,6 +7,7 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import { Textarea } from '@/components/ui/textarea'
 import { Badge } from '@/components/ui/badge'
 import { useAuth } from '@/contexts/auth-context'
+import { useUsage } from '@/hooks/use-usage'
 import { supabase } from '@/lib/supabaseClient'
 import { cn } from '@/lib/utils'
 import { Heart, MessageCircle, Share, Users, Target, Leaf, Shield, TrendingUp, Calendar, BookOpen, Zap, BarChart2, TreesIcon } from 'lucide-react'
@@ -40,6 +41,7 @@ interface Post {
 
 export function NetworksFeed() {
   const { user, profile } = useAuth()
+  const { usage } = useUsage()
   const [posts, setPosts] = useState<Post[]>([])
   const [isLoading, setIsLoading] = useState(true)
   const [newPostContent, setNewPostContent] = useState('')
@@ -53,8 +55,8 @@ export function NetworksFeed() {
       icon: <Leaf className="h-5 w-5" />,
       href: "/diagnosis",
       color: "bg-green-500",
-      usage: profile?.ai_predictions_used || 0,
-      limit: profile?.ai_predictions_limit || 5
+      usage: usage?.ai_predictions.used || 0,
+      limit: usage?.ai_predictions.limit || 5
     },
     {
       title: "AgriBeta Predict",
@@ -208,7 +210,7 @@ export function NetworksFeed() {
                   {profile?.role === 'farmer' && (
                     <div className="flex justify-between text-sm">
                       <span>AI Diagnoses Used</span>
-                      <span className="font-semibold">{profile.ai_predictions_used}/{profile.ai_predictions_limit}</span>
+                      <span className="font-semibold">{usage?.ai_predictions.used || 0}/{usage?.ai_predictions.limit || 5}</span>
                     </div>
                   )}
                 </div>

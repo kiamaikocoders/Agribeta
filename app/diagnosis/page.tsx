@@ -31,7 +31,7 @@ export default function DiagnosisPage() {
   const [selectedImage, setSelectedImage] = useState<string | null>(null)
   const [processedImage, setProcessedImage] = useState<string | null>(null)
   const { addDiagnosis } = useDiagnosisHistory()
-  const { user, profile } = useAuth()
+  const { user, profile, refreshProfile } = useAuth()
   const { usage, canUseService, trackUsage } = useUsage()
 
   const handleImageCapture = async (imageData: string) => {
@@ -117,6 +117,11 @@ export default function DiagnosisPage() {
       const usageResult = await trackUsage('ai_prediction', 1)
       if (!usageResult.success) {
         console.error('Error tracking usage:', usageResult.error)
+      } else {
+        console.log('Usage tracked successfully:', usageResult.usage)
+        // Refresh profile data to update usage counters in real-time
+        await refreshProfile()
+        console.log('Profile refreshed after usage tracking')
       }
 
       setResult(diagnosisResult)

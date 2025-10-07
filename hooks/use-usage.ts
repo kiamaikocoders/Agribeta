@@ -35,8 +35,10 @@ export function useUsage() {
         throw new Error(data.error || 'Failed to fetch usage')
       }
 
+      console.log('Usage data fetched:', data.usage)
       setUsage(data.usage)
     } catch (err) {
+      console.error('Error fetching usage:', err)
       setError(err instanceof Error ? err.message : 'Unknown error')
     } finally {
       setLoading(false)
@@ -87,6 +89,7 @@ export function useUsage() {
           newUsage.consultations.used = data.usage.current
           newUsage.consultations.remaining = data.usage.remaining
         }
+        console.log('Usage updated locally:', newUsage)
         setUsage(newUsage)
       }
 
@@ -126,8 +129,17 @@ export function useUsage() {
   }
 
   useEffect(() => {
-    fetchUsage()
+    if (user) {
+      fetchUsage()
+    }
   }, [user])
+
+  // Also refresh usage data when the component mounts (useful for navigation)
+  useEffect(() => {
+    if (user && !usage) {
+      fetchUsage()
+    }
+  }, [])
 
   return {
     usage,

@@ -100,18 +100,17 @@ export function PostInteractions({ post, onUpdate }: PostInteractionsProps) {
         .eq('interaction_type', 'share')
 
       // Check if current user liked this post
-      const { data: userLike } = await supabase
+      const { data: userLikes } = await supabase
         .from('post_interactions')
         .select('id')
         .eq('post_id', post.id)
         .eq('user_id', user?.id)
         .eq('interaction_type', 'like')
-        .single()
 
       setLikeCount(likes || 0)
       setCommentCount(comments || 0)
       setShareCount(shares || 0)
-      setIsLiked(!!userLike)
+      setIsLiked(userLikes && userLikes.length > 0)
     } catch (error) {
       console.error('Error fetching post stats:', error)
     } finally {
@@ -167,15 +166,14 @@ export function PostInteractions({ post, onUpdate }: PostInteractionsProps) {
         setLikeCount(prev => prev - 1)
       } else {
         // Like - check if already exists first
-        const { data: existingLike } = await supabase
+        const { data: existingLikes } = await supabase
           .from('post_interactions')
           .select('id')
           .eq('post_id', post.id)
           .eq('user_id', user?.id)
           .eq('interaction_type', 'like')
-          .single()
 
-        if (existingLike) {
+        if (existingLikes && existingLikes.length > 0) {
           // Already liked, just update state
           setIsLiked(true)
           return
@@ -200,7 +198,7 @@ export function PostInteractions({ post, onUpdate }: PostInteractionsProps) {
             await supabase.from('notifications').insert({
               user_id: post.user_id,
               sender_id: user.id,
-              type: 'like',
+              type: 'post_like',
               title: 'New Like',
               message: `${profile?.first_name || 'Someone'} liked your post`,
             })

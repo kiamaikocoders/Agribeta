@@ -5,6 +5,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { useAuth } from '@/contexts/auth-context'
+import { useUsage } from '@/hooks/use-usage'
 import { PageBackground } from '@/components/page-background'
 import { 
   Leaf, 
@@ -24,6 +25,7 @@ import Link from 'next/link'
 
 export default function FarmerDashboard() {
   const { profile, farmerProfile } = useAuth()
+  const { usage } = useUsage()
 
   // Quick Actions
   const quickActions = [
@@ -33,8 +35,8 @@ export default function FarmerDashboard() {
       icon: <Leaf className="h-6 w-6" />,
       href: "/diagnosis",
       color: "bg-green-500",
-      usage: profile?.ai_predictions_used || 0,
-      limit: profile?.ai_predictions_limit || 5
+      usage: usage?.ai_predictions.used || 0,
+      limit: usage?.ai_predictions.limit || 5
     },
     {
       title: "Book Agronomist",
@@ -67,7 +69,7 @@ export default function FarmerDashboard() {
       { disease: "Leaf Spot", date: "2024-01-02", status: "Monitoring", treatment: "Pruning" }
     ],
     treatmentSuccessRate: 85,
-    aiPredictionsUsed: profile?.ai_predictions_used || 0,
+    aiPredictionsUsed: usage?.ai_predictions.used || 0,
     costSavings: 1250
   }
 
@@ -285,7 +287,7 @@ export default function FarmerDashboard() {
                   <div className="flex items-center justify-between">
                     <span className="text-sm font-medium">Usage Limits</span>
                     <span className="text-sm text-muted-foreground">
-                      {profile?.ai_predictions_used || 0}/{profile?.ai_predictions_limit || 5} AI predictions
+                      {usage?.ai_predictions.used || 0}/{usage?.ai_predictions.limit || 5} AI predictions
                     </span>
                   </div>
 

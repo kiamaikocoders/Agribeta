@@ -5,6 +5,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { useAuth } from '@/contexts/auth-context'
+import { useUsage } from '@/hooks/use-usage'
 import { PageBackground } from '@/components/page-background'
 import { 
   CheckCircle, 
@@ -22,6 +23,7 @@ import { useState } from 'react'
 
 export default function BillingPage() {
   const { profile } = useAuth()
+  const { usage } = useUsage()
   const [selectedPlan, setSelectedPlan] = useState<string | null>(null)
 
   const plans = [
@@ -130,7 +132,7 @@ export default function BillingPage() {
                       {profile?.subscription_tier === 'free' ? 'Free' : 'Active'}
                     </Badge>
                     <p className="text-sm text-muted-foreground">
-                      {profile?.ai_predictions_used || 0}/{profile?.ai_predictions_limit || 5} AI predictions used
+                      {usage?.ai_predictions.used || 0}/{usage?.ai_predictions.limit || 5} AI predictions used
                     </p>
                   </div>
                 </div>
@@ -225,7 +227,7 @@ export default function BillingPage() {
                     <div>
                       <h3 className="font-semibold">AI Predictions</h3>
                       <p className="text-2xl font-bold text-blue-600">
-                        {profile?.ai_predictions_used || 0}/{profile?.ai_predictions_limit || 5}
+                        {usage?.ai_predictions.used || 0}/{usage?.ai_predictions.limit || 5}
                       </p>
                       <p className="text-sm text-muted-foreground">This month</p>
                     </div>
