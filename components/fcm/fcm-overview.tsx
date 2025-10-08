@@ -11,9 +11,9 @@ export function FCMOverview() {
             <CardTitle className="text-lg">Zero Tolerance</CardTitle>
           </CardHeader>
           <CardContent>
-            <Alert variant="destructive" className="bg-red-50">
+            <Alert variant="destructive" className="bg-red-50 dark:bg-red-950/20 dark:border-red-800">
               <AlertTriangle className="h-4 w-4" />
-              <AlertDescription>Even one FCM pinpoint results in lot rejection</AlertDescription>
+              <AlertDescription className="text-red-800 dark:text-red-200">Even one FCM pinpoint results in lot rejection</AlertDescription>
             </Alert>
           </CardContent>
         </Card>
@@ -22,9 +22,9 @@ export function FCMOverview() {
             <CardTitle className="text-lg">EU Compliance</CardTitle>
           </CardHeader>
           <CardContent>
-            <Alert className="bg-blue-50">
+            <Alert className="bg-blue-50 dark:bg-blue-950/20 dark:border-blue-800">
               <InfoIcon className="h-4 w-4" />
-              <AlertDescription>Required under regulations 2019/2072 & 2024/2004</AlertDescription>
+              <AlertDescription className="text-blue-800 dark:text-blue-200">Required under regulations 2019/2072 & 2024/2004</AlertDescription>
             </Alert>
           </CardContent>
         </Card>
@@ -33,9 +33,9 @@ export function FCMOverview() {
             <CardTitle className="text-lg">Systems Approach</CardTitle>
           </CardHeader>
           <CardContent>
-            <Alert className="bg-green-50">
+            <Alert className="bg-green-50 dark:bg-green-950/20 dark:border-green-800">
               <CheckCircle2 className="h-4 w-4" />
-              <AlertDescription>Follows ISPM 14 international standards</AlertDescription>
+              <AlertDescription className="text-green-800 dark:text-green-200">Follows ISPM 14 international standards</AlertDescription>
             </Alert>
           </CardContent>
         </Card>
@@ -55,7 +55,7 @@ export function FCMOverview() {
                 alt="Adult FCM"
                 className="w-full h-40 object-cover rounded-md mb-2"
               />
-              <p className="text-sm text-gray-600">10-15mm wingspan, gray-brown with dark markings</p>
+              <p className="text-sm text-gray-600 dark:text-gray-300">10-15mm wingspan, gray-brown with dark markings</p>
             </div>
             <div>
               <h3 className="font-medium mb-2">Larvae</h3>
@@ -64,7 +64,7 @@ export function FCMOverview() {
                 alt="FCM Larvae"
                 className="w-full h-40 object-cover rounded-md mb-2"
               />
-              <p className="text-sm text-gray-600">Pink-white caterpillars up to 15mm, primary damaging stage</p>
+              <p className="text-sm text-gray-600 dark:text-gray-300">Pink-white caterpillars up to 15mm, primary damaging stage</p>
             </div>
             <div>
               <h3 className="font-medium mb-2">Damage Signs</h3>
@@ -73,7 +73,7 @@ export function FCMOverview() {
                 alt="FCM Damage"
                 className="w-full h-40 object-cover rounded-md mb-2"
               />
-              <p className="text-sm text-gray-600">Entry holes, frass, discoloration on rose stems and buds</p>
+              <p className="text-sm text-gray-600 dark:text-gray-300">Entry holes, frass, discoloration on rose stems and buds</p>
             </div>
           </div>
         </CardContent>
@@ -90,23 +90,23 @@ export function FCMOverview() {
           <div className="space-y-4">
             <div>
               <h3 className="font-medium mb-2">Structural Integrity</h3>
-              <p className="text-gray-600">
+              <p className="text-gray-600 dark:text-gray-300">
                 Maintain polythene covers with no tears or damages; repair immediately if compromised
               </p>
             </div>
             <div>
               <h3 className="font-medium mb-2">Insect-Proof Netting</h3>
-              <p className="text-gray-600">T7-20 mesh netting on all openings and vents; inspect weekly for damage</p>
+              <p className="text-gray-600 dark:text-gray-300">T7-20 mesh netting on all openings and vents; inspect weekly for damage</p>
             </div>
             <div>
               <h3 className="font-medium mb-2">Entry/Exit Control</h3>
-              <p className="text-gray-600">
+              <p className="text-gray-600 dark:text-gray-300">
                 Double-door systems with self-closing mechanism at all greenhouse entrances
               </p>
             </div>
             <div>
               <h3 className="font-medium mb-2">Facility Registration</h3>
-              <p className="text-gray-600">
+              <p className="text-gray-600 dark:text-gray-300">
                 Register with KEPHIS (Kenya) or EAA (Ethiopia); obtain unique production site code
               </p>
             </div>
@@ -122,19 +122,19 @@ export function FCMOverview() {
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
             <div className="border rounded-lg p-4">
               <h3 className="font-medium mb-2">Prevention</h3>
-              <p className="text-sm text-gray-600">Rigorous greenhouse standards to block FCM entry</p>
+              <p className="text-sm text-gray-600 dark:text-gray-300">Rigorous greenhouse standards to block FCM entry</p>
             </div>
             <div className="border rounded-lg p-4">
               <h3 className="font-medium mb-2">Detection</h3>
-              <p className="text-sm text-gray-600">Systematic monitoring via traps and scouting</p>
+              <p className="text-sm text-gray-600 dark:text-gray-300">Systematic monitoring via traps and scouting</p>
             </div>
             <div className="border rounded-lg p-4">
               <h3 className="font-medium mb-2">Response</h3>
-              <p className="text-sm text-gray-600">Zero-tolerance policy with swift corrective measures</p>
+              <p className="text-sm text-gray-600 dark:text-gray-300">Zero-tolerance policy with swift corrective measures</p>
             </div>
             <div className="border rounded-lg p-4">
               <h3 className="font-medium mb-2">Traceability</h3>
-              <p className="text-sm text-gray-600">Unique site codes and documentation throughout process</p>
+              <p className="text-sm text-gray-600 dark:text-gray-300">Unique site codes and documentation throughout process</p>
             </div>
           </div>
         </CardContent>

@@ -146,46 +146,46 @@ export function FCMCompliance() {
         <CardContent>
           <div className="space-y-4">
             <div className="flex items-start">
-              <div className="flex-shrink-0 bg-red-100 rounded-full p-2 mr-4">
+              <div className="flex-shrink-0 bg-red-100 dark:bg-red-900/30 rounded-full p-2 mr-4">
                 <span className="font-bold">1</span>
               </div>
               <div>
                 <h3 className="font-medium">Halt Exports</h3>
-                <p className="text-gray-600">
+                <p className="text-gray-600 dark:text-gray-300">
                   Immediately stop all exports from the affected greenhouse until the issue is resolved.
                 </p>
               </div>
             </div>
             <div className="flex items-start">
-              <div className="flex-shrink-0 bg-yellow-100 rounded-full p-2 mr-4">
+              <div className="flex-shrink-0 bg-yellow-100 dark:bg-yellow-900/30 rounded-full p-2 mr-4">
                 <span className="font-bold">2</span>
               </div>
               <div>
                 <h3 className="font-medium">Increase Monitoring</h3>
-                <p className="text-gray-600">
+                <p className="text-gray-600 dark:text-gray-300">
                   Implement daily trapping and scouting for at least 5 consecutive days to assess the extent of
                   infestation.
                 </p>
               </div>
             </div>
             <div className="flex items-start">
-              <div className="flex-shrink-0 bg-blue-100 rounded-full p-2 mr-4">
+              <div className="flex-shrink-0 bg-blue-100 dark:bg-blue-900/30 rounded-full p-2 mr-4">
                 <span className="font-bold">3</span>
               </div>
               <div>
                 <h3 className="font-medium">Apply Treatments</h3>
-                <p className="text-gray-600">
+                <p className="text-gray-600 dark:text-gray-300">
                   Use approved pesticides according to label rates and implement biological controls as appropriate.
                 </p>
               </div>
             </div>
             <div className="flex items-start">
-              <div className="flex-shrink-0 bg-green-100 rounded-full p-2 mr-4">
+              <div className="flex-shrink-0 bg-green-100 dark:bg-green-900/30 rounded-full p-2 mr-4">
                 <span className="font-bold">4</span>
               </div>
               <div>
                 <h3 className="font-medium">Verify Effectiveness</h3>
-                <p className="text-gray-600">
+                <p className="text-gray-600 dark:text-gray-300">
                   Continue monitoring until no FCM is pinpointed for at least 14 consecutive days before resuming exports.
                 </p>
               </div>

@@ -78,7 +78,7 @@ export function ProfilePosts({ userId }: ProfilePostsProps) {
     return (
       <div className="space-y-6">
         <div className="flex items-center justify-between">
-          <h3 className="text-xl font-semibold text-gray-900">📝 Posts</h3>
+          <h3 className="text-xl font-semibold text-gray-900 dark:text-white">📝 Posts</h3>
           {isOwnProfile && (
             <Button>
               <MessageCircle className="h-4 w-4 mr-2" />
@@ -111,7 +111,7 @@ export function ProfilePosts({ userId }: ProfilePostsProps) {
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
-        <h3 className="text-xl font-semibold text-gray-900">📝 Posts</h3>
+        <h3 className="text-xl font-semibold text-gray-900 dark:text-white">📝 Posts</h3>
         {isOwnProfile && (
           <Button onClick={() => setShowCreateForm(true)}>
             <MessageCircle className="h-4 w-4 mr-2" />
@@ -131,7 +131,7 @@ export function ProfilePosts({ userId }: ProfilePostsProps) {
               </AvatarFallback>
             </Avatar>
             <div>
-              <p className="font-medium text-gray-900">
+              <p className="font-medium text-gray-900 dark:text-white">
                 {profile?.first_name} {profile?.last_name}
               </p>
               <Badge variant="secondary" className="text-xs">
@@ -175,10 +175,10 @@ export function ProfilePosts({ userId }: ProfilePostsProps) {
       {userPosts.length === 0 ? (
         <div className="bg-gray-50 rounded-lg p-8 text-center">
           <MessageCircle className="h-12 w-12 text-gray-400 mx-auto mb-4" />
-          <h4 className="text-lg font-medium text-gray-900 mb-2">
+          <h4 className="text-lg font-medium text-gray-900 dark:text-white mb-2">
             {isOwnProfile ? 'No posts yet' : 'No posts available'}
           </h4>
-          <p className="text-gray-600">
+          <p className="text-gray-600 dark:text-gray-300">
             {isOwnProfile 
               ? 'Share your farming insights, ask questions, or connect with the community.'
               : 'This user hasn\'t shared any posts yet.'
@@ -200,7 +200,7 @@ export function ProfilePosts({ userId }: ProfilePostsProps) {
                   </Avatar>
                   <div>
                     <div className="flex items-center gap-2">
-                      <p className="font-medium text-gray-900">
+                      <p className="font-medium text-gray-900 dark:text-white">
                         {post.author.first_name} {post.author.last_name}
                       </p>
                       <Badge 
@@ -214,7 +214,7 @@ export function ProfilePosts({ userId }: ProfilePostsProps) {
                         {post.author.role}
                       </Badge>
                     </div>
-                    <div className="flex items-center gap-1 text-sm text-gray-500">
+                    <div className="flex items-center gap-1 text-sm text-gray-500 dark:text-gray-400">
                       <Calendar className="h-3 w-3" />
                       {formatTimeAgo(post.created_at)}
                     </div>
@@ -237,7 +237,7 @@ export function ProfilePosts({ userId }: ProfilePostsProps) {
 
               {/* Post Content */}
               <div className="space-y-3">
-                <p className="text-gray-900 whitespace-pre-wrap">{post.content}</p>
+                <p className="text-gray-900 dark:text-gray-200 whitespace-pre-wrap">{post.content}</p>
                 
                 {/* Post Images */}
                 {post.images && post.images.length > 0 && (
@@ -261,19 +261,19 @@ export function ProfilePosts({ userId }: ProfilePostsProps) {
                   size="sm"
                   onClick={() => handleLikePost(post.id)}
                   className={`flex items-center gap-2 ${
-                    post.is_liked ? 'text-red-500' : 'text-gray-500'
+                    post.is_liked ? 'text-red-500' : 'text-gray-500 dark:text-gray-400'
                   }`}
                 >
                   <Heart className={`h-4 w-4 ${post.is_liked ? 'fill-current' : ''}`} />
                   {post.likes_count}
                 </Button>
                 
-                <Button variant="ghost" size="sm" className="flex items-center gap-2 text-gray-500">
+                <Button variant="ghost" size="sm" className="flex items-center gap-2 text-gray-500 dark:text-gray-400">
                   <Reply className="h-4 w-4" />
                   {post.comments_count}
                 </Button>
                 
-                <Button variant="ghost" size="sm" className="flex items-center gap-2 text-gray-500">
+                <Button variant="ghost" size="sm" className="flex items-center gap-2 text-gray-500 dark:text-gray-400">
                   <Share2 className="h-4 w-4" />
                   {post.shares_count}
                 </Button>

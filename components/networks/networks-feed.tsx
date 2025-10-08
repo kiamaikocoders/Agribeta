@@ -301,17 +301,17 @@ export function NetworksFeed() {
                             <Badge variant="outline" className="text-xs">
                               {post.profiles?.role ? post.profiles.role.charAt(0).toUpperCase() + post.profiles.role.slice(1) : 'User'}
                             </Badge>
-                            <span className="text-sm text-gray-500">
+                            <span className="text-sm text-gray-500 dark:text-gray-400">
                               {formatTimeAgo(post.created_at)}
                             </span>
                           </div>
                           <PostActions post={post} onUpdate={fetchPosts} />
                         </div>
-                        <div className="text-sm text-gray-600 mb-3">
+                        <div className="text-sm text-gray-600 dark:text-gray-300 mb-3">
                           {post.profiles?.farm_name || post.profiles?.company}
                         </div>
                         <div className="mb-4">
-                          <p className="text-gray-800 break-words">{post.content}</p>
+                          <p className="text-gray-800 dark:text-gray-200 break-words">{post.content}</p>
                         </div>
                         
                         {/* Media Content */}

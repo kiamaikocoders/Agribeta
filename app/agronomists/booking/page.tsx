@@ -140,7 +140,7 @@ export default function AgronomistBookingPage() {
   }
 
   const handleConfirmBooking = async () => {
-    if (!selectedAgronomist || !user) return
+    if (!selectedAgronomist || !user || !profile) return
 
     setLoading(true)
 
@@ -148,45 +148,57 @@ export default function AgronomistBookingPage() {
       // Check if user can book consultation
       if (!canUseService('consultation')) {
         alert('You have reached your consultation limit. Please upgrade your plan.')
+        setLoading(false)
         return
       }
 
-      // Track usage
+      // Get user's timezone (default to Africa/Nairobi)
+      const userTimezone = Intl.DateTimeFormat().resolvedOptions().timeZone || 'Africa/Nairobi'
+
+      // Create booking via API
+      const bookingResponse = await fetch('/api/bookings', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          farmer_id: user.id,
+          agronomist_id: selectedAgronomist.id,
+          date: selectedDate,
+          time: selectedTime,
+          type: consultationType,
+          duration: duration,
+          message: message || null,
+          cost: selectedAgronomist.consultation_fee,
+          farmer_timezone: userTimezone,
+          agronomist_timezone: selectedAgronomist.timezone || 'Africa/Nairobi'
+        })
+      })
+
+      const bookingData = await bookingResponse.json()
+
+      if (!bookingResponse.ok) {
+        throw new Error(bookingData.error || 'Failed to create booking')
+      }
+
+      // Only track usage after successful booking
       const usageResult = await trackUsage('consultation', 1)
       if (!usageResult.success) {
-        if (usageResult.limitReached) {
-          alert('You have reached your consultation limit. Please upgrade your plan.')
-          return
-        }
-        alert('Failed to book consultation. Please try again.')
-        return
+        // Booking was created but usage tracking failed
+        // We should still show success since booking exists
+        console.warn('Booking created but usage tracking failed:', usageResult.error)
       }
 
-      // Create booking (in real app, this would call an API)
-      const booking = {
-        id: Date.now().toString(),
-        farmer_id: user.id,
-        agronomist_id: selectedAgronomist.id,
-        date: selectedDate,
-        time: selectedTime,
-        type: consultationType,
-        duration: duration,
-        message: message,
-        status: 'confirmed',
-        cost: selectedAgronomist.consultation_fee
-      }
-
-      console.log('Booking created:', booking)
+      console.log('Booking created successfully:', bookingData.booking)
       
       // Show success message
-      alert('Consultation booked successfully! You will receive a confirmation email.')
+      alert('Consultation booked successfully! The agronomist has been notified and you will receive a confirmation email.')
       
-      // Redirect to dashboard
-      router.push('/dashboard/farmer')
+      // Redirect to consultations page
+      router.push('/consultations')
     } catch (error) {
       console.error('Booking error:', error)
-      alert('Failed to book consultation. Please try again.')
-    } finally {
+      alert(`Failed to book consultation: ${error instanceof Error ? error.message : 'Please try again.'}`)
       setLoading(false)
     }
   }

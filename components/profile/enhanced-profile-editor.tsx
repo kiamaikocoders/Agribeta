@@ -357,13 +357,13 @@ export function EnhancedProfileEditor({ onUpdate }: EnhancedProfileEditorProps) 
         <div className="flex-1 space-y-2">
           <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
             <div>
-              <h2 className="text-2xl lg:text-3xl font-bold text-gray-900">
+              <h2 className="text-2xl lg:text-3xl font-bold text-gray-900 dark:text-white">
                 {profile?.first_name && profile?.last_name 
                   ? `${profile.first_name} ${profile.last_name}`
                   : profile?.first_name || profile?.email || 'User'
                 }
               </h2>
-              <p className="text-lg text-gray-600">
+              <p className="text-lg text-gray-600 dark:text-gray-300">
                 {profile?.role === 'farmer' ? 'Growing Farm' : 'Professional Agronomist'}
               </p>
               <div className="flex items-center gap-2 mt-2">
@@ -373,7 +373,7 @@ export function EnhancedProfileEditor({ onUpdate }: EnhancedProfileEditorProps) 
                 >
                   {profile?.role ? profile.role.charAt(0).toUpperCase() + profile.role.slice(1) : 'User'}
                 </Badge>
-                <div className="flex items-center gap-1 text-sm text-gray-500">
+                <div className="flex items-center gap-1 text-sm text-gray-500 dark:text-gray-400">
                   <MapPin className="h-4 w-4" />
                   {profile?.country || 'Location not set'}
                 </div>

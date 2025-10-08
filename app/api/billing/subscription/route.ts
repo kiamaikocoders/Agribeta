@@ -59,7 +59,8 @@ export async function POST(request: NextRequest) {
         consultations_limit: limits.consultations_limit,
         subscription_start_date: new Date().toISOString(),
         subscription_end_date: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString(), // 30 days from now
-        ai_predictions_used: 0 // Reset usage counter
+        ai_predictions_used: 0, // Reset usage counter
+        consultations_used: 0 // Reset consultations usage counter
       })
       .eq('id', userId)
 
