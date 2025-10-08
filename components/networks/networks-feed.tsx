@@ -278,29 +278,35 @@ export function NetworksFeed() {
                 <Card key={post.id} className="hover:shadow-md transition-shadow overflow-hidden">
                   <CardContent className="p-4">
                     <div className="flex items-start gap-3">
-                      <Avatar>
-                        <AvatarImage src={post.profiles?.avatar_url} />
-                        <AvatarFallback>
-                          {post.profiles?.first_name?.[0] || 'U'}
-                        </AvatarFallback>
-                      </Avatar>
+                      <Link href={`/profile?u=${post.user_id}`}>
+                        <Avatar className="cursor-pointer hover:ring-2 hover:ring-agribeta-green/20 transition-all">
+                          <AvatarImage src={post.profiles?.avatar_url} />
+                          <AvatarFallback>
+                            {post.profiles?.first_name?.[0] || 'U'}
+                          </AvatarFallback>
+                        </Avatar>
+                      </Link>
                       <div className="flex-1">
                         <div className="flex items-center justify-between mb-2">
                           <div className="flex items-center gap-2">
-                            <span className="font-semibold">
-                              {post.profiles?.first_name && post.profiles?.last_name 
-                                ? `${post.profiles.first_name} ${post.profiles.last_name}`
-                                : post.profiles?.first_name || post.profiles?.email || 'User'
-                              }
-                            </span>
+                            <Link href={`/profile?u=${post.user_id}`} className="hover:text-agribeta-green transition-colors">
+                              <span className="font-semibold cursor-pointer">
+                                {post.profiles?.first_name && post.profiles?.last_name 
+                                  ? `${post.profiles.first_name} ${post.profiles.last_name}`
+                                  : post.profiles?.first_name || post.profiles?.email || 'User'
+                                }
+                              </span>
+                            </Link>
                             {post.profiles?.is_verified && (
                               <Badge variant="secondary" className="text-xs">
                                 Verified
                               </Badge>
                             )}
-                            <Badge variant="outline" className="text-xs">
-                              {post.profiles?.role ? post.profiles.role.charAt(0).toUpperCase() + post.profiles.role.slice(1) : 'User'}
-                            </Badge>
+                            <Link href={`/profile?u=${post.user_id}`}>
+                              <Badge variant="outline" className="text-xs cursor-pointer hover:bg-agribeta-green/10 transition-colors">
+                                {post.profiles?.role ? post.profiles.role.charAt(0).toUpperCase() + post.profiles.role.slice(1) : 'User'}
+                              </Badge>
+                            </Link>
                             <span className="text-sm text-gray-500 dark:text-gray-400">
                               {formatTimeAgo(post.created_at)}
                             </span>
@@ -332,9 +338,9 @@ export function NetworksFeed() {
                                             alt={`Post media ${index + 1}`}
                                             width={500}
                                             height={300}
-                                            className="w-full h-auto max-w-full rounded-lg object-cover"
-                                            priority={index === 0}
+                                            className="w-full h-auto max-w-full rounded-lg"
                                             style={{ maxWidth: '100%', height: 'auto' }}
+                                            priority={index === 0}
                                           />
                                         )}
                                 </div>
@@ -367,13 +373,17 @@ export function NetworksFeed() {
             <CardContent className="space-y-4">
               {suggestions.map((s) => (
                 <div key={s.id} className="flex items-center gap-3">
-                  <Avatar className="h-10 w-10">
-                    <AvatarImage src={s.avatar_url} />
-                    <AvatarFallback>{(s.first_name || 'U')[0]}</AvatarFallback>
-                  </Avatar>
+                  <Link href={`/profile?u=${s.id}`}>
+                    <Avatar className="h-10 w-10 cursor-pointer hover:ring-2 hover:ring-agribeta-green/20 transition-all">
+                      <AvatarImage src={s.avatar_url} />
+                      <AvatarFallback>{(s.first_name || 'U')[0]}</AvatarFallback>
+                    </Avatar>
+                  </Link>
                   <div className="flex-1">
                     <div className="flex items-center gap-1">
-                      <span className="font-medium text-sm">{s.first_name} {s.last_name}</span>
+                      <Link href={`/profile?u=${s.id}`} className="hover:text-agribeta-green transition-colors">
+                        <span className="font-medium text-sm cursor-pointer">{s.first_name} {s.last_name}</span>
+                      </Link>
                       {s.is_verified && (
                         <Badge variant="secondary" className="text-xs">✓</Badge>
                       )}

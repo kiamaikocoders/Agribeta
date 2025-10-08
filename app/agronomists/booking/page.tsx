@@ -4,6 +4,7 @@ import { ProtectedRoute } from '@/components/auth/protected-route'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Textarea } from '@/components/ui/textarea'
@@ -78,6 +79,7 @@ export default function AgronomistBookingPage() {
             specializations: user.specializations || ['General Agriculture'],
             hourly_rate: user.consultation_fee || 100,
             consultation_fee: user.consultation_fee || 100,
+            avatar_url: user.avatar_url,
             bio: user.bio || 'Experienced agricultural consultant ready to help with your farming needs.',
             experience: user.years_experience || 5,
             location: user.location || 'Location not specified',
@@ -249,9 +251,12 @@ export default function AgronomistBookingPage() {
                   <Card key={agronomist.id} className="hover:shadow-lg transition-shadow cursor-pointer">
                     <CardHeader>
                       <div className="flex items-center gap-4">
-                        <div className="w-16 h-16 bg-gray-200 rounded-full flex items-center justify-center">
-                          <Users className="h-8 w-8 text-gray-600" />
-                        </div>
+                        <Avatar className="w-16 h-16">
+                          <AvatarImage src={agronomist.avatar_url} />
+                          <AvatarFallback className="bg-agribeta-green/10 text-agribeta-green">
+                            {agronomist.name.split(' ').map(n => n[0]).join('').toUpperCase()}
+                          </AvatarFallback>
+                        </Avatar>
                         <div className="flex-1">
                           <CardTitle className="text-lg">{agronomist.name}</CardTitle>
                           <CardDescription>{agronomist.title}</CardDescription>
@@ -426,9 +431,12 @@ export default function AgronomistBookingPage() {
                     <CardContent className="p-6">
                       <div className="space-y-4">
                         <div className="flex items-center gap-3">
-                          <div className="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center">
-                            <Users className="h-6 w-6 text-blue-600" />
-                          </div>
+                          <Avatar className="w-12 h-12">
+                            <AvatarImage src={selectedAgronomist.avatar_url} />
+                            <AvatarFallback className="bg-agribeta-green/10 text-agribeta-green">
+                              {selectedAgronomist.name.split(' ').map(n => n[0]).join('').toUpperCase()}
+                            </AvatarFallback>
+                          </Avatar>
                           <div>
                             <h4 className="font-medium">{selectedAgronomist.name}</h4>
                             <p className="text-sm text-muted-foreground">{selectedAgronomist.title}</p>

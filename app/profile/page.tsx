@@ -4,11 +4,16 @@ import { ProtectedRoute } from '@/components/auth/protected-route'
 import { useAuth } from '@/contexts/auth-context'
 import { PageBackground } from '@/components/page-background'
 import { EnhancedProfileEditor } from '@/components/profile/enhanced-profile-editor'
+import { PublicProfileView } from '@/components/profile/public-profile-view'
 import { FollowsProvider } from '@/contexts/follows-context'
 import { PostsProvider } from '@/contexts/posts-context'
+import { MessagingProvider } from '@/contexts/messaging-context'
+import { useSearchParams } from 'next/navigation'
 
 export default function ProfilePage() {
   const { user, profile, loading } = useAuth()
+  const searchParams = useSearchParams()
+  const targetUserId = searchParams.get('u')
 
   // Show loading while checking authentication
   if (loading) {
@@ -40,6 +45,26 @@ export default function ProfilePage() {
     )
   }
 
+  // If viewing another user's profile
+  if (targetUserId && targetUserId !== user?.id) {
+    return (
+      <ProtectedRoute>
+        <MessagingProvider>
+          <FollowsProvider>
+            <PostsProvider>
+            <PageBackground imageSrc="/greenhouse-robotics.png" opacity={0.1}>
+              <div className="container mx-auto px-4 py-8 max-w-7xl">
+                <PublicProfileView userId={targetUserId} />
+              </div>
+            </PageBackground>
+            </PostsProvider>
+          </FollowsProvider>
+        </MessagingProvider>
+      </ProtectedRoute>
+    )
+  }
+
+  // Default: show current user's profile editor
   return (
     <ProtectedRoute>
       <FollowsProvider>

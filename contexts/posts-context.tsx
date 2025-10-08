@@ -45,66 +45,57 @@ export function PostsProvider({ children }: { children: ReactNode }) {
     try {
       setLoading(true)
       
-      // For now, we'll use mock data since we don't have a posts table yet
-      // In a real implementation, you'd fetch from a posts table
-      const mockPosts: Post[] = [
-        {
-          id: '1',
-          content: "Just harvested my first batch of avocados! The quality is amazing. Thanks to AgriBeta for the irrigation tips that helped increase my yield by 30%! 🥑🌱",
-          author_id: user?.id || '',
-          created_at: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000).toISOString(),
-          updated_at: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000).toISOString(),
-          likes_count: 12,
-          comments_count: 3,
-          shares_count: 2,
-          images: ['/avocado-diseases-chart.png'],
-          is_liked: false,
-          author: {
-            first_name: profile?.first_name || 'User',
-            last_name: profile?.last_name || '',
-            avatar_url: profile?.avatar_url || '',
-            role: profile?.role || 'farmer'
-          }
-        },
-        {
-          id: '2',
-          content: "Facing some challenges with pest management in my greenhouse. Anyone have experience with aphids on tomato plants? Looking for organic solutions.",
-          author_id: user?.id || '',
-          created_at: new Date(Date.now() - 5 * 24 * 60 * 60 * 1000).toISOString(),
-          updated_at: new Date(Date.now() - 5 * 24 * 60 * 60 * 1000).toISOString(),
-          likes_count: 8,
-          comments_count: 7,
-          shares_count: 1,
-          is_liked: true,
-          author: {
-            first_name: profile?.first_name || 'User',
-            last_name: profile?.last_name || '',
-            avatar_url: profile?.avatar_url || '',
-            role: profile?.role || 'farmer'
-          }
-        },
-        {
-          id: '3',
-          content: "Great session with Dr. Sarah Johnson today! She helped me identify a nutrient deficiency in my soil. The recommendations were spot on and easy to implement.",
-          author_id: 'agronomist-1',
-          created_at: new Date(Date.now() - 1 * 24 * 60 * 60 * 1000).toISOString(),
-          updated_at: new Date(Date.now() - 1 * 24 * 60 * 60 * 1000).toISOString(),
-          likes_count: 15,
-          comments_count: 4,
-          shares_count: 3,
-          is_liked: false,
-          author: {
-            first_name: 'Sarah',
-            last_name: 'Johnson',
-            avatar_url: '',
-            role: 'agronomist'
-          }
-        }
-      ]
+      // Fetch real posts from the database
+      const { data: postsData, error } = await supabase
+        .from('posts')
+        .select(`
+          id,
+          user_id,
+          content,
+          media_urls,
+          created_at,
+          updated_at,
+          profiles!posts_user_id_fkey (
+            first_name,
+            last_name,
+            avatar_url,
+            role
+          )
+        `)
+        .order('created_at', { ascending: false })
+        .limit(50)
 
-      setPosts(mockPosts)
+      if (error) {
+        console.error('Error fetching posts:', error)
+        // Fallback to empty array if there's an error
+        setPosts([])
+        return
+      }
+
+      // Transform the data to match our Post interface
+      const transformedPosts: Post[] = (postsData || []).map(post => ({
+        id: post.id,
+        content: post.content,
+        author_id: post.user_id,
+        created_at: post.created_at,
+        updated_at: post.updated_at,
+        likes_count: 0, // TODO: Implement likes functionality
+        comments_count: 0, // TODO: Implement comments functionality
+        shares_count: 0, // TODO: Implement shares functionality
+        images: post.media_urls || [],
+        is_liked: false, // TODO: Check if current user liked this post
+        author: {
+          first_name: post.profiles?.first_name || 'Unknown',
+          last_name: post.profiles?.last_name || '',
+          avatar_url: post.profiles?.avatar_url || '',
+          role: post.profiles?.role || 'user'
+        }
+      }))
+
+      setPosts(transformedPosts)
     } catch (error) {
       console.error('Error fetching posts:', error)
+      setPosts([])
     } finally {
       setLoading(false)
     }
@@ -114,27 +105,29 @@ export function PostsProvider({ children }: { children: ReactNode }) {
     if (!user || !profile) return
 
     try {
-      // In a real implementation, you'd save to a posts table
-      const newPost: Post = {
-        id: Date.now().toString(),
-        content,
-        author_id: user.id,
-        created_at: new Date().toISOString(),
-        updated_at: new Date().toISOString(),
-        likes_count: 0,
-        comments_count: 0,
-        shares_count: 0,
-        images: images?.map((_, index) => `/uploaded-image-${index}.jpg`), // Mock image URLs
-        is_liked: false,
-        author: {
-          first_name: profile.first_name || 'User',
-          last_name: profile.last_name || '',
-          avatar_url: profile.avatar_url || '',
-          role: profile.role || 'farmer'
-        }
+      // Save to the database
+      const { data, error } = await supabase
+        .from('posts')
+        .insert({
+          user_id: user.id,
+          content,
+          media_urls: images ? images.map((_, index) => `/uploaded-image-${index}.jpg`) : null
+        })
+        .select()
+        .single()
+
+      if (error) {
+        console.error('Error creating post:', error)
+        toast({
+          title: 'Error',
+          description: 'Failed to create post. Please try again.',
+          variant: 'destructive'
+        })
+        return
       }
 
-      setPosts(prev => [newPost, ...prev])
+      // Refresh posts to show the new post
+      await fetchPosts()
       
       toast({
         title: 'Post created',

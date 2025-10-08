@@ -79,14 +79,18 @@ export function NetworkingCard({ user }: NetworkingCardProps) {
     <Card className="hover:shadow-lg transition-shadow">
       <CardHeader className="text-center">
         <div className="flex justify-center mb-4">
-          <Avatar className="h-20 w-20">
-            <AvatarImage src={user.avatar_url || "/placeholder-user.jpg"} alt={`${user.first_name} ${user.last_name}`} />
-            <AvatarFallback className="text-xl">
-              {user.first_name?.[0]}{user.last_name?.[0]}
-            </AvatarFallback>
-          </Avatar>
+          <Link href={`/profile?u=${user.id}`}>
+            <Avatar className="h-20 w-20 cursor-pointer hover:ring-2 hover:ring-agribeta-green/20 transition-all">
+              <AvatarImage src={user.avatar_url || "/placeholder-user.jpg"} alt={`${user.first_name} ${user.last_name}`} />
+              <AvatarFallback className="text-xl">
+                {user.first_name?.[0]}{user.last_name?.[0]}
+              </AvatarFallback>
+            </Avatar>
+          </Link>
         </div>
-        <CardTitle className="text-lg">{user.first_name} {user.last_name}</CardTitle>
+        <Link href={`/profile?u=${user.id}`} className="hover:text-agribeta-green transition-colors">
+          <CardTitle className="text-lg cursor-pointer">{user.first_name} {user.last_name}</CardTitle>
+        </Link>
         
         {isAgronomist ? (
           <CardDescription>
@@ -153,6 +157,17 @@ export function NetworkingCard({ user }: NetworkingCardProps) {
 
         {/* Action Buttons */}
         <div className="flex gap-2">
+          <Button 
+            variant="outline" 
+            className="flex-1"
+            asChild
+          >
+            <Link href={`/profile?u=${user.id}`}>
+              <User className="mr-2 h-4 w-4" />
+              View
+            </Link>
+          </Button>
+          
           <FollowConnectButton 
             targetUserId={user.id} 
             targetUserRole={user.role} 

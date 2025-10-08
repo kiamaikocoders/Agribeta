@@ -17,7 +17,10 @@ import {
   Calendar,
   ThumbsUp,
   Reply,
-  Trash2
+  Trash2,
+  Bookmark,
+  Flag,
+  MoreHorizontal
 } from 'lucide-react'
 import { toast } from '@/components/ui/use-toast'
 import { formatDistanceToNow } from 'date-fns'
@@ -188,41 +191,41 @@ export function ProfilePosts({ userId }: ProfilePostsProps) {
       ) : (
         <div className="space-y-6">
           {userPosts.map((post) => (
-            <div key={post.id} className="bg-white border rounded-lg p-6 space-y-4">
+            <div key={post.id} className="bg-white rounded-2xl shadow-lg overflow-hidden hover:shadow-xl transition-shadow duration-300">
               {/* Post Header */}
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-3">
-                  <Avatar className="h-10 w-10">
-                    <AvatarImage src={post.author.avatar_url} />
-                    <AvatarFallback>
-                      {post.author.first_name[0]}
-                    </AvatarFallback>
-                  </Avatar>
-                  <div>
-                    <div className="flex items-center gap-2">
-                      <p className="font-medium text-gray-900 dark:text-white">
-                        {post.author.first_name} {post.author.last_name}
-                      </p>
-                      <Badge 
-                        variant="secondary" 
-                        className={`text-xs ${
-                          post.author.role === 'farmer' 
-                            ? 'bg-green-100 text-green-800' 
-                            : 'bg-blue-100 text-blue-800'
-                        }`}
-                      >
-                        {post.author.role}
-                      </Badge>
-                    </div>
-                    <div className="flex items-center gap-1 text-sm text-gray-500 dark:text-gray-400">
-                      <Calendar className="h-3 w-3" />
-                      {formatTimeAgo(post.created_at)}
+              <div className="p-4 pb-2">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-3">
+                    <Avatar className="h-10 w-10">
+                      <AvatarImage src={post.author.avatar_url} />
+                      <AvatarFallback className="bg-gradient-to-br from-agribeta-green to-green-600 text-white text-sm">
+                        {post.author.first_name[0]}
+                      </AvatarFallback>
+                    </Avatar>
+                    <div>
+                      <div className="flex items-center gap-2">
+                        <p className="font-semibold text-gray-900">
+                          {post.author.first_name} {post.author.last_name}
+                        </p>
+                        <Badge 
+                          variant="secondary" 
+                          className={`text-xs font-medium ${
+                            post.author.role === 'farmer' 
+                              ? 'bg-green-100 text-green-800' 
+                              : 'bg-blue-100 text-blue-800'
+                          }`}
+                        >
+                          {post.author.role}
+                        </Badge>
+                      </div>
+                      <div className="flex items-center gap-1 text-sm text-gray-500">
+                        <Calendar className="h-3 w-3" />
+                        {formatTimeAgo(post.created_at)}
+                      </div>
                     </div>
                   </div>
-                </div>
-                
-                {isOwnProfile && (
-                  <div className="flex gap-1">
+                  
+                  {isOwnProfile && (
                     <Button 
                       variant="ghost" 
                       size="sm"
@@ -231,52 +234,96 @@ export function ProfilePosts({ userId }: ProfilePostsProps) {
                     >
                       <Trash2 className="h-4 w-4" />
                     </Button>
-                  </div>
-                )}
+                  )}
+                </div>
               </div>
 
               {/* Post Content */}
-              <div className="space-y-3">
-                <p className="text-gray-900 dark:text-gray-200 whitespace-pre-wrap">{post.content}</p>
-                
-                {/* Post Images */}
-                {post.images && post.images.length > 0 && (
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
-                    {post.images.map((image, index) => (
+              <div className="px-4 pb-2">
+                <p className="text-gray-800 leading-relaxed whitespace-pre-wrap">{post.content}</p>
+              </div>
+              
+              {/* Post Images - Full Width */}
+              {post.images && post.images.length > 0 && (
+                <div className="mt-2">
+                  {post.images.map((image, index) => (
+                    <div key={index} className="relative">
                       <img
-                        key={index}
                         src={image}
                         alt={`Post image ${index + 1}`}
-                        className="rounded-lg object-cover w-full h-48"
+                        className="w-full h-auto"
+                        style={{ maxWidth: '100%', height: 'auto' }}
                       />
-                    ))}
-                  </div>
-                )}
-              </div>
+                    </div>
+                  ))}
+                </div>
+              )}
 
               {/* Post Actions */}
-              <div className="flex items-center gap-6 pt-4 border-t">
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  onClick={() => handleLikePost(post.id)}
-                  className={`flex items-center gap-2 ${
-                    post.is_liked ? 'text-red-500' : 'text-gray-500 dark:text-gray-400'
-                  }`}
-                >
-                  <Heart className={`h-4 w-4 ${post.is_liked ? 'fill-current' : ''}`} />
-                  {post.likes_count}
-                </Button>
-                
-                <Button variant="ghost" size="sm" className="flex items-center gap-2 text-gray-500 dark:text-gray-400">
-                  <Reply className="h-4 w-4" />
-                  {post.comments_count}
-                </Button>
-                
-                <Button variant="ghost" size="sm" className="flex items-center gap-2 text-gray-500 dark:text-gray-400">
-                  <Share2 className="h-4 w-4" />
-                  {post.shares_count}
-                </Button>
+              <div className="p-4 pt-3">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-6">
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => handleLikePost(post.id)}
+                      className={`flex items-center gap-2 hover:text-red-500 transition-colors ${
+                        post.is_liked ? 'text-red-500' : 'text-gray-500'
+                      }`}
+                    >
+                      <Heart className={`h-4 w-4 ${post.is_liked ? 'fill-current' : ''}`} />
+                      <span className="text-sm font-medium">{post.likes_count}</span>
+                    </Button>
+                    
+                    <Button 
+                      variant="ghost" 
+                      size="sm" 
+                      className="flex items-center gap-2 text-gray-500 hover:text-blue-500 transition-colors"
+                    >
+                      <MessageCircle className="h-4 w-4" />
+                      <span className="text-sm font-medium">{post.comments_count}</span>
+                    </Button>
+                    
+                    <Button 
+                      variant="ghost" 
+                      size="sm" 
+                      className="flex items-center gap-2 text-gray-500 hover:text-green-500 transition-colors"
+                    >
+                      <Share2 className="h-4 w-4" />
+                      <span className="text-sm font-medium">{post.shares_count}</span>
+                    </Button>
+                    
+                    <Button 
+                      variant="ghost" 
+                      size="sm" 
+                      className="flex items-center gap-2 text-gray-500 hover:text-yellow-500 transition-colors"
+                    >
+                      <Bookmark className="h-4 w-4" />
+                      <span className="text-sm font-medium">Save</span>
+                    </Button>
+                  </div>
+                  
+                  <div className="flex items-center gap-2">
+                    {!isOwnProfile && (
+                      <Button 
+                        variant="ghost" 
+                        size="sm" 
+                        className="flex items-center gap-2 text-gray-400 hover:text-red-500 transition-colors"
+                      >
+                        <Flag className="h-4 w-4" />
+                        <span className="text-sm">Report</span>
+                      </Button>
+                    )}
+                    
+                    <Button 
+                      variant="ghost" 
+                      size="sm" 
+                      className="text-gray-400 hover:text-gray-600 transition-colors"
+                    >
+                      <MoreHorizontal className="h-4 w-4" />
+                    </Button>
+                  </div>
+                </div>
               </div>
             </div>
           ))}
