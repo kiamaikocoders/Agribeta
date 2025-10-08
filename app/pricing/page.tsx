@@ -143,25 +143,25 @@ export default function PricingPage() {
                         {plan.icon}
                       </div>
                       <CardTitle className="text-2xl font-bold">{plan.name}</CardTitle>
-                      <CardDescription className="text-gray-600 mb-4">
+                      <CardDescription className="text-gray-300 mb-4">
                         {plan.description}
                       </CardDescription>
                       <div className="flex items-baseline justify-center">
-                        <span className="text-4xl font-bold text-gray-900">
+                        <span className="text-4xl font-bold text-white">
                           ${plan.price}
                         </span>
-                        <span className="text-gray-500 ml-1">/{plan.period}</span>
+                        <span className="text-gray-300 ml-1">/{plan.period}</span>
                       </div>
                     </CardHeader>
 
                     <CardContent className="space-y-6">
                       {/* Features */}
                       <div className="space-y-3">
-                        <h4 className="font-semibold text-gray-900">What's included:</h4>
+                        <h4 className="font-semibold text-white">What's included:</h4>
                         {plan.features.map((feature, index) => (
                           <div key={index} className="flex items-start gap-3">
-                            <Check className="h-5 w-5 text-green-500 mt-0.5 flex-shrink-0" />
-                            <span className="text-gray-700 text-sm">{feature}</span>
+                            <Check className="h-5 w-5 text-green-400 mt-0.5 flex-shrink-0" />
+                            <span className="text-gray-200 text-sm">{feature}</span>
                           </div>
                         ))}
                       </div>
@@ -169,11 +169,11 @@ export default function PricingPage() {
                       {/* Limitations */}
                       {plan.limitations.length > 0 && (
                         <div className="space-y-3">
-                          <h4 className="font-semibold text-gray-900">Limitations:</h4>
+                          <h4 className="font-semibold text-white">Limitations:</h4>
                           {plan.limitations.map((limitation, index) => (
                             <div key={index} className="flex items-start gap-3">
-                              <X className="h-5 w-5 text-red-500 mt-0.5 flex-shrink-0" />
-                              <span className="text-gray-500 text-sm">{limitation}</span>
+                              <X className="h-5 w-5 text-red-400 mt-0.5 flex-shrink-0" />
+                              <span className="text-red-300 text-sm">{limitation}</span>
                             </div>
                           ))}
                         </div>
@@ -181,7 +181,7 @@ export default function PricingPage() {
 
                       {/* CTA Button */}
                       <Button 
-                        className={`w-full ${plan.popular ? 'bg-agribeta-green hover:bg-agribeta-green/90' : ''}`}
+                        className={`w-full ${plan.popular ? 'bg-agribeta-green hover:bg-agribeta-green/90 text-white' : 'text-white'}`}
                         variant={plan.buttonVariant}
                         onClick={() => handlePlanSelect(plan.id)}
                       >
@@ -217,25 +217,25 @@ export default function PricingPage() {
                     {plan.icon}
                   </div>
                   <CardTitle className="text-2xl font-bold">{plan.name}</CardTitle>
-                  <CardDescription className="text-gray-600 mb-4">
+                  <CardDescription className="text-gray-300 mb-4">
                     {plan.description}
                   </CardDescription>
                   <div className="flex items-baseline justify-center">
-                    <span className="text-4xl font-bold text-gray-900">
+                    <span className="text-4xl font-bold text-white">
                       ${plan.price}
                     </span>
-                    <span className="text-gray-500 ml-1">/{plan.period}</span>
+                    <span className="text-gray-300 ml-1">/{plan.period}</span>
                   </div>
                 </CardHeader>
 
                 <CardContent className="space-y-6">
                   {/* Features */}
                   <div className="space-y-3">
-                    <h4 className="font-semibold text-gray-900">What's included:</h4>
+                    <h4 className="font-semibold text-white">What's included:</h4>
                     {plan.features.map((feature, index) => (
                       <div key={index} className="flex items-start gap-3">
-                        <Check className="h-5 w-5 text-green-500 mt-0.5 flex-shrink-0" />
-                        <span className="text-gray-700">{feature}</span>
+                        <Check className="h-5 w-5 text-green-400 mt-0.5 flex-shrink-0" />
+                        <span className="text-gray-200">{feature}</span>
                       </div>
                     ))}
                   </div>
@@ -243,11 +243,11 @@ export default function PricingPage() {
                   {/* Limitations */}
                   {plan.limitations.length > 0 && (
                     <div className="space-y-3">
-                      <h4 className="font-semibold text-gray-900">Limitations:</h4>
+                      <h4 className="font-semibold text-white">Limitations:</h4>
                       {plan.limitations.map((limitation, index) => (
                         <div key={index} className="flex items-start gap-3">
-                          <X className="h-5 w-5 text-red-500 mt-0.5 flex-shrink-0" />
-                          <span className="text-gray-500">{limitation}</span>
+                          <X className="h-5 w-5 text-red-400 mt-0.5 flex-shrink-0" />
+                          <span className="text-red-300">{limitation}</span>
                         </div>
                       ))}
                     </div>
@@ -255,7 +255,7 @@ export default function PricingPage() {
 
                   {/* CTA Button */}
                   <Button 
-                    className={`w-full ${plan.popular ? 'bg-agribeta-green hover:bg-agribeta-green/90' : ''}`}
+                    className={`w-full ${plan.popular ? 'bg-agribeta-green hover:bg-agribeta-green/90 text-white' : 'text-white'}`}
                     variant={plan.buttonVariant}
                     onClick={() => handlePlanSelect(plan.id)}
                   >
